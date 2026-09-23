@@ -1,0 +1,31 @@
+{
+  "name": "slash-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "test": "node scripts/test-webllm-summary.mjs",
+    "test:auth": "node scripts/test-auth-session.mjs",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@microsoft/clarity": "^1.0.2",
+    "@mlc-ai/web-llm": "^0.2.84",
+    "lucide-react": "^1.27.0",
+    "oidc-client-ts": "^3.5.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router": "^8.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
+  }
+}

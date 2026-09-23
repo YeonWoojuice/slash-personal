@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: slash-postgres
+    environment:
+      POSTGRES_DB: slash
+      POSTGRES_USER: slash
+      POSTGRES_PASSWORD: slash
+      # 프로젝트 시각 기준은 한국 시각이다. (메시지 프로토콜 정의 3.5)
+      # 앱은 JDBC Session 에서도 Asia/Seoul 을 걸지만, psql·관리 도구로 직접
+      # 조회할 때도 별도 변환 없이 한국 시각으로 보이도록 서버 기본값을 맞춘다.
+      TZ: Asia/Seoul
+    # PostgreSQL 서버 기본 시간대를 명시한다.
+    # TZ 환경변수만으로는 서버 GUC 가 바뀌지 않는다.
+    command: ["postgres", "-c", "timezone=Asia/Seoul"]
+    ports:
+      - "5432:5432"
+    volumes:
+      - slash-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slash -d slash"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: slash-valkey
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  slash-pgdata:

@@ -1,0 +1,40 @@
+# slash-api가 클러스터 내부 DNS(slash-nlu.<namespace>.svc.cluster.local)로만 호출한다 —
+# 외부 노출 없음, Ingress 자체가 없다.
+# repository는 정적 값이다 — slash-api/values.yaml과 같은 이유(§11, §13 TODO 참고).
+image:
+  repository: 061039804626.dkr.ecr.ap-northeast-2.amazonaws.com/slash-nlu
+  tag: "" # values-<env>.yaml에서 반드시 채운다
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+
+serviceAccount:
+  roleArn: ""
+
+service:
+  port: 80
+  targetPort: 8001
+
+env: {}
+
+# /health 하나로 liveness/readiness를 겸한다(slash-nlu는 별도 readiness 엔드포인트가
+# 없음). Kiwi 형태소 사전 로딩 때문에 기동이 느릴 수 있어 initialDelay를 넉넉히 둔다.
+probes:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 3
+
+# Kiwi 형태소 사전을 메모리에 올려서 api/llm과 같은 128Mi/256Mi로는 OOMKilled(2026-08-13
+# dev 배포 검증 중 실측). §13 TODO였던 "slash-nlu 컴퓨트 요구사항 미확정"이 실제로
+# 터진 것 — 정확한 최소값은 아직 안 재봤고, 우선 넉넉히 올려서 기동만 확인한다.
+resources:
+  requests:
+    cpu: 200m
+    memory: 384Mi
+  limits:
+    memory: 768Mi

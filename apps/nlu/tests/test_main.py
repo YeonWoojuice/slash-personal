@@ -1,0 +1,912 @@
+import json
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+
+from main import app
+
+
+FIXTURES = json.loads((Path(__file__).parent / "fixtures" / "analyze_cases.json").read_text(encoding="utf-8"))
+
+
+@pytest.fixture()
+def client():
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+def post(client: TestClient, payload: dict):
+    return client.post("/internal/v1/nlu/analyze", json=payload)
+
+
+@pytest.mark.parametrize("case", FIXTURES, ids=lambda case: case["name"])
+def test_contract_fixtures(client: TestClient, case: dict):
+    response = post(client, case["request"])
+    assert response.status_code == 200
+    body = response.json()
+    for key, value in case["expected"].items():
+        assert body[key] == value
+    assert body["requestId"] == case["request"]["requestId"]
+    assert 0 <= body["confidence"] <= 1
+    assert "processingRoute" not in body
+
+
+@pytest.mark.parametrize(
+    ("path", "operands", "task_type", "parameters"),
+    [
+        (["file"], ["report.pdf"], "FILE_SEARCH", {"query": "report.pdf"}),
+        (["open"], ["opaque-file-ref"], "FILE_OPEN", {"fileRef": "opaque-file-ref"}),
+        (["status_com"], [], "SYSTEM_STATUS", {}),
+        (["날씨"], ["부산"], "WEATHER_LOOKUP", {"location": "부산"}),
+        (["summary"], ["가" * 150], "TEXT_SUMMARY", {"text": "가" * 150}),
+        (["code"], ["이", "프로젝트", "분석해줘"], "CODE_ANALYSIS", {"query": "이 프로젝트 분석해줘"}),
+        (["usage"], ["claude-code"], "AI_AGENT_USAGE", {"provider": "CLAUDE_CODE"}),
+    ],
+)
+def test_all_slash_tasks(client, path, operands, task_type, parameters):
+    body = post(client, {"requestId": "req-slash", "command": {"path": path, "operands": operands}}).json()
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == task_type
+    assert body["parameters"] == parameters
+    assert body["missingRequiredParameters"] == []
+    assert body["analyzer"] == "SLASH"
+
+
+@pytest.mark.parametrize(
+    ("path", "missing"),
+    [
+        (["파일"], ["query"]),
+        (["열기"], ["fileRef"]),
+        (["날씨"], ["location"]),
+        (["요약"], ["text"]),
+        (["코드"], ["query"]),
+        (["사용량"], ["provider"]),
+    ],
+)
+def test_slash_missing_parameters_clarifies(client, path, missing):
+    body = post(client, {"requestId": "req-missing", "command": {"path": path, "operands": []}}).json()
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] is not None
+    assert body["missingRequiredParameters"] == missing
+    assert body["question"]
+
+
+@pytest.mark.parametrize(
+    ("path", "question"),
+    [
+        (["파일"], "어떤 파일을 찾을까요? 파일명이나 문서 종류를 입력해 주세요."),
+        (["열기"], "열 파일을 검색 결과에서 선택해 주세요."),
+        (["날씨"], "어느 지역의 날씨를 확인할까요? 지역명을 입력해 주세요."),
+        (["요약"], "요약할 내용을 공백 제외 150자 이상 입력해 주세요."),
+        (["코드"], "코드에서 무엇을 분석할까요? 분석할 내용을 입력해 주세요."),
+        (
+            ["사용량"],
+            "Claude Code와 Codex 중 어떤 사용량을 확인할까요? 확인할 대상을 선택해 주세요.",
+        ),
+    ],
+)
+def test_clarification_questions_tell_the_user_what_to_enter(client, path, question):
+    body = post(
+        client,
+        {"requestId": "req-question-copy", "command": {"path": path, "operands": []}},
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["question"] == question
+
+
+def test_unsupported_input_does_not_invent_a_clarification_question(client):
+    body = post(client, {"requestId": "req-question-unsupported", "text": "메일 보내줘"}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["question"] is None
+
+
+@pytest.mark.parametrize(("text", "task_type"), [("서울 날씨 알려줘", "WEATHER_LOOKUP"), ("회의록 파일 찾아줘", "FILE_SEARCH"), ("회의록 찾아줘", "FILE_SEARCH"), ("작년 견적서 찾아줘", "FILE_SEARCH"), ("컴퓨터 상태 알려줘", "SYSTEM_STATUS"), ("요약: " + ("가" * 150), "TEXT_SUMMARY")])
+def test_natural_language_tasks(client, text, task_type):
+    body = post(client, {"requestId": "req-natural", "text": text}).json()
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == task_type
+    assert body["analyzer"] == "RULE_KIWI"
+
+
+@pytest.mark.parametrize(
+    ("text", "location"),
+    [
+        ("오늘 서울 날씨 어때?", "서울"),
+        ("서울 기온 알려줘", "서울"),
+        ("서울 기온이 궁금해", "서울"),
+        ("서울 온도 알려줘", "서울"),
+        ("서울 날씨 알려주세요", "서울"),
+        ("서울 날씨 어떤가요", "서울"),
+        ("서울 날씨 좀 알려줘", "서울"),
+        ("서울 날씨 말해 주세요", "서울"),
+        ("서울 날씨 알려줄래", "서울"),
+        ("서울 weather", "서울"),
+        ("weather 서울", "서울"),
+        ("weather 서울 알려줘", "서울"),
+    ],
+)
+def test_weather_expressions_extract_only_the_location(client, text, location):
+    body = post(client, {"requestId": "req-weather-expression", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+@pytest.mark.parametrize(
+    ("text", "location"),
+    [
+        ("서울 비 와?", "서울"),
+        ("서울에 비 와?", "서울"),
+        ("서울에도 비 와?", "서울"),
+        ("서울도 비 와?", "서울"),
+        ("서울은 비 와?", "서울"),
+        ("서울 비가 안 와?", "서울"),
+        ("서울 비 와요?", "서울"),
+        ("서울 눈 오나요?", "서울"),
+        ("서울 눈이 내려요?", "서울"),
+        ("서울 강수량 알려줘", "서울"),
+        ("서울 습도 어때?", "서울"),
+        ("서울 바람 많이 불어?", "서울"),
+        ("서울에서 바람 많이 불어?", "서울"),
+        ("서울 풍속 확인해 주세요", "서울"),
+        ("서울 체감온도 알려줘", "서울"),
+        ("서울 체감온도 몇 도야?", "서울"),
+        ("서울 체감 온도 몇 도야?", "서울"),
+        ("지금 서울 몇 도야?", "서울"),
+        ("습도 서울 알려줘", "서울"),
+        ("제주도 비 와?", "제주도"),
+        ("경기도 광주시에는 비 와?", "광주시"),
+    ],
+)
+def test_weather_detail_questions_extract_the_location(client, text, location):
+    body = post(client, {"requestId": "req-weather-detail", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+@pytest.mark.parametrize("text", ["비 와?", "습도 알려줘", "지금 몇 도야?"])
+def test_weather_detail_questions_without_location_clarify(client, text):
+    body = post(client, {"requestId": "req-weather-detail-missing", "text": text}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+@pytest.mark.parametrize("text", ["서울 미세먼지 어때?", "서울 자외선 알려줘"])
+@pytest.mark.parametrize("input_kind", ["text", "command"])
+def test_unsupported_weather_metrics_remain_unsupported(client, text, input_kind):
+    payload = {"text": text}
+    if input_kind == "command":
+        payload = {"command": {"path": ["날씨"], "operands": [text]}}
+
+    body = post(client, {"requestId": "req-weather-detail-unsupported", **payload}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "내일 서울 비 와?",
+        "서울 비 올까?",
+        "내일습도 알려줘",
+        "주말습도 알려줘",
+        "내일바람 많이 불어?",
+    ],
+)
+@pytest.mark.parametrize("input_kind", ["text", "command"])
+def test_weather_detail_forecast_questions_remain_unsupported(client, text, input_kind):
+    payload = {"text": text}
+    if input_kind == "command":
+        payload = {"command": {"path": ["날씨"], "operands": [text]}}
+
+    body = post(client, {"requestId": "req-weather-detail-forecast", **payload}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    ("operand", "location"),
+    [
+        ("서울 비 와?", "서울"),
+        ("서울 눈 오나요?", "서울"),
+        ("서울 습도 어때?", "서울"),
+        ("서울 바람 많이 불어?", "서울"),
+        ("서울 체감온도 몇 도야?", "서울"),
+    ],
+)
+def test_weather_detail_question_in_slash_operands_uses_the_same_cleanup(
+    client, operand, location
+):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-detail-slash",
+            "command": {"path": ["날씨"], "operands": [operand]},
+        },
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["준비 와?", "나비가 안 와?", "습도 높은 날이야", "바람 좋은 곳 추천해줘", "온도계 추천해줘"],
+)
+def test_weather_detail_words_inside_unrelated_requests_remain_unsupported(client, text):
+    body = post(client, {"requestId": "req-weather-detail-false-positive", "text": text}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize("input_kind", ["text", "command"])
+def test_weather_detail_multiple_locations_clarify(client, input_kind):
+    text = "서울과 부산 비 와?"
+    payload = {"text": text}
+    if input_kind == "command":
+        payload = {"command": {"path": ["날씨"], "operands": [text]}}
+
+    body = post(client, {"requestId": "req-weather-detail-multiple", **payload}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "서울 부산 날씨 어때",
+        "서울이랑 부산 날씨 어때",
+        "서울과 부산 날씨 알려줘",
+        "서울, 부산 날씨 알려줘",
+        "서울·부산 날씨 알려줘",
+        "서울 & 부산 날씨 알려줘",
+        "서울 그리고 부산 날씨 알려줘",
+        "서울 또는 부산 날씨 알려줘",
+    ],
+)
+def test_weather_with_multiple_locations_clarifies(client, text):
+    body = post(client, {"requestId": "req-weather-multiple", "text": text}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+    assert body["question"] == "어느 지역의 날씨를 확인할까요? 지역명을 입력해 주세요."
+
+
+@pytest.mark.parametrize(
+    ("text", "location"),
+    [
+        ("서울 강남구 날씨 어때", "서울 강남구"),
+        ("경기도 수원시 날씨 알려줘", "수원시"),
+        ("강원도 강릉 날씨 알려줘", "강릉"),
+        ("충청남도 천안 날씨 알려줘", "천안"),
+        ("경기도 광주 날씨 알려줘", "경기도 광주"),
+        ("경기 광주 날씨 알려줘", "경기도 광주"),
+        ("경기광주 날씨 알려줘", "경기도 광주"),
+        ("전라도 광주 날씨 알려줘", "광주"),
+        ("전라도광주 날씨 알려줘", "광주"),
+        ("경상도 안동 날씨 알려줘", "안동"),
+    ],
+)
+def test_weather_with_multiword_single_location_remains_a_task(client, text, location):
+    body = post(client, {"requestId": "req-weather-multiword", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+def test_nonexistent_province_qualified_gwangju_clarifies(client):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-ambiguous-province",
+            "text": "충청남도 광주 날씨 알려줘",
+            "now": "2026-08-26T15:00:00+09:00",
+        },
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+@pytest.mark.parametrize(
+    ("payload", "location"),
+    [
+        ({"text": "경기도 광주시 8/26날씨"}, "광주시"),
+        ({"text": "경기도 광주시 8월 26일 날씨"}, "광주시"),
+        ({"command": {"path": ["날씨"], "operands": ["경기도 광주시 8/26날씨"]}}, "광주시"),
+        ({"command": {"path": ["날씨"], "operands": ["경기도 광주시"]}}, "광주시"),
+    ],
+)
+def test_weather_current_date_and_province_city_are_normalized(client, payload, location):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-current-date",
+            "now": "2026-08-26T10:00:00+09:00",
+            **payload,
+        },
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+@pytest.mark.parametrize(
+    "weather_text",
+    [
+        "경기도 광주시 8/27날씨",
+        "경기도 광주시 2025-08-26 날씨",
+        "경기도 광주시 13/40 날씨",
+    ],
+)
+def test_weather_non_current_or_invalid_date_is_unsupported(client, weather_text):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-unsupported-date",
+            "now": "2026-08-26T10:00:00+09:00",
+            "command": {"path": ["날씨"], "operands": [weather_text]},
+        },
+    ).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+    assert body["parameters"] == {}
+
+
+@pytest.mark.parametrize(
+    "weather_text",
+    [
+        "내일 서울 날씨 알려줘",
+        "내일은 서울 날씨 알려줘",
+        "모레 부산 기온 알려줘",
+        "이번 주 서울 날씨 알려줘",
+        "다음주말 서울 날씨 알려줘",
+        "다음 월요일 대전 날씨 알려줘",
+        "서울 최고기온 알려줘",
+        "서울 최저 온도 알려줘",
+    ],
+)
+@pytest.mark.parametrize("input_kind", ["text", "command"])
+def test_weather_forecast_requests_are_unsupported(client, weather_text, input_kind):
+    payload = {"text": weather_text}
+    if input_kind == "command":
+        payload = {"command": {"path": ["날씨"], "operands": [weather_text]}}
+
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-unsupported-forecast",
+            "now": "2026-08-26T10:00:00+09:00",
+            **payload,
+        },
+    ).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+    assert body["parameters"] == {}
+
+
+@pytest.mark.parametrize(
+    ("path", "operands", "location"),
+    [
+        (["weather"], ["서울 날씨 어때?"], "서울"),
+        (["날씨"], ["서울 기온 알려줘"], "서울"),
+        (["weather"], ["weather 서울"], "서울"),
+        (["weather"], ["weather 서울 알려줘"], "서울"),
+        (["날씨"], ["오늘 서울 날씨 확인해줘"], "서울"),
+    ],
+)
+def test_weather_slash_operands_use_the_same_location_cleanup_as_natural_language(
+    client, path, operands, location
+):
+    body = post(
+        client,
+        {"requestId": "req-weather-slash-expression", "command": {"path": path, "operands": operands}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {"location": location}
+
+
+def test_weather_slash_with_multiple_locations_clarifies(client):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-slash-multiple",
+            "command": {"path": ["날씨"], "operands": ["서울이랑 부산"]},
+        },
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["기온 알려줘", "날씨 알려줘", "기온이 궁금해", "날씨가 궁금해요"],
+)
+def test_weather_without_location_clarifies(client, text):
+    body = post(client, {"requestId": "req-weather-missing", "text": text}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+def test_weather_slash_without_location_clarifies_after_cleanup(client):
+    body = post(
+        client,
+        {
+            "requestId": "req-weather-slash-missing",
+            "command": {"path": ["weather"], "operands": ["날씨 알려줘"]},
+        },
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "WEATHER_LOOKUP"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["location"]
+
+
+def test_misspelled_weather_slash_command_is_unsupported(client):
+    body = post(client, {"requestId": "req-weather-typo", "text": "/weathr 서울"}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    ("operands", "provider"),
+    [
+        (["CLAUDE_CODE"], "CLAUDE_CODE"),
+        (["claude-code"], "CLAUDE_CODE"),
+        (["claude", "code"], "CLAUDE_CODE"),
+        (["claude"], "CLAUDE_CODE"),
+        (["클로드"], "CLAUDE_CODE"),
+        (["CODEX"], "CODEX"),
+        (["코덱스"], "CODEX"),
+    ],
+)
+def test_usage_provider_aliases_are_normalized(client, operands, provider):
+    body = post(
+        client,
+        {"requestId": "req-usage-provider", "command": {"path": ["usage"], "operands": operands}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "AI_AGENT_USAGE"
+    assert body["parameters"] == {"provider": provider}
+
+
+def test_unknown_usage_provider_clarifies_without_guessing(client):
+    body = post(
+        client,
+        {"requestId": "req-usage-unknown", "command": {"path": ["usage"], "operands": ["gpt"]}},
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "AI_AGENT_USAGE"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["provider"]
+
+
+def test_file_open_preserves_opaque_reference(client):
+    file_ref = "f62dfe8a-8525-4ba9-a0b5-7f6d70ebfedd"
+    body = post(
+        client,
+        {"requestId": "req-file-open", "command": {"path": ["open"], "operands": [file_ref]}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_OPEN"
+    assert body["parameters"] == {"fileRef": file_ref}
+
+
+def test_file_open_rejects_more_than_one_reference_token(client):
+    body = post(
+        client,
+        {"requestId": "req-file-open-invalid", "command": {"path": ["open"], "operands": ["ref-a", "ref-b"]}},
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "FILE_OPEN"
+    assert body["parameters"] == {}
+    assert body["missingRequiredParameters"] == ["fileRef"]
+
+
+def test_code_analysis_returns_query_but_not_backend_workspace_id(client):
+    body = post(
+        client,
+        {
+            "requestId": "req-code-analysis",
+            "command": {"path": ["code"], "operands": ["이", "프로젝트", "분석해줘"]},
+        },
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "CODE_ANALYSIS"
+    assert body["parameters"] == {"query": "이 프로젝트 분석해줘"}
+    assert "workspaceId" not in body["parameters"]
+    assert "workspaceId" not in body["missingRequiredParameters"]
+
+
+def test_service_candidate_without_parameter_clarifies(client):
+    body = post(client, {"requestId": "req-clarify", "text": "파일 찾아줘"}).json()
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["missingRequiredParameters"] == ["query"]
+
+
+@pytest.mark.parametrize("text", ["파일", "문서", "file"])
+def test_bare_file_subject_clarifies(client, text):
+    body = post(client, {"requestId": "req-bare-file", "text": text}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["missingRequiredParameters"] == ["query"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "파일을 삭제해줘",
+        "파일 지워줘",
+        "보고서 만들어줘",
+        "문서 생성해줘",
+        "delete report file",
+        "create report file",
+    ],
+)
+def test_non_search_file_actions_are_unsupported(client, text):
+    body = post(client, {"requestId": "req-unsupported-file-action", "text": text}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+    assert body["parameters"] == {}
+
+
+@pytest.mark.parametrize("payload", [
+    {"requestId": "req-short-summary", "text": "요약: 짧은 본문"},
+    {"requestId": "req-short-summary", "command": {"path": ["요약"], "operands": ["짧은 본문"]}},
+])
+def test_short_summary_clarifies_before_llm_call(client, payload):
+    body = post(client, payload).json()
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "TEXT_SUMMARY"
+    assert body["missingRequiredParameters"] == ["text"]
+    assert body["question"] == "요약할 내용을 공백 제외 150자 이상 입력해 주세요."
+
+
+@pytest.mark.parametrize(("character_count", "decision"), [(149, "CLARIFY"), (150, "TASK")])
+def test_summary_minimum_excludes_whitespace(client, character_count, decision):
+    spaced_text = "가 " * character_count
+    body = post(client, {"requestId": "req-spaced-summary", "text": f"요약: {spaced_text}"}).json()
+
+    assert body["decision"] == decision
+    assert body["taskType"] == "TEXT_SUMMARY"
+
+
+def test_summary_slash_joins_legacy_split_operands_with_spaces(client):
+    words = ["프로젝트", "회의에서", "결정된", "내용과", "후속", "작업을", "정리한", "긴", "원문입니다."] * 8
+    body = post(
+        client,
+        {"requestId": "req-summary-legacy-operands", "command": {"path": ["summary"], "operands": words}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["parameters"]["text"] == " ".join(words)
+
+
+def test_summary_slash_preserves_internal_whitespace_in_single_free_text_operand(client):
+    original = (
+        "첫 문단은  여러 공백을 그대로 유지합니다.\n"
+        "둘째 문단도 줄바꿈을 보존해야 합니다. "
+        + "서로 다른 의미를 가진 충분히 긴 문장을 반복하지 않고 작성합니다. " * 8
+    ).rstrip()
+    body = post(
+        client,
+        {"requestId": "req-summary-original-spacing", "command": {"path": ["요약"], "operands": [original]}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["parameters"]["text"] == original
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"requestId": "req-natural-summary-window", "text": "요약: " + ("가" * 149) + (" " * (8000 - 149)) + "나"},
+        {"requestId": "req-slash-summary-window", "command": {"path": ["summary"], "operands": [("가" * 149) + (" " * (8000 - 149)) + "나"]}},
+    ],
+)
+def test_summary_minimum_only_counts_first_8000_input_characters(client, payload):
+    body = post(client, payload).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "TEXT_SUMMARY"
+    assert body["missingRequiredParameters"] == ["text"]
+
+
+def test_file_word_inside_another_word_is_not_file_search(client):
+    body = post(client, {"requestId": "req-pilot", "text": "파일럿 검색해줘"}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize("text", ["맛집 검색해줘", "보안 찾아줘"])
+def test_general_search_is_not_mistaken_for_file_search(client, text):
+    body = post(client, {"requestId": "req-general-search", "text": text}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    ("text", "query"),
+    [
+        ("예산안 찾아줘", "예산안"),
+        ("계약서 찾아줘", "계약서"),
+        ("이력서 찾아줘", "이력서"),
+        ("제안서 찾아줘", "제안서"),
+        ("기획안 찾아줘", "기획안"),
+    ],
+)
+def test_natural_file_search_recognizes_document_name_endings(client, text, query):
+    body = post(client, {"requestId": "req-document-name", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["parameters"]["query"] == query
+
+
+@pytest.mark.parametrize(
+    ("text", "query"),
+    [
+        ("회의록 문서 검색해줘", "회의록"),
+        ("예산안이라는 파일 찾아줘", "예산안"),
+        ("예산안 파일 좀 찾아줄래", "예산안"),
+        ("예산안을 찾아주세요", "예산안"),
+    ],
+)
+def test_natural_file_search_removes_structural_words_and_action_endings(client, text, query):
+    body = post(client, {"requestId": "req-natural-file-query", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["parameters"]["query"] == query
+
+
+def test_file_slash_preserves_query_starting_with_file_syllables(client):
+    body = post(
+        client,
+        {"requestId": "req-pilot-file", "command": {"path": ["file"], "operands": ["파일럿.txt"]}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["parameters"]["query"] == "파일럿.txt"
+
+
+def test_file_slash_preserves_query_ending_with_english_action_syllables(client):
+    body = post(
+        client,
+        {"requestId": "req-research-file", "command": {"path": ["file"], "operands": ["research"]}},
+    ).json()
+
+    assert body["decision"] == "TASK"
+    assert body["parameters"]["query"] == "research"
+
+
+@pytest.mark.parametrize("query", ["파일", "file"])
+def test_file_slash_generic_subject_clarifies(client, query):
+    body = post(
+        client,
+        {"requestId": "req-generic-file", "command": {"path": ["file"], "operands": [query]}},
+    ).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["missingRequiredParameters"] == ["query"]
+
+
+@pytest.mark.parametrize(("text", "query"), [("report.pdf 찾아줘", "report.pdf"), ("report.ppt 찾아줘", "report.ppt")])
+def test_natural_file_search_recognizes_filename_extensions(client, text, query):
+    body = post(client, {"requestId": "req-file-extension", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["parameters"]["query"] == query
+
+
+@pytest.mark.parametrize("text", ["file search", "file find", "file research"])
+def test_english_file_request_without_query_clarifies(client, text):
+    body = post(client, {"requestId": "req-english-file", "text": text}).json()
+
+    assert body["decision"] == "CLARIFY"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["missingRequiredParameters"] == ["query"]
+
+
+@pytest.mark.parametrize(("text", "query"), [("요약본 파일 찾아줘", "요약본"), ("날씨 보고서 파일 찾아줘", "날씨 보고서")])
+def test_explicit_file_search_takes_priority_over_other_keywords(client, text, query):
+    body = post(client, {"requestId": "req-file-priority", "text": text}).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["parameters"]["query"] == query
+
+
+@pytest.mark.parametrize("payload", [{"requestId": "req-none"}, {"requestId": "req-both", "text": "서울 날씨", "command": {"path": ["날씨"], "operands": ["서울"]}}, {"requestId": "req-empty", "text": "   "}])
+def test_business_input_conflicts_are_400(client, payload):
+    assert post(client, payload).status_code == 400
+
+
+def test_schema_errors_are_422(client):
+    assert post(client, {"requestId": "", "text": "날씨"}).status_code == 422
+    assert post(client, {"requestId": "req", "text": "날씨", "now": "2026-08-05T00:00:00"}).status_code == 422
+    assert post(client, {"requestId": "req", "command": {"path": [], "operands": []}}).status_code == 422
+
+
+def test_health(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "UP", "analyzerReady": True}
+
+
+def test_health_stays_up_when_analyzer_is_not_ready(client):
+    del client.app.state.analyzer
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "UP", "analyzerReady": False}
+
+
+def test_ready_returns_200_when_analyzer_is_ready(client):
+    response = client.get("/ready")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "UP", "analyzerReady": True}
+
+
+def test_ready_returns_503_when_analyzer_is_not_ready(client):
+    del client.app.state.analyzer
+
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json() == {"status": "NOT_READY", "analyzerReady": False}
+
+
+def test_unexpected_analyzer_error_is_500(client, monkeypatch):
+    def fail(*args, **kwargs):
+        raise RuntimeError("internal detail must not leak")
+
+    monkeypatch.setattr(client.app.state.analyzer, "analyze_text", fail)
+    response = post(client, {"requestId": "req-error", "text": "서울 날씨"})
+    assert response.status_code == 500
+    assert response.json() == {"detail": "NLU analysis failed"}
+
+
+def test_openapi_exposes_contract():
+    schema = app.openapi()
+    assert "/health" in schema["paths"]
+    assert "/ready" in schema["paths"]
+    assert "/internal/v1/nlu/analyze" in schema["paths"]
+    properties = schema["components"]["schemas"]["AnalyzeResponse"]["properties"]
+    assert {"requestId", "decision", "taskType", "parameters", "missingRequiredParameters", "question", "confidence", "analyzer"} <= set(properties)
+    assert "processingRoute" not in properties
+
+    ready_responses = schema["paths"]["/ready"]["get"]["responses"]
+    assert {"200", "503"} <= set(ready_responses)
+    for status_code in ("200", "503"):
+        response_schema = ready_responses[status_code]["content"]["application/json"]["schema"]
+        assert response_schema["$ref"].endswith("/HealthResponse")
+
+
+def test_openapi_exposes_wire_values_as_string_enums():
+    schemas = app.openapi()["components"]["schemas"]
+
+    assert schemas["Decision"] == {
+        "type": "string",
+        "enum": ["TASK", "CLARIFY", "UNSUPPORTED"],
+        "title": "Decision",
+    }
+    assert schemas["TaskType"] == {
+        "type": "string",
+        "enum": [
+            "FILE_SEARCH",
+            "FILE_OPEN",
+            "SYSTEM_STATUS",
+            "WEATHER_LOOKUP",
+            "TEXT_SUMMARY",
+            "CODE_ANALYSIS",
+            "AI_AGENT_USAGE",
+        ],
+        "title": "TaskType",
+    }
+    assert schemas["AnalyzerType"] == {
+        "type": "string",
+        "enum": ["SLASH", "RULE_KIWI"],
+        "title": "AnalyzerType",
+    }
+
+
+@pytest.mark.parametrize(
+    "path",
+    [["command"], ["네이버"], ["web_search"], ["chat"]],
+)
+def test_non_mvp_slash_commands_are_unsupported(client: TestClient, path):
+    body = post(
+        client,
+        {"requestId": "req-non-mvp", "command": {"path": path, "operands": ["hello"]}},
+    ).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+    assert body["parameters"] == {}
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["/command hello", "네이버에서 뉴스 검색해줘", "제네릭 어떻게 써?"],
+)
+def test_non_mvp_natural_inputs_never_create_future_task_types(client: TestClient, text):
+    body = post(client, {"requestId": "req-non-mvp-text", "text": text}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["코드 분석해줘", "클로드 사용량 알려줘", "이 파일 열어줘"],
+)
+def test_slash_only_tasks_are_not_guessed_from_natural_language(client: TestClient, text):
+    body = post(client, {"requestId": "req-slash-only", "text": text}).json()
+
+    assert body["decision"] == "UNSUPPORTED"
+    assert body["taskType"] is None
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"requestId": "req-file-slash", "command": {"path": ["file"], "operands": ["회의록"]}},
+        {"requestId": "req-file-natural", "text": "회의록 파일 찾아줘"},
+    ],
+)
+def test_file_search_leaves_structural_parameters_to_backend(client: TestClient, payload):
+    body = post(client, payload).json()
+
+    assert body["decision"] == "TASK"
+    assert body["taskType"] == "FILE_SEARCH"
+    assert body["parameters"]["query"] == "회의록"
+    assert "searchFolderId" not in body["parameters"]
+    assert "searchFolderId" not in body["missingRequiredParameters"]
+    assert "processingRoute" not in body

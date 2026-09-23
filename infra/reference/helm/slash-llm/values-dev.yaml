@@ -1,0 +1,23 @@
+# GPU 노드그룹은 안 만들기로 확정(2026-08-13, 이슈 #12, docs/aws-architecture.md §5-1)
+# — Ollama는 EKS 밖 별도 EC2(environments/dev/llm-runtime)에서 돈다. nodeSelector/
+# tolerations는 그래서 계속 비워둔다.
+image:
+  tag: "sha-27d76da2bb1f26a1788a75c6676dcc4090c14c0a"
+
+replicaCount: 1
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+
+env:
+  # environments/dev/llm-runtime의 ollama_private_ip 출력값 — 정적 값(§5-1, image.repository와
+  # 같은 이유). 매일 스케줄되는 stop/start(schedule.tf)로는 안 바뀐다 — 인스턴스를 실제로
+  # 재생성할 때만(AZ 변경, Spot->On-Demand 전환 등) 갱신 필요.
+  # 2026-08-18: Spot 전환 중 ap-northeast-2a 용량 부족으로 2c로 재생성하며 IP 변경
+  # (10.8.10.40 → 10.8.11.201). 같은 날 2c에서도 InsufficientInstanceCapacity 재현돼
+  # On-Demand로 전환(environments/dev/llm-runtime use_spot=false)하며 다시 재생성, IP 변경
+  # (10.8.11.201 → 10.8.11.172).
+  OLLAMA_URL: "http://10.8.11.172:11434"

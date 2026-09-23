@@ -1,0 +1,303 @@
+# ---------------------------------------------------------------------------
+# 공통 설정. 환경별 값은 application-{profile}.yml 에서 재정의한다.
+#   local : 로컬 Docker (기본값)
+#   dev   : Dev EKS + Dev RDS
+#   demo  : 시연 환경
+# ---------------------------------------------------------------------------
+spring:
+  application:
+    name: slash-api
+
+  profiles:
+    default: local
+
+  datasource:
+    hikari:
+      # Pod 별 커넥션 상한을 명시한다.
+      # HPA 최대 replica x maximum-pool-size 가 RDS max_connections 의 70% 를 넘지 않도록 관리한다.
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 3000
+      # JDBC Session 시간대를 한국 시각으로 고정한다.
+      # SQL 조회와 관리 화면에서 별도 변환 없이 한국 시각으로 확인한다.
+      connection-init-sql: "SET TIME ZONE 'Asia/Seoul'"
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # 전체 삭제를 원천 차단한다. 어떤 프로필에서도 활성화하지 않는다.
+    clean-disabled: true
+
+  task:
+    scheduling:
+      # 주기 작업은 기본값이 스레드 1개라 모두 한 줄로 선다. 붙지 못한 Valkey 에 구독을
+      # 시도하는 동안(연결 대기까지 수 초) 스윕들이 그만큼 밀리므로 여유를 둔다.
+      # 지금 도는 주기 작업은 스윕 4개와 구독 재시도 1개다.
+      pool:
+        size: 3
+
+  jooq:
+    sql-dialect: postgres
+
+  jackson:
+    # 프로젝트 시각 기준은 한국 시각이다. (메시지 프로토콜 정의 3.5 · 11.3)
+    # API·WSS·SQS·DB Session·SQL 조회를 모두 Asia/Seoul 로 통일한다.
+    time-zone: Asia/Seoul
+    serialization:
+      # 시각을 epoch 숫자가 아니라 ISO 8601 문자열로 내보낸다.
+      # 예: 2026-08-04T10:47:00+09:00
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# ---------------------------------------------------------------------------
+# 애플리케이션 고유 설정
+# ---------------------------------------------------------------------------
+slash:
+  # 우리 앞에 있는 신뢰할 수 있는 프록시 수. X-Forwarded-For 를 오른쪽에서 이만큼 세어
+  # 들어간 값을 호출자 주소로 본다. (common/ClientAddressResolver)
+  #
+  # 0 이면 헤더를 보지 않고 소켓 주소를 쓴다. 설정을 빠뜨렸을 때 안전한 쪽으로 실패하도록
+  # 기본값을 0 으로 둔다 — 로컬·시험이 여기 해당한다.
+  #
+  # 배포 환경은 구성에 맞춰 주입한다. ALB 만 있으면 1, ALB 뒤에 Ingress Controller 가
+  # 한 번 더 있으면 2 다. 값이 실제보다 작으면 위조된 주소를 믿게 되므로
+  # 인프라 담당자와 확인한 뒤 넣는다.
+  trusted-proxy-hops: ${TRUSTED_PROXY_HOPS:0}
+
+  auth:
+    cognito:
+      # Hosted UI 도메인 아래의 userInfo 주소.
+      # 예: https://slash.auth.ap-northeast-2.amazoncognito.com/oauth2/userInfo
+      #
+      # Access Token 에는 이메일이 없어서 사용자를 처음 만들 때 여기서 받아 온다.
+      # 스코프에 email 이 포함돼 있어야 한다.
+      user-info-uri: ${COGNITO_USER_INFO_URI:}
+
+  cors:
+    # 브라우저에서 API 를 호출할 수 있는 오리진. 환경마다 다르다.
+    # 기본값은 웹 클라이언트(Vite) 로컬 개발 서버다.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+  nlu:
+    # Helm 배포에서는 같은 Namespace 의 짧은 주소를 주입한다. (문서 3.1.1)
+    # Namespace 를 코드에 고정하지 않는다.
+    #
+    # 기본값의 포트는 slash-nlu 를 로컬에서 띄웠을 때의 포트다. 8000 은 slash-llm 이라
+    # 그 값을 두면 로컬에서 NLU 요청이 엉뚱한 서비스로 간다 — 404 나 형식 오류로 끝나서
+    # 원인이 포트라는 것이 드러나지 않는다.
+    #
+    # 배포 환경은 Service 80 → 컨테이너 8001 로 넘기므로 주입값(`http://slash-nlu`)에
+    # 포트가 없다. 이 기본값은 로컬에서만 쓰인다.
+    # (slash-nlu Dockerfile `EXPOSE 8001` · README 실행 예시)
+    base-url: ${NLU_BASE_URL:http://localhost:8001}
+    # 연결·응답 합계 2초. 자동 재시도 없음. (문서 3.7.1)
+    timeout: 2s
+
+  llm:
+    # Helm 배포에서는 같은 Namespace 의 짧은 주소를 주입한다. Service 80 → 컨테이너 8000 이라
+    # 주입값에는 포트가 없다. 이 기본값은 로컬에서만 쓰인다.
+    # (slash-llm Dockerfile `EXPOSE 8000` · README 실행 예시)
+    base-url: ${LLM_BASE_URL:http://localhost:8000}
+
+    # slash-llm 의 LLM_TIMEOUT(기본 120초)보다 길게 잡는다.
+    #
+    # 우리가 먼저 끊으면 slash-llm 이 만들어 준 MODEL_TIMEOUT 을 받지 못해 원장에는
+    # UPSTREAM_ERROR 만 남는다. "모델이 오래 걸려서" 인지 "닿지 못해서" 인지 구분되지 않는다.
+    #
+    # 짧게 끊는다고 GPU 가 놀지도 않는다 — slash-llm 은 Ollama 를 stream:false 로 부르므로
+    # (main.py) 우리가 기다리길 그만두어도 생성은 끝까지 돈다. 조기 실패만 늘어난다.
+    #
+    # 사용자를 기다리게 하지도 않는다. 요약은 QUEUED 로 즉시 답한 뒤 뒤에서 도는 일이라
+    # 이 값이 길어도 붙들리는 요청 스레드가 없다. (PR #42 리뷰)
+    timeout: 125s
+
+    # 준비 상태를 묻는 데 주는 시간. 요약 호출과 따로 둔다.
+    #
+    # 사람을 기다리게 하지 않으려고 미리 묻는 것이라 오래 걸리면 물어본 의미가 없다.
+    # slash-llm 도 같은 이유로 이 경로에만 짧은 제한을 둔다. (LLM_READY_TIMEOUT 기본 2초)
+    #
+    # 그 값보다 길어야 한다. 짧으면 slash-llm 이 "받을 수 없다" 고 답하려는 순간 우리가 먼저
+    # 끊어 버려 그 답을 못 받는다. 답을 못 받은 것은 "모른다" 로 다루므로(LlmReadiness)
+    # 결국 통과시키게 되고, 미리 거르려던 요청이 그대로 접수된다.
+    ready-timeout: 3s
+
+    # 준비 상태를 다시 묻는 간격.
+    #
+    # GPU EC2 는 근무 시간에만 켜 두는 자원이라 꺼져 있는 구간이 있다. 그때 요약을 접수하면
+    # 원장을 만들고 호출했다가 실패로 마감하는 일을 반복하므로, 접수 시점에 미리 거른다.
+    #
+    # @Scheduled 의 문자열 값은 30s 같은 표기를 해석하지 못해 여기만 밀리초로 적는다.
+    readiness-check:
+      interval-ms: 30000
+
+    # 요약 작업의 기한. 이 시각까지 끝나지 않으면 스윕이 마감한다.
+    #
+    # 한 번의 호출이 아니라 **다시 돌리는 것까지** 담아야 한다.
+    # 놓친 판정(stale-after 150초) 뒤 다시 호출(125초)해도 275초라 6분이면 여유가 있다.
+    job-deadline: 6m
+
+    # 시작되지 못한 요약 작업을 다시 돌리는 스윕.
+    #
+    # 실행은 별도 스레드에서 하고 그 스레드는 Pod 과 함께 사라진다. 호출 도중에 Pod 이
+    # 내려가면 작업은 원장에만 남으므로 이 스윕이 이어받는다.
+    job-sweep:
+      # @Scheduled 의 문자열 값은 30s 같은 표기를 해석하지 못해 여기만 밀리초로 적는다.
+      interval-ms: 30000
+      # 만들어진 지 이만큼 지나도 끝나지 않았으면 놓친 것으로 본다.
+      #
+      # **위 timeout 보다 커야 한다.** 작으면 아직 돌고 있는 호출을 스윕이 다시 집어
+      # 같은 글을 두 번 요약한다 — markRunning 은 RUNNING 상태에서도 통과하기 때문이다.
+      # 결과는 한 번만 반영되지만 모델을 두 번 돌리는 것 자체가 낭비다.
+      stale-after: 150s
+      # 한 회차에서 다룰 최대 건수.
+      batch-size: 50
+  weather:
+    # Open-Meteo. API 키가 필요 없어 Secrets Manager → ESO → env 배선 없이 붙는다.
+    # 지명을 좌표로 바꾸는 것과 그 좌표의 날씨를 받는 것이 서로 다른 호스트다.
+    geocoding-base-url: ${WEATHER_GEOCODING_BASE_URL:https://geocoding-api.open-meteo.com}
+    forecast-base-url: ${WEATHER_FORECAST_BASE_URL:https://api.open-meteo.com}
+
+    # 한 번의 조회에 주는 시간. 지오코딩과 예보를 각각 이 시간 안에 받는다.
+    #
+    # 밖으로 나가는 호출이라 NLU(같은 Cluster, 2초)보다 넉넉하게 잡되, 사용자가 응답을
+    # 기다리는 동안 도는 일이라 길게 두지 않는다. 실측은 두 번 합쳐 1초 안쪽이다.
+    timeout: 3s
+
+  device:
+    # Heartbeat 30초, 3회 누락 시 OFFLINE (문서 DV-02, NFR-07)
+    heartbeat-interval: 30s
+    offline-threshold: 90s
+    # 기기 Token 유효기간 (문서 3.5.2)
+    token-ttl: 24h
+
+    # 연결이 끊긴 기기를 OFFLINE 으로 내리는 스윕.
+    #
+    # 연결이 끊겨도 Agent 가 알려줄 수 없다. 이 스윕이 없으면 꺼진 PC 가 READY 로 남아
+    # 작업이 그리로 전달되고, 기기 목록에도 켜져 있는 것처럼 보인다.
+    offline-sweep:
+      # @Scheduled 의 문자열 값은 30s 같은 표기를 해석하지 못해 여기만 밀리초로 적는다.
+      #
+      # offline-threshold(90초)보다 촘촘해야 판정이 그 값에 가깝게 유지된다. 실제 지연은
+      # 최대 threshold + interval 이다. 조회가 무겁지 않아 30초면 충분하다.
+      interval-ms: 30000
+
+  pairing:
+    # 등록 코드 5분·1회용 (문서 DV-01)
+    code-ttl: 5m
+    # 페어링 도전값. Agent 가 서명해 돌려줄 때까지만 산다. (메시지 스펙 §8.1)
+    session-ttl: 30s
+
+    # 등록 코드는 6자리라 경우의 수가 백만뿐이다. 5분이면 전부 시도해 볼 수 있어
+    # 해시 저장만으로는 막지 못한다. 실패 횟수 제한이 실제 방어선이다.
+    #
+    # 호출자별 한도. 한 곳에서 반복해 찌르는 것을 막는다.
+    max-attempts: 10
+    # 서비스 전체 한도. 주소를 바꿔 가며 찌르는 것을 막는 마지막 그물이다.
+    # 평상시 실패는 코드를 잘못 옮겨 적는 정도라 몇 건에 그친다.
+    # 여기 닿았다는 것 자체가 공격 신호이므로 로그를 함께 남긴다.
+    global-max-attempts: 100
+    attempt-window: 5m
+
+    # 세션 재발급 요청의 requestedAt 허용 오차. 벗어나면 재전송 공격으로 본다.
+    refresh-skew: 2m
+
+  agent:
+    # 페어링을 마친 Agent 에게 알려줄 WSS 주소. 환경마다 다르다.
+    ws-url: ${AGENT_WS_URL:ws://localhost:8080/ws/agent}
+
+  websocket:
+    # 사용자 WSS Ticket 30초·1회용 (문서 3.4.2)
+    #
+    # 브라우저 WebSocket API 는 Authorization 헤더를 붙일 수 없어 자격이 URL 에 실린다.
+    # URL 은 프록시 접근 로그에 남으므로 Access Token 을 그대로 쓸 수 없다. 짧게 두는 것이
+    # 이 값의 존재 이유이니 늘릴 때는 로그에 남는 시간이 늘어난다는 것을 함께 본다.
+    ticket-ttl: 30s
+
+    # 접속표를 받은 브라우저에게 알려줄 WSS 주소. 환경마다 다르다.
+    ws-url: ${USER_WS_URL:ws://localhost:8080/ws/user}
+
+    # Pod 간 이벤트 구독을 다시 시도하는 간격.
+    #
+    # Valkey 에 닿지 못하면 구독은 걸리지 않지만 앱은 뜬다. 그동안 화면 반영이 늦어질 뿐
+    # API·WSS·스윕은 정상이므로(이슈 #36), 붙을 때까지 이 간격으로 다시 시도한다.
+    #
+    # @Scheduled 의 문자열 값은 5s 같은 표기를 해석하지 못해 여기만 밀리초로 적는다.
+    subscribe-retry:
+      interval-ms: 5000
+
+  dispatch:
+    # 전달 기한. Agent 는 이 시각이 지난 TASK 를 실행하지 않는다. (메시지 스펙 §5)
+    #
+    # 기기가 켜져 있는 것을 확인한 뒤에만 전달을 만들기 때문에 짧아도 된다.
+    # 꺼져 있는 동안 접수된 작업은 전달 없이 WAITING_FOR_DEVICE 로 기다리다가,
+    # Agent 가 READY 를 보고할 때 그 시점 기준으로 기한을 새로 받는다.
+    ttl: 60s
+
+    # ACK 를 받은 뒤 실행에 주는 기한. 위 ttl 을 대신한다.
+    #
+    # 위 ttl(60초)은 전달이 "도달하는 데" 주는 시간이다. 실행까지 그 값으로 재면 60초 넘게
+    # 걸리는 작업이 실행 도중 만료되고, PC 가 일을 마치고 보낸 RESULT 는 이미 마감된 전달이라
+    # 버려진다. 사용자는 "기한이 지났습니다"를 보는데 PC 는 작업을 끝낸 상태가 된다.
+    #
+    # 길게 잡을수록 실패한 실행이 기기를 오래 붙잡는다는 것이 반대쪽 대가다.
+    # 실행 중 PC 가 꺼지면 그 기기는 이 시간만큼 새 작업을 받지 못한다.
+    #
+    # P0 작업(/status·/file)은 1초 안에 끝나 지금은 여유가 크다. 오래 걸리는 P1 /code 를
+    # 붙일 때 이 값을 다시 본다.
+    execution-ttl: 5m
+
+    # 미전달 작업 재발행 스윕. (docs/w1-06-wss-routing.md 5.4)
+    #
+    # Pod 간 전달에 쓰는 Valkey Pub/Sub 은 전달을 보장하지 않는다.
+    # 대상 Pod 이 재시작 중이면 메시지가 사라지고 전달은 PENDING 으로 남는데,
+    # 그것을 다시 발행하는 그물이다. 주 경로는 Agent 재연결 시 재전송이다.
+    resend:
+      # @Scheduled 의 문자열 값은 30s 같은 표기를 해석하지 못해 여기만 밀리초로 적는다.
+      interval-ms: 5000
+      # 발행된 지 이만큼 지나도 PENDING 이면 유실로 본다.
+      # 방금 발행한 전달을 곧바로 다시 보내지 않기 위한 여유이기도 하다.
+      stale-after: 5s
+      # 한 회차에서 처리할 최대 건수. 밀린 양이 많아도 한 회차를 길게 잡지 않는다.
+      batch-size: 100
+
+    # 기한이 지난 전달을 마감하는 스윕. (DispatchExpirySweeper)
+    #
+    # uk_dispatch_active_device 가 기기당 활성 전달을 한 건으로 제한한다. 작업을 받은 PC 가
+    # 꺼지면 그 전달이 활성인 채로 남아 그 기기는 다시 켜도 작업을 받지 못한다.
+    # 이 스윕이 그것을 푸는 유일한 수단이다.
+    expiry-sweep:
+      # 기한(전달 전에는 ttl, ACK 뒤에는 execution-ttl)보다 촘촘해야 기기가 막혀 있는 시간이
+      # 그 값에 가깝게 유지된다. 실제 지연은 최대 기한 + interval 이다.
+      interval-ms: 10000
+      # 한 회차에서 마감할 최대 건수.
+      batch-size: 100
+
+  task:
+    # 접수 후 이 시간이 지나도 끝나지 않은 작업을 만료로 본다. (StaleTaskSweeper)
+    #
+    # 전달이 붙은 작업은 위 dispatch.expiry-sweep 이 그 전달의 기한에 맞춰 정리한다.
+    # 이 값이 맡는 것은 전달이 만들어지지도 않은 작업이다 — PC 를 켜지 않아
+    # WAITING_FOR_DEVICE 로 기다리거나, 되묻는 말에 답하지 않고 창을 닫은 경우다.
+    #
+    # 사람을 기다리는 상태라 짧게 잡으면 멀쩡히 기다리던 작업을 서버가 먼저 지운다.
+    # 길게 잡아도 손해가 적다 — 기기를 막는 것은 전달이지 작업이 아니다.
+    stale-after: 30m
+
+    expiry-sweep:
+      # 만료 판정이 분 단위라 촘촘할 이유가 없다.
+      interval-ms: 60000
+      batch-size: 100

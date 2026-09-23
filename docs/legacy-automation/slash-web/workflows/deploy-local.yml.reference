@@ -1,0 +1,85 @@
+name: Deploy (local)
+
+# local 환경 검증용 워크플로. slash-infra의 modules/frontend-cicd가 만든
+# IAM Role(trust policy가 dev 브랜치로 제한됨)을 그대로 사용한다.
+#
+# 왜 main이 아니라 dev인가: main은 아직 README뿐인 빈 스텁 브랜치라 빌드할
+# 앱 코드가 없다(2026-08-05 첫 시도 때 npm ci 단계에서 실패해서 발견).
+# 실제 개발은 전부 dev에서 이뤄지고 있어서 검증 목적상 dev를 타겟으로 한다.
+# TODO: 팀이 dev->main 첫 정식 릴리스를 하면 main으로 옮기고 slash-infra의
+# environments/local/frontend github_branch도 같이 되돌릴 것.
+#
+# dev/prod는 버킷/배포/Role ARN이 달라지므로, 검증 끝나면 GitHub Environments로
+# 나누거나 이 워크플로를 복제해서 값만 바꾸는 방식을 추천한다.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [dev]
+
+permissions:
+  id-token: write # OIDC로 AWS 자격증명을 받기 위해 필수
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  # slash-infra: environments/local/frontend terraform output 값
+  AWS_ROLE_ARN: arn:aws:iam::061039804626:role/slash-frontend-deploy-local
+  S3_BUCKET: slash-web-local-061039804626
+  CLOUDFRONT_DISTRIBUTION_ID: E3FZBJIG5MLJ1M
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+      - run: npm run test:auth
+
+      # Cognito 값은 public 클라이언트라 secret이 아니다(Client ID에 secret 없음) —
+      # Variables로 둔다. VITE_API_BASE_URL은 아직 배포된 slash-api가 없어(§ frontend-api-contract.md
+      # §9 TBD) 일부러 빈 문자열로 둔다 — apiClient.ts가 상대경로로 나가 이 도메인 자신을
+      # 예측 가능하게 실패시킨다. 비워두지 않고 아예 안 주면 Vite가 리터럴 문자열 "undefined"를
+      # 심어서 `undefined/api/v1/...` 같은 요청이 나간다(Cognito 쪽에서 실제로 이 증상을 겪었다).
+      - run: npm run build
+        env:
+          VITE_COGNITO_REGION: ${{ vars.VITE_COGNITO_REGION }}
+          VITE_COGNITO_USER_POOL_ID: ${{ vars.VITE_COGNITO_USER_POOL_ID }}
+          VITE_COGNITO_CLIENT_ID: ${{ vars.VITE_COGNITO_CLIENT_ID }}
+          VITE_COGNITO_DOMAIN: ${{ vars.VITE_COGNITO_DOMAIN }}
+          VITE_API_BASE_URL: ""
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 해시 붙은 파일(assets/*)과 그 외 정적 파일은 오래 캐시해도 안전 —
+      # index.html만 빼고 먼저 올린다.
+      - name: Sync static assets (long cache)
+        run: |
+          aws s3 sync dist/ "s3://${S3_BUCKET}" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # index.html은 새 빌드의 해시 파일들을 참조하므로 캐시하면 안 된다 —
+      # 반드시 위 sync가 끝난 뒤에 올려야 배포 중 404가 안 난다.
+      - name: Upload index.html (no cache)
+        run: |
+          aws s3 cp dist/index.html "s3://${S3_BUCKET}/index.html" \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/index.html"

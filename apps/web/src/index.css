@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-hairline: var(--hairline);
+  --color-focus: var(--focus);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent-blue: #5b8cff;
+  --color-accent-purple: #9b6bff;
+  --color-accent-green: #34d399;
+
+  --font-sans: "Pretendard Variable", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  /* 글씨 크기(설정 > 환경설정) — 배율 하나로 타이포그래피 전체가 따라 커진다.
+     루트 font-size를 키우지 않는 이유: Tailwind의 간격·크기도 rem이라 여백까지 같이 커져
+     화면 확대가 되어버린다. 간격/반경 스케일(DESIGN.md §5)은 브랜드가 정한 고정값이므로
+     글씨만 움직여야 한다. line-height도 같은 배율을 걸어 현재 행간 비율을 그대로 유지한다.
+     text-* 유틸리티가 참조하는 변수를 그대로 재정의하는 방식이라 화면 쪽 코드는 손댈 게 없다.
+     새 크기 단계를 쓰기 시작하면 여기에도 추가해야 한다 — 빠뜨리면 그 글자만 안 커진다. */
+  --text-2xs: calc(0.625rem * var(--font-scale));
+  --text-2xs--line-height: calc(0.875rem * var(--font-scale));
+  --text-xs: calc(0.75rem * var(--font-scale));
+  --text-xs--line-height: calc(1rem * var(--font-scale));
+  /* DESIGN.md §3의 Control(15px) — 검색바 입력, 사이드바 주요 버튼 */
+  --text-control: calc(0.9375rem * var(--font-scale));
+  --text-control--line-height: calc(1.3125rem * var(--font-scale));
+  --text-sm: calc(0.875rem * var(--font-scale));
+  --text-sm--line-height: calc(1.25rem * var(--font-scale));
+  --text-base: calc(1rem * var(--font-scale));
+  --text-base--line-height: calc(1.5rem * var(--font-scale));
+  --text-lg: calc(1.125rem * var(--font-scale));
+  --text-lg--line-height: calc(1.75rem * var(--font-scale));
+  --text-xl: calc(1.25rem * var(--font-scale));
+  --text-xl--line-height: calc(1.75rem * var(--font-scale));
+  --text-2xl: calc(1.5rem * var(--font-scale));
+  --text-2xl--line-height: calc(2rem * var(--font-scale));
+  --text-3xl: calc(1.875rem * var(--font-scale));
+  --text-3xl--line-height: calc(2.25rem * var(--font-scale));
+  --text-4xl: calc(2.25rem * var(--font-scale));
+  --text-4xl--line-height: calc(2.5rem * var(--font-scale));
+}
+
+/* 글씨 크기 단계. 값은 설정 화면의 보통/크게/매우 크게와 1:1로 대응한다. */
+:root {
+  --font-scale: 1;
+}
+:root[data-font-size='large'] {
+  --font-scale: 1.15;
+}
+:root[data-font-size='x-large'] {
+  --font-scale: 1.3;
+}
+
+/* Dark is the default theme (matches the original reference). */
+:root {
+  --canvas: #0a0c14;
+  --surface: #12141f;
+  --surface-raised: #181b2a;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --focus: rgba(93, 143, 255, 0.55);
+  --foreground: #f2f4f8;
+  --muted: #8b8fa3;
+}
+
+:root[data-theme='light'] {
+  --canvas: #f7f7fb;
+  --surface: #ffffff;
+  --surface-raised: #eef0f6;
+  --hairline: rgba(10, 12, 20, 0.08);
+  --focus: rgba(59, 130, 246, 0.5);
+  --foreground: #14151a;
+  --muted: #6b7280;
+}
+
+/* Brand mark gradient — the logo/hero "/" and the search bar's focus ring only.
+   Feature icons keep their own single-hue accents; don't spread this elsewhere.
+   Matches the app-icon's slash bar (red -> orange -> yellow -> green -> blue, no purple stop). */
+.brand-gradient {
+  background-image: linear-gradient(160deg, #ff4d4d 0%, #ff9a3d 25%, #ffd23d 45%, #4ade80 68%, #3b82f6 100%);
+}
+
+body {
+  background-color: var(--color-canvas);
+  transition: background-color 0.2s ease;
+}
+
+/* Dark mode: gradient stays confined to shapes/lines (hero mark, focus ring) — flat canvas otherwise.
+   Light mode: gradient shows up as a soft background wash instead. */
+:root[data-theme='light'] body {
+  background-image: radial-gradient(circle at 15% 0%, rgba(255, 95, 95, 0.10), transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(255, 210, 61, 0.12), transparent 45%),
+    radial-gradient(circle at 15% 60%, rgba(59, 130, 246, 0.10), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(74, 222, 128, 0.10), transparent 45%);
+  background-attachment: fixed;
+}
+
+/* Tailwind v4의 preflight는 button에 cursor를 지정하지 않아 기본 화살표가 뜬다. 이 앱은 링크가
+   거의 없고 사이드바 항목·칩·메뉴까지 대부분의 조작이 <button>이라, 개별 클래스 대신 전역에서
+   한 번 잡는다. 비활성 버튼은 제외 — 눌리지 않는데 눌릴 것처럼 보이면 안 된다. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

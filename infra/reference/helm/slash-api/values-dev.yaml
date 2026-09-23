@@ -1,0 +1,86 @@
+# dev 환경 구축 진행 중(2026-08-12, network/cognito/database/eks/observability 적용 완료).
+image:
+  tag: "sha-d44125aa4786c84a7254f70888ffcacf3e21d19b"
+
+serviceAccount:
+  # 2026-08-18 environments/dev/eks apply로 채움 (modules/eks/slash_api_irsa.tf, 이슈 #23/#24)
+  roleArn: "arn:aws:iam::061039804626:role/slash-slash-api-dev"
+
+env:
+  # 2026-08-18: 첫 실배포 시도에서 발견 — SPRING_PROFILES_ACTIVE가 없으면
+  # application.yml의 spring.profiles.default=local로 떨어져서 DB_URL 등을 전부
+  # 무시하고 localhost로 접속을 시도한다(Connection to localhost:5432 refused).
+  # application-dev.yml이 DB_URL/VALKEY_HOST를 실제로 매핑하는 프로필이라 반드시 필요.
+  SPRING_PROFILES_ACTIVE: "dev"
+  # RDS/Valkey 엔드포인트 자체는 시크릿이 아니라 평문 env로 충분 — 이슈 #23에서 확보한 실측값.
+  DB_URL: "jdbc:postgresql://slash-rds-dev.c3qme6c6e7fj.ap-northeast-2.rds.amazonaws.com:5432/slash_dev"
+  VALKEY_HOST: "master.slash-valkey-dev.2iapp0.apn2.cache.amazonaws.com"
+  # Cognito 값은 공개 클라이언트가 쓰는 값이라 시크릿이 아님(slash-web CI도 Variables로 취급,
+  # docs/aws-architecture.md §9-2 참고). environments/dev/cognito output(2026-08-18 apply).
+  COGNITO_ISSUER_URI: "https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_kiW46VZ9O"
+  COGNITO_CLIENT_ID: "4pjdb0cuqt991vpclf1b8ai91e"
+  COGNITO_USER_INFO_URI: "https://slash-dev-061039804626.auth.ap-northeast-2.amazoncognito.com/oauth2/userInfo"
+  # slash-nlu 서비스로 클러스터 내부 짧은 주소 사용 (application.yml 주석, 같은 namespace)
+  NLU_BASE_URL: "http://slash-nlu"
+  # slash-llm 서비스로 클러스터 내부 짧은 주소 사용 — 이슈 #42(slash-api#42 리뷰에서 지적).
+  # 기본값 localhost:8000으로 배포하면 요약 요청이 UPSTREAM_UNAVAILABLE로 조용히 실패한다.
+  # Service 80 → 컨테이너 8000(helm/slash-llm/values.yaml)이라 포트 없이 주입.
+  LLM_BASE_URL: "http://slash-llm"
+  # 2026-08-18: slash-web dev 프론트엔드 착수(이슈 #31) — 기본값(localhost:5173)만으로는
+  # dev.sbsh.cloud에서 오는 브라우저 요청이 CORS로 막힌다.
+  CORS_ALLOWED_ORIGINS: "https://dev.sbsh.cloud"
+
+externalSecrets:
+  enabled: true
+  refreshInterval: 1h
+  data:
+    - secretKey: DB_USERNAME
+      remoteRef:
+        key: "rds!db-11d47fea-b814-4bd7-a983-004c0df424b3"
+        property: username
+    - secretKey: DB_PASSWORD
+      remoteRef:
+        key: "rds!db-11d47fea-b814-4bd7-a983-004c0df424b3"
+        property: password
+    # VALKEY_AUTH_TOKEN: 키 이름은 잠정값 — slash-api 앱이 아직 spring.data.redis.password를
+    # 안 읽는다(이슈 #23 "문제 1", slash-api 팀 앱 코드 변경 대기). 실제 설정 키가 정해지면
+    # 이 secretKey와 아래 envSecrets를 맞춰서 갱신할 것.
+    - secretKey: VALKEY_AUTH_TOKEN
+      remoteRef:
+        key: "slash/valkey/dev"
+        property: auth_token
+
+envSecrets:
+  - DB_USERNAME
+  - DB_PASSWORD
+  - VALKEY_AUTH_TOKEN
+
+ingress:
+  # 2026-08-18: slash-web dev 프론트엔드 착수(이슈 #31) — 이미지가 실제로 정상 기동
+  # 확인된 상태(이슈 #23 해소)라 이제 켜도 안전하다. ALB 생긴 뒤 DNS 이름을 확인해서
+  # api.dev.sbsh.cloud A레코드를 연결하는 후속 작업이 필요하다(environments/dev/eks/domain.tf).
+  enabled: true
+  host: api.dev.sbsh.cloud
+  annotations:
+    # ACM 인증서는 dev/eks apply마다 새로 발급된다(도메인 검증 필요, ISSUED 확인은 apply 후
+    # `aws acm describe-certificate`로). 2026-08-18 재apply로 새 ARN — ingress 다시 켤 때
+    # 그대로 재사용하면 됨. Route53 A레코드 연결은 그 시점에 마저 진행.
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:061039804626:certificate/a3aefb70-9621-4e0b-b044-758bf91e943d
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+
+replicaCount: 2
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+
+# 2026-08-18: 첫 실배포에서 차트 기본값(128Mi/256Mi)으로 OOMKilled 확인 —
+# slash-nlu와 같은 패턴(docs/operations-log.md §10-2). Spring Boot(JVM)라 더 넉넉히 잡는다.
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 1Gi

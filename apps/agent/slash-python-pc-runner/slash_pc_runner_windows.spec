@@ -1,0 +1,87 @@
+# PyInstaller 스펙(Windows) — macOS용 slash_pc_runner.spec과 같은 구조(단일 진입점 run.py,
+# 트레이+색인 폴더 창을 인자로 분기)를 Windows에 맞게 옮긴 것.
+#
+# Windows 11 실기기 및 GitHub Actions windows-latest 러너 양쪽에서 빌드·실행 검증을
+# 완료했다(README.md "빌드 및 실행 파일 생성 > Windows" 참고).
+#
+# 빌드(Windows에서): cd slash-python-pc-runner && pyinstaller slash_pc_runner_windows.spec
+
+import subprocess
+from pathlib import Path
+
+block_cipher = None
+project_root = Path(SPECPATH)
+repo_root = project_root.parent
+package_dir = project_root / "src" / "slash_pc_runner"
+
+# 빌드 시점 커밋 SHA·날짜를 파일로 남겨서 함께 얼린다(_build_info.py가 런타임에 읽는다) —
+# CI뿐 아니라 이 명령으로 직접 로컬에서 빌드해도 항상 정확한 값이 들어간다.
+def _write_build_info() -> None:
+    def _git(*args: str) -> str:
+        result = subprocess.run(["git", *args], cwd=repo_root, capture_output=True, text=True, timeout=5)
+        return result.stdout.strip() if result.returncode == 0 else ""
+
+    (package_dir / "_build_sha.txt").write_text(_git("rev-parse", "--short", "HEAD"), encoding="utf-8")
+    (package_dir / "_build_date.txt").write_text(
+        _git("log", "-1", "--format=%cd", "--date=format:%Y%m%d"), encoding="utf-8"
+    )
+
+
+_write_build_info()
+
+datas = [
+    (str(package_dir / "folders_window.html"), "."),
+    (str(package_dir / "pairing_window.html"), "."),
+    (str(package_dir / "assets"), "assets"),
+    (str(repo_root / "fixtures" / "search-folder"), "fixtures/search-folder"),
+    (str(package_dir / "_build_sha.txt"), "."),
+    (str(package_dir / "_build_date.txt"), "."),
+]
+
+a = Analysis(
+    [str(project_root / "run.py")],
+    pathex=[str(project_root / "src")],
+    binaries=[],
+    datas=datas,
+    # pystray/pywebview는 실행 시점에 플랫폼별 백엔드를 골라 import해서 정적 분석에 안 잡힌다
+    # (macOS용 spec의 AppKit/Foundation/objc/cocoa와 같은 이유) — Windows 쪽 백엔드로 대응.
+    hiddenimports=[
+        "pystray._win32",
+        "webview.platforms.winforms",
+        "webview.platforms.edgechromium",
+        "webview.platforms.mshtml",
+        "clr",
+    ],
+    hookspath=[],
+    runtime_hooks=[],
+    excludes=[],
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name="Slash",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    # 콘솔 창을 띄우지 않는다 — 트레이 전용 백그라운드 앱(macOS EXE의 console=False와 동일 목적).
+    console=False,
+    icon=str(package_dir / "assets" / "AppIcon.ico"),
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    name="Slash",
+)

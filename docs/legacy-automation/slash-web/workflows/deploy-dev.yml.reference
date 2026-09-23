@@ -1,0 +1,80 @@
+name: Deploy (dev)
+
+# dev.sbsh.cloud 배포. slash-infra의 modules/frontend-cicd가 만든 dev용 IAM Role 사용
+# (slash-infra 이슈 #31). deploy-local.yml과 같은 구조이되 두 가지가 다르다:
+#   - dev API(slash-api)가 실제로 떠 있어서 VITE_API_BASE_URL을 채운다(local은 아직 없어서 비움)
+#   - Cognito User Pool이 local과 별개라(slash-infra docs/aws-architecture.md §11) 저장소 공용
+#     vars.*(local용)를 재사용하지 않고 여기 직접 적는다 — 공개 클라이언트값이라 시크릿 아님
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [dev]
+
+permissions:
+  id-token: write # OIDC로 AWS 자격증명을 받기 위해 필수
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  # slash-infra: environments/dev/frontend terraform output 값
+  AWS_ROLE_ARN: arn:aws:iam::061039804626:role/slash-frontend-deploy-dev
+  S3_BUCKET: slash-web-dev-061039804626
+  CLOUDFRONT_DISTRIBUTION_ID: E3509V383MY8KA
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+      - run: npm run test:auth
+
+      - run: npm run build
+        env:
+          # slash-infra: environments/dev/cognito terraform output 값
+          VITE_COGNITO_REGION: ap-northeast-2
+          VITE_COGNITO_USER_POOL_ID: ap-northeast-2_kiW46VZ9O
+          VITE_COGNITO_CLIENT_ID: 4pjdb0cuqt991vpclf1b8ai91e
+          VITE_COGNITO_DOMAIN: https://slash-dev-061039804626.auth.ap-northeast-2.amazoncognito.com
+          VITE_API_BASE_URL: https://api.dev.sbsh.cloud
+          # clarity.microsoft.com 프로젝트 ID. Clarity ID도 Cognito Client ID처럼
+          # 클라이언트 번들에 그대로 노출되는 공개 값이라 시크릿 아님 — 인라인으로 둔다.
+          # local(deploy-local.yml)에는 일부러 안 넣는다 — 팀 검증용 실험 트래픽이
+          # Clarity 대시보드(실사용 분석)에 섞이는 걸 피하기 위함.
+          VITE_CLARITY_PROJECT_ID: y59hfygw8b
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 해시 붙은 파일(assets/*)과 그 외 정적 파일은 오래 캐시해도 안전 —
+      # index.html만 빼고 먼저 올린다.
+      - name: Sync static assets (long cache)
+        run: |
+          aws s3 sync dist/ "s3://${S3_BUCKET}" \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # index.html은 새 빌드의 해시 파일들을 참조하므로 캐시하면 안 된다 —
+      # 반드시 위 sync가 끝난 뒤에 올려야 배포 중 404가 안 난다.
+      - name: Upload index.html (no cache)
+        run: |
+          aws s3 cp dist/index.html "s3://${S3_BUCKET}/index.html" \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/index.html"

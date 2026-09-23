@@ -1,0 +1,56 @@
+[
+  {
+    "source": "slash-web",
+    "destination": "apps/web",
+    "remote": "https://github.com/LikeLionTeam4/slash-web.git",
+    "commit": "b94573fd34922259fc44a6ad881ad4dc2f36ffc7",
+    "local_changes": []
+  },
+  {
+    "source": "slash-api",
+    "destination": "apps/api",
+    "remote": "https://github.com/LikeLionTeam4/slash-api.git",
+    "commit": "d44125aa4786c84a7254f70888ffcacf3e21d19b",
+    "local_changes": []
+  },
+  {
+    "source": "slash-nlu",
+    "destination": "apps/nlu",
+    "remote": "https://github.com/LikeLionTeam4/slash-nlu.git",
+    "commit": "7b42ad50d2b89fa3cc1321cfc00c80ddedcd54cc",
+    "local_changes": []
+  },
+  {
+    "source": "slash-llm",
+    "destination": "apps/llm",
+    "remote": "https://github.com/YeonWoojuice/slash-llm.git",
+    "commit": "27d76da2bb1f26a1788a75c6676dcc4090c14c0a",
+    "local_changes": []
+  },
+  {
+    "source": "slash-agent",
+    "destination": "apps/agent",
+    "remote": "https://github.com/LikeLionTeam4/slash-agent.git",
+    "commit": "e57100cdce04702fdfa433cc476cba99a3ef8b47",
+    "local_changes": []
+  },
+  {
+    "source": "slash-docs",
+    "destination": "docs/original",
+    "remote": "https://github.com/LikeLionTeam4/slash-docs.git",
+    "commit": "831e6b0d71002a47d1bc86bbe18c058b34b9c62f",
+    "local_changes": [
+      " M README.md",
+      "?? api/"
+    ]
+  },
+  {
+    "source": "slash-infra",
+    "destination": "infra/reference",
+    "remote": "https://github.com/LikeLionTeam4/slash-infra.git",
+    "commit": "6056b605090a2ef55f63502a95f8ffce025c36b9",
+    "local_changes": [
+      "?? docs/architecture-improvement-proposals.md"
+    ]
+  }
+]

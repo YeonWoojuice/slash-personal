@@ -1,0 +1,46 @@
+# slash-api가 클러스터 내부 DNS로만 호출한다 — 외부 노출 없음, Ingress 없음.
+# GPU 노드그룹은 아직 없음(docs/aws-architecture.md §5, §13 TODO) — 준비되면
+# nodeSelector/tolerations를 values-dev.yaml/values-prod.yaml에서 채운다.
+# repository는 정적 값이다 — slash-api/values.yaml과 같은 이유(§11, §13 TODO 참고).
+image:
+  repository: 061039804626.dkr.ecr.ap-northeast-2.amazonaws.com/slash-llm
+  tag: "" # values-<env>.yaml에서 반드시 채운다
+
+replicaCount: 1
+
+autoscaling:
+  # CPU 기준 HPA — GPU 노드그룹이 실제로 붙으면(#12) GPU 사용률 기반 스케일링이 더 맞을 수
+  # 있는데, 그건 custom-metrics-adapter 같은 별도 메트릭 소스가 필요해서 이번 범위 밖.
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+
+serviceAccount:
+  roleArn: ""
+
+service:
+  port: 80
+  targetPort: 8000
+
+env: {}
+
+# /health(liveness)와 /ready(readiness, Ollama 연결+모델 확인)가 분리돼 있다
+# (LikeLionTeam4/slash-llm#5, 이슈 #25). /ready는 앱 내부적으로 LLM_READY_TIMEOUT
+# (기본 2초) 안에 Ollama를 확인하는데, K8s httpGet probe의 기본 timeoutSeconds(1초)로는
+# 그 안에 안 끝날 수 있어 넉넉히 잡는다.
+probes:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+  timeoutSeconds: 3
+
+nodeSelector: {}
+tolerations: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 256Mi

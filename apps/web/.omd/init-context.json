@@ -1,0 +1,18 @@
+{
+  "reference_id": "custom:slash-home-design1",
+  "description": "Slash — natural-language + slash-command AI agent (file/web search, generative AI, local PC control). Home/search screen styled after a user-provided dark/neon reference screenshot.",
+  "mode": "inspired",
+  "delta_set": {
+    "axes": {},
+    "voiceHints": [],
+    "matchedKeywords": ["dark", "neon", "glow"],
+    "warnings": ["Not a catalog reference — bootstrapped from a user-provided screenshot, not omd's fingerprinted brand catalog."]
+  },
+  "requested_components": ["button", "input", "table", "card", "badge", "tabs", "dialog"],
+  "superseded": {
+    "reference_id": "claude",
+    "preserved_at": "DESIGN_DEPRECATED.md",
+    "reason": "pivoted from claude-style test bootstrap to Slash's actual brand"
+  },
+  "bootstrapped_at": "2026-07-29"
+}
