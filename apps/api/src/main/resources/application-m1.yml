@@ -1,0 +1,24 @@
+# Activate with SPRING_PROFILES_ACTIVE=local,m1 for the isolated M1 testbed.
+# The fault endpoints and unauthenticated scrape route require both profiles.
+server:
+  address: 127.0.0.1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      service: slash-api
+      environment: local
+      version: ${SLASH_VERSION:local}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        slash.db.query: true
+
+slash:
+  observability:
+    faults:
+      enabled: true

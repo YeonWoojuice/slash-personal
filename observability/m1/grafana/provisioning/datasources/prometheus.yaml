@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+  - name: Slash M1 Prometheus
+    uid: slash-m1-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
