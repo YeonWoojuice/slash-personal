@@ -20,5 +20,7 @@ management:
 
 slash:
   observability:
+    query-metrics:
+      enabled: true
     faults:
       enabled: true

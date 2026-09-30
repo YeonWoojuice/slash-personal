@@ -44,6 +44,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    implementation("software.amazon.awssdk:cloudwatch:2.55.3")
 
     // 인증 — Cognito Access Token(JWT) 검증 (W1-01)
     implementation("org.springframework.boot:spring-boot-starter-security")

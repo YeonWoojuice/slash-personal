@@ -8,13 +8,13 @@ import org.jooq.ExecuteListener;
 import org.jooq.ExecuteListenerProvider;
 import org.jooq.impl.DefaultExecuteListenerProvider;
 import org.springframework.boot.autoconfigure.jooq.DefaultConfigurationCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 /** Times jOOQ queries without recording SQL text, bind values, or user identifiers. */
 @Configuration
-@Profile("local & m1")
+@ConditionalOnProperty(name = "slash.observability.query-metrics.enabled", havingValue = "true")
 public class QueryMetricsConfig {
 
     @Bean
