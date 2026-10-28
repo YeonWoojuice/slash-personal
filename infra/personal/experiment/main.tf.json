@@ -19,6 +19,7 @@
   "locals": {
     "api_environment": {
       "SPRING_PROFILES_ACTIVE": "personal",
+      "PERSONAL_REQUEST_TIMING_ENABLED": "true",
       "SPRING_DATASOURCE_URL": "jdbc:postgresql://${aws_db_instance.test.address}:5432/slash?sslmode=require",
       "SPRING_DATASOURCE_USERNAME": "slashadmin",
       "SPRING_DATA_REDIS_HOST": "${aws_elasticache_replication_group.test.primary_endpoint_address}",

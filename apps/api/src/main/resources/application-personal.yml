@@ -50,3 +50,7 @@ logging:
   level:
     com.likelion.slash: INFO
     org.jooq.tools.LoggerListener: WARN
+personal:
+  request-timing:
+    # Enable explicitly for the bounded /me probe; IDs are log fields, not metric labels.
+    enabled: false

@@ -96,10 +96,11 @@ class Http(unittest.TestCase):
 
     def test_slow_200_is_observation_not_failure_and_contains_no_identity(self):
         conn = self.connection()
-        with patch('run.http.client.HTTPSConnection', return_value=conn) as constructor, \
-                patch('run.time.monotonic', side_effect=[0, 3]):
+        conn.request.side_effect = lambda *a, **kw: time.sleep(.02)
+        with patch('run.TimedHTTPSConnection', return_value=conn) as constructor:
             record = run.request_once(ORIGIN, 'secret-token', 8, 1)
-        self.assertEqual(record['elapsed_ms'], 3000)
+        self.assertGreaterEqual(record['elapsed_ms'], 20)
+        self.assertGreaterEqual(record['timing_ms']['request_send'], 20)
         self.assertIsNone(record['error'])
         self.assertNotIn('secret-token', json.dumps(record))
         self.assertNotIn('synthetic@example.test', json.dumps(record))
@@ -114,7 +115,7 @@ class Http(unittest.TestCase):
     def test_gateway_stage_keeps_fixed_me_suffix(self):
         conn = self.connection()
         target = run.parse_origin('https://abc123def4.execute-api.ap-northeast-2.amazonaws.com/m2')
-        with patch('run.http.client.HTTPSConnection', return_value=conn) as constructor:
+        with patch('run.TimedHTTPSConnection', return_value=conn) as constructor:
             record = run.request_once(target, 'secret-token', 8, 1)
         self.assertIsNone(record['error'])
         self.assertEqual(conn.request.call_args.args, ('GET', '/m2/api/v1/me'))
@@ -122,7 +123,7 @@ class Http(unittest.TestCase):
 
     def test_redirect_is_recorded_without_following_or_reading_body(self):
         conn = self.connection(302, b'secret redirect body')
-        with patch('run.http.client.HTTPSConnection', return_value=conn):
+        with patch('run.TimedHTTPSConnection', return_value=conn):
             record = run.request_once(ORIGIN, 'secret-token', 8, 1)
         self.assertEqual(record['status'], 302)
         self.assertEqual(record['error'], 'http_status')
@@ -135,7 +136,7 @@ class Http(unittest.TestCase):
                           (OSError('secret-token'), 'connection_error')]:
             conn = self.connection()
             conn.connect.side_effect = exc
-            with patch('run.http.client.HTTPSConnection', return_value=conn):
+            with patch('run.TimedHTTPSConnection', return_value=conn):
                 record = run.request_once(ORIGIN, 'secret-token', 8, 1)
             self.assertEqual(record['error'], code)
             self.assertNotIn('secret-token', json.dumps(record))
@@ -143,9 +144,25 @@ class Http(unittest.TestCase):
     def test_body_limit_and_shape_are_enforced(self):
         for body, expected in [(b'x' * (run.MAX_BODY_BYTES + 1), 'response_too_large'),
                                (b'{}', 'invalid_response_shape')]:
-            with patch('run.http.client.HTTPSConnection', return_value=self.connection(body=body)):
+            with patch('run.TimedHTTPSConnection', return_value=self.connection(body=body)):
                 record = run.request_once(ORIGIN, 'secret-token', 8, 1)
             self.assertEqual(record['error'], expected)
+
+    def test_cleanup_errors_preserve_records_and_close_both_resources(self):
+        for status, error in [(200, 'connection_error'), (401, 'http_status')]:
+            conn = self.connection(status)
+            conn.getresponse.return_value.close.side_effect = OSError('secret-token')
+            conn.close.side_effect = OSError('secret-token')
+            with patch('run.TimedHTTPSConnection', return_value=conn):
+                record = run.request_once(ORIGIN, 'secret-token', 8, 1)
+            self.assertEqual(record['status'], status)
+            self.assertEqual(record['error'], error)
+            self.assertEqual(record['phase_at_failure'], 'cleanup')
+            self.assertIsNone(record['timing_ms']['cleanup'])
+            self.assertIsNotNone(record['elapsed_ms'])
+            self.assertIsNotNone(record['timing_ms']['request_send'])
+            conn.close.assert_called_once()
+            self.assertNotIn('secret-token', json.dumps(record))
 
 
 class Schedule(unittest.TestCase):

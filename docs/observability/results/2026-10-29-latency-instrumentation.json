@@ -1,0 +1,227 @@
+{
+  "scope": "Latency instrumentation local validation; no AWS deployment or repeat load trial",
+  "implementation": {
+    "client_phases": [
+      "client_setup",
+      "dns",
+      "tcp_connect",
+      "tls_handshake",
+      "request_send",
+      "response_headers_wait",
+      "response_body",
+      "validation",
+      "cleanup"
+    ],
+    "client_request_id_header": "X-Slash-Probe-Id",
+    "app_response_id_header": "X-Slash-Request-Id",
+    "gateway_mapping": "context.extendedRequestId -> X-Slash-Gateway-Request-Id",
+    "app_event": "personal_request_timing",
+    "app_fields": [
+      "event",
+      "timestamp",
+      "route",
+      "clientProbeId",
+      "appRequestId",
+      "gatewayRequestId",
+      "status",
+      "durationMs"
+    ],
+    "default_app_enabled": false,
+    "experiment_app_enabled": true,
+    "gateway_access_logs_enabled": false
+  },
+  "local_validation": {
+    "request_and_report_tests": {
+      "passed": 69,
+      "failures": 0,
+      "skipped": 0
+    },
+    "app_auth_metrics_regression_tests": {
+      "passed": 47,
+      "failures": 0,
+      "skipped": 0,
+      "note": "Includes 17 new timing checks; gateway format tightening rechecked with 8 filter tests."
+    },
+    "infrastructure_tests": {
+      "passed": 35,
+      "failures": 0
+    },
+    "terraform_format": "PASS",
+    "terraform_validate": "PASS",
+    "independent_reviews": [
+      "app registration/security/scope",
+      "request-log matching and output privacy",
+      "oversized numeric input and correlation ambiguity fixes"
+    ]
+  },
+  "synthetic_loopback_tls": {
+    "at": "2026-10-28T17:51:42.301789+00:00",
+    "scope": "Synthetic loopback TLS measurements only; no Spring app, AWS API, CloudWatch Alarm or M3 request was run. These values cannot explain the historical 2054.693ms request.",
+    "python": "3.9.6",
+    "measurement_contract": "Completed phases have durations; failed/incomplete phases are null plus a separate failed-phase elapsed duration. Header wait is status-line plus complete headers, not pure TTFB.",
+    "status": "PASS",
+    "cases": [
+      {
+        "case": "synthetic_150ms_before_headers",
+        "expected_phase": "response_headers_wait",
+        "passed": true,
+        "record": {
+          "sequence": 1,
+          "phase": "local_evidence",
+          "started_at": "2026-10-28T17:51:41.804748Z",
+          "status": 200,
+          "elapsed_ms": 153.428,
+          "error": null,
+          "client_probe_id": "60875943-8328-4435-a55a-9745fc6dccc6",
+          "correlation": {
+            "app_request_id": null,
+            "gateway_extended_request_id": null,
+            "gateway_request_id": null
+          },
+          "finished_at": "2026-10-28T17:51:41.958264Z",
+          "timing_ms": {
+            "client_setup": 0.02,
+            "dns": 0.058,
+            "tcp_connect": 0.154,
+            "tls_handshake": 1.762,
+            "request_send": 0.123,
+            "response_headers_wait": 151.008,
+            "response_body": 0.104,
+            "validation": 0.06,
+            "cleanup": 0.016
+          },
+          "phase_at_failure": null,
+          "failed_phase_elapsed_ms": null
+        }
+      },
+      {
+        "case": "synthetic_150ms_before_body",
+        "expected_phase": "response_body",
+        "passed": true,
+        "record": {
+          "sequence": 2,
+          "phase": "local_evidence",
+          "started_at": "2026-10-28T17:51:41.970981Z",
+          "status": 200,
+          "elapsed_ms": 164.147,
+          "error": null,
+          "client_probe_id": "40ac0e0f-cb16-43cc-a6f2-19a60a95140f",
+          "correlation": {
+            "app_request_id": null,
+            "gateway_extended_request_id": null,
+            "gateway_request_id": null
+          },
+          "finished_at": "2026-10-28T17:51:42.135174Z",
+          "timing_ms": {
+            "client_setup": 0.028,
+            "dns": 0.095,
+            "tcp_connect": 0.258,
+            "tls_handshake": 2.833,
+            "request_send": 0.07,
+            "response_headers_wait": 0.275,
+            "response_body": 160.289,
+            "validation": 0.082,
+            "cleanup": 0.012
+          },
+          "phase_at_failure": null,
+          "failed_phase_elapsed_ms": null
+        }
+      },
+      {
+        "case": "100ms_deadline_during_250ms_header_delay",
+        "expected_phase": "response_headers_wait",
+        "passed": true,
+        "record": {
+          "sequence": 3,
+          "phase": "local_evidence",
+          "started_at": "2026-10-28T17:51:42.141873Z",
+          "status": null,
+          "elapsed_ms": 102.178,
+          "error": "timeout",
+          "client_probe_id": "df8b79e3-06b7-4d20-871c-d6a7fcdf95ff",
+          "correlation": {
+            "app_request_id": null,
+            "gateway_extended_request_id": null,
+            "gateway_request_id": null
+          },
+          "finished_at": "2026-10-28T17:51:42.244146Z",
+          "timing_ms": {
+            "client_setup": 0.057,
+            "dns": 0.261,
+            "tcp_connect": 0.274,
+            "tls_handshake": 4.628,
+            "request_send": 0.095,
+            "response_headers_wait": null,
+            "response_body": null,
+            "validation": null,
+            "cleanup": 0.12
+          },
+          "phase_at_failure": "response_headers_wait",
+          "failed_phase_elapsed_ms": 96.442
+        }
+      },
+      {
+        "case": "untrusted_local_certificate_rejected",
+        "expected_phase": "tls_handshake",
+        "passed": true,
+        "record": {
+          "sequence": 4,
+          "phase": "local_evidence",
+          "started_at": "2026-10-28T17:51:42.254754Z",
+          "status": null,
+          "elapsed_ms": 46.246,
+          "error": "tls_error",
+          "client_probe_id": "f4125ee6-4401-4a76-9295-1cd15be67202",
+          "correlation": {
+            "app_request_id": null,
+            "gateway_extended_request_id": null,
+            "gateway_request_id": null
+          },
+          "finished_at": "2026-10-28T17:51:42.301081Z",
+          "timing_ms": {
+            "client_setup": 7.385,
+            "dns": 0.17,
+            "tcp_connect": 0.272,
+            "tls_handshake": null,
+            "request_send": null,
+            "response_headers_wait": null,
+            "response_body": null,
+            "validation": null,
+            "cleanup": 0.064
+          },
+          "phase_at_failure": "tls_handshake",
+          "failed_phase_elapsed_ms": 38.138
+        }
+      }
+    ],
+    "secrets_or_user_profiles_recorded": false
+  },
+  "historical_run_review": {
+    "source": "2026-10-29-step-demo/requests.jsonl",
+    "source_sha256": "c148c2f571f8ffea85d2766c894a05b41ae54a774ba3a3274d0c962f51bda593",
+    "observed_requests": 709,
+    "requests_with_phase_timings": 0,
+    "slowest_sequence": 699,
+    "slowest_elapsed_ms": 2054.693,
+    "root_cause": "UNDETERMINED; phase durations and individual app correlation were not recorded then",
+    "original_evidence_modified": false
+  },
+  "environment": {
+    "aws_mutations_performed": false,
+    "aws_load_requests_sent": 0,
+    "aws_read_only_check": "STS account 642935793048 and Seoul REST get-account; cloudWatchRoleArn absent",
+    "experiment_managed_state_count": 0,
+    "new_api_image_published": false,
+    "gateway_header_forwarding_verified_in_aws": false,
+    "app_and_client_correlation_verified_in_aws": false,
+    "m2_m3_status": "In Progress"
+  },
+  "limits": [
+    "Local TLS fixture is not the Spring app or AWS.",
+    "Response header wait is not precise TTFB or app-only latency.",
+    "App filter duration overlaps client timings and excludes container queues and network transmission; no sum/subtraction attribution.",
+    "OS DNS lookups cannot be cancelled; waits and daemon worker count are bounded. SSLContext creation and OS scheduling cannot be forcibly bounded.",
+    "Gateway per-request latency requires a separately planned shared log role.",
+    "High 4 DB tool findings and Alarm/M3 end-to-end verification remain outside this change."
+  ]
+}

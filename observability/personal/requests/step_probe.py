@@ -43,15 +43,22 @@ def _record(raw, sequence, phase, stage=None):
     status, elapsed, error = raw.get('status'), raw.get('elapsed_ms'), raw.get('error')
     if isinstance(status, bool) or not isinstance(status, int) or not 100 <= status <= 599:
         status = None
-    if isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or not math.isfinite(elapsed) or elapsed < 0:
+    try:
+        valid_elapsed = (not isinstance(elapsed, bool) and isinstance(elapsed, (int, float))
+                         and math.isfinite(elapsed) and elapsed >= 0)
+    except OverflowError:
+        valid_elapsed = False
+    if not valid_elapsed:
         elapsed, error = None, 'invalid_result'
     elif error is not None and (not isinstance(error, str) or error not in ERROR_CODES):
         error = 'invalid_result'
-    return {'sequence': sequence, 'phase': phase, 'stage': stage,
+    record = {'sequence': sequence, 'phase': phase, 'stage': stage,
             'started_at': _timestamp(raw.get('started_at')),
             'finished_at': _timestamp(raw.get('finished_at')),
             'observed_at': observer.utc_now(), 'status': status,
             'elapsed_ms': elapsed, 'error': error}
+    record.update(observer.sanitize_measurement(raw))
+    return record
 
 
 def _problem(record):

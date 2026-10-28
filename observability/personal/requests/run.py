@@ -17,11 +17,13 @@ import socket
 import ssl
 import stat
 import sys
-import threading
 import time
 from urllib.parse import urlsplit
 from typing import NamedTuple
 import uuid
+
+from timing_transport import (Deadline, PhaseTimings, TimedHTTPSConnection,
+                              response_correlation, sanitize_measurement)
 
 MAX_BODY_BYTES = 65536
 CONCURRENCY = 4
@@ -129,44 +131,51 @@ def valid_me(body):
 
 def request_once(origin, token, timeout, sequence, phase='trial', context=None):
     record = {'sequence': sequence, 'phase': phase, 'started_at': utc_now(),
-              'status': None, 'elapsed_ms': None, 'error': None}
+              'status': None, 'elapsed_ms': None, 'error': None,
+              'client_probe_id': str(uuid.uuid4()), 'correlation': {}}
     start = time.monotonic()
-    conn = http.client.HTTPSConnection(origin.host, origin.port, timeout=timeout,
-                                      context=context or ssl.create_default_context())
-    transport = []
-    timed_out = threading.Event()
-    def abort():
-        timed_out.set()
-        for sock in transport:
-            if sock is None:
-                continue
-            try:
-                sock.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-            sock.close()
-        conn.close()
-    timer = threading.Timer(timeout, abort)
-    timer.daemon = True
-    timer.start()
+    timings = PhaseTimings()
+    deadline = Deadline(start, timeout)
+    conn = response = None
     try:
+        with timings.measure('client_setup'):
+            tls_context = context or ssl.create_default_context()
+            if tls_context.verify_mode != ssl.CERT_REQUIRED or not tls_context.check_hostname:
+                raise ssl.SSLError('Verified TLS context required')
+            conn = TimedHTTPSConnection(origin.host, origin.port, timeout=timeout,
+                                       context=tls_context, deadline=deadline, timings=timings)
+            deadline.remaining()
         conn.connect()
-        transport.append(conn.sock)
-        if timed_out.is_set():
-            raise TimeoutError
-        conn.request('GET', origin.path, headers={
-            'Authorization': 'Bearer ' + token, 'Accept': 'application/json',
-            'User-Agent': 'slash-m2-db-delay-observer/1', 'Connection': 'close'})
-        response = conn.getresponse()
+        with timings.measure('request_send'):
+            deadline.set_socket_timeout(conn.sock)
+            conn.request('GET', origin.path, headers={
+                'Authorization': 'Bearer ' + token, 'Accept': 'application/json',
+                'User-Agent': 'slash-m2-db-delay-observer/1', 'Connection': 'close',
+                'X-Slash-Probe-Id': record['client_probe_id']})
+            deadline.remaining()
+        # This includes status-line/header reception, not pure first-byte time.
+        with timings.measure('response_headers_wait'):
+            deadline.set_socket_timeout(conn.sock)
+            response = conn.getresponse()
+            deadline.remaining()
         record['status'] = response.status
+        record['correlation'] = response_correlation(response)
         if response.status != 200:
             record['error'] = 'http_status'
         else:
-            body = response.read(MAX_BODY_BYTES + 1)
-            if len(body) > MAX_BODY_BYTES:
-                record['error'] = 'response_too_large'
-            elif not valid_me(body):
-                record['error'] = 'invalid_response_shape'
+            with timings.measure('response_body'):
+                # getresponse can detach a Connection: close socket from conn;
+                # the deadline registry still holds its live transport.
+                body = response.read(MAX_BODY_BYTES + 1)
+                deadline.remaining()
+            with timings.measure('validation'):
+                if len(body) > MAX_BODY_BYTES:
+                    record['error'] = 'response_too_large'
+                elif not valid_me(body):
+                    record['error'] = 'invalid_response_shape'
+                deadline.remaining()
+            if record['error']:
+                timings.validation_failed()
     except (TimeoutError, socket.timeout):
         record['error'] = 'timeout'
     except ssl.SSLError:
@@ -174,12 +183,30 @@ def request_once(origin, token, timeout, sequence, phase='trial', context=None):
     except (OSError, http.client.HTTPException):
         record['error'] = 'connection_error'
     finally:
-        timer.cancel()
-        conn.close()
-        if timed_out.is_set():
+        deadline.finish()
+        try:
+            with timings.measure('cleanup'):
+                cleanup_failed = False
+                for resource in (response, conn):
+                    if resource is not None:
+                        try:
+                            resource.close()
+                        except Exception:
+                            # Still close the other resource, and never lose
+                            # the earlier result or echo a cleanup exception.
+                            cleanup_failed = True
+                if cleanup_failed:
+                    raise OSError('Cleanup failed')
+        except OSError:
+            if record['error'] is None:
+                record['error'] = 'connection_error'
+        if deadline.expired.is_set():
             record['error'] = 'timeout'
         record['elapsed_ms'] = round((time.monotonic() - start) * 1000, 3)
         record['finished_at'] = utc_now()
+        record.update(sanitize_measurement({**record, 'timing_ms': timings.values,
+                                           'phase_at_failure': timings.failed_phase,
+                                           'failed_phase_elapsed_ms': timings.failed_elapsed_ms}))
     return record
 
 

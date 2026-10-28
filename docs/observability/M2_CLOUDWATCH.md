@@ -85,6 +85,22 @@ CloudWatch `LambdaOps/Slash`, `Service=slash-api`, `Environment=dev`에서 기�
 
 실제 브라우저 화면의 1초 간격 캡처를 40초 영상으로 묶고 시간 생략과 조기 중단을 표시했다. [후속 요청·지표·영상 근거](results/2026-10-29-step-demo/index.json)를 첫 시험과 구분한다. 배포 해시를 설정 파일과 입력값 기준으로 보완한 뒤 최종 Terraform 재계획은 `No changes`였다. 02:30 KST [정리 후 실제 조회 59/59](results/2026-10-29-step-demo/cleanup-verification.json)를 통과했다. 시험용 자원과 Terraform 관리 항목은 모두 정리됐으며 Cognito·ECR·기존 LambdaOps와 비활성 수집 상태는 유지했다. 보존 자원이 있으므로 계정 전체 비용 0을 뜻하지 않는다. DB 장애 도구의 High 4건, 비허용 IP의 실제 거부·세 Alarm 전환·M3 종단 경로는 미해결·미검증이다. M2·M3는 In Progress를 유지한다.
 
+### 지연 구간 측정 보강 — 로컬 검증
+
+이후 보강에서는 클라이언트 전체 시간을 준비·DNS·TCP 연결·TLS·전송·응답 헤더 대기·본문 수신·검증·정리로 나눴다. 기존 2초 정지 기준과 요청량은 유지한다. 요청마다 생성한 probe UUID, 앱 응답 UUID, Gateway extended request ID를 허용 목록으로 기록한다. 앱은 개인 환경의 `GET /api/v1/me`에만 인증 필터 전부터 처리 종료까지의 시간과 상태를 JSON으로 남긴다. 토큰·본문·사용자 정보·원문 IP는 기록하지 않고 요청 ID를 지표 라벨로 사용하지 않는다.
+
+| 로컬 검증 | 결과 |
+| --- | --- |
+| 합성 HTTPS 서버에서 헤더 전 150ms 대기 | `response_headers_wait` 151.008ms |
+| 합성 HTTPS 서버에서 본문 전 150ms 대기 | `response_body` 160.289ms |
+| 제한 시간·미신뢰 인증서 | 중단 구간과 미완료 `null`을 기록, TLS 검증 유지 |
+| 자동 검사 | 요청·보고서 69개, 앱 인증·지표 회귀 47개, 인프라 35개 통과. Terraform 형식·구성 검사 통과 |
+| 과거 파일 재분석 | 709건 모두 구간 측정값이 없어 기존 2,054.693ms의 원인은 미확정 |
+
+앱 시간과 클라이언트 시간은 측정 범위가 겹치므로 더하거나 차이를 네트워크 시간으로 단정하지 않는다. 저장한 요청과 앱 로그를 비교하는 `latency_report.py`는 ID가 충돌하면 연결하지 않으며, AWS 호출 없이 과거 전체 시간만 있는 기록도 구분한다. [측정 계약·사용법](../../observability/personal/requests/README.md#지연-구간과-같은-요청의-앱-기록-비교)과 [로컬 검증 근거](results/2026-10-29-latency-instrumentation.json)를 연결한다.
+
+이번 작업은 코드·설정과 로컬 검증이다. 새 API 이미지를 게시하거나 시험 서버를 생성하지 않았다. 실제 Gateway 헤더 전달과 앱 로그 연결은 새 이미지·배포 계획 이후 환경 검증이다. 서울 REST Gateway 공용 로그 역할이 없어 요청별 Gateway 내부 시간 로그는 켜지 않았고, 일반 ALB access log도 활성화하지 않았다. 기존 여섯 지표·Alarm·Incident 계약과 M2·M3 In Progress 상태는 유지한다.
+
 ## AWS 시험 준비 — 2026-10-28
 
 이 절은 당시 개인 ECS 시험 환경의 설정과 실행 방법을 정의한 기록이다. 이후 AWS 배포·정상 지표 수신은 위 2026-10-29 실행에서 확인했으며 Alarm 전이는 아직 별도 환경 검증이다. 기존 `local,m1` 장애 API와 `personal`의 인증·프로필 제한은 유지한다.

@@ -40,6 +40,11 @@
       "me_options": "/api/v1/me",
       "grafana": "/grafana",
       "grafana_proxy": "/grafana/{proxy}"
+    },
+    "ingress_request_headers": {
+      "me_get": {
+        "integration.request.header.X-Slash-Gateway-Request-Id": "context.extendedRequestId"
+      }
     }
   },
   "resource": {
@@ -130,7 +135,7 @@
           "aws_lb_listener_rule.baseline_me",
           "aws_lb_listener_rule.grafana"
         ],
-        "request_parameters": "${each.value.proxy ? {\"integration.request.path.proxy\"=\"method.request.path.proxy\"} : {}}"
+        "request_parameters": "${merge(each.value.proxy ? {\"integration.request.path.proxy\"=\"method.request.path.proxy\"} : {}, lookup(local.ingress_request_headers, each.key, {}))}"
       }
     },
     "aws_api_gateway_gateway_response": {

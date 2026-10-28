@@ -228,7 +228,7 @@ class BoundedSteps(unittest.TestCase):
         self.assertIsNone(events[0]['started_at'])
 
     def test_invalid_latency_or_error_is_not_a_false_success(self):
-        for value in [None, float('nan'), float('inf'), True, -1]:
+        for value in [None, float('nan'), float('inf'), True, -1, 10 ** 999]:
             with self.subTest(value=value):
                 result, _, _, _, _ = self.execute(lambda n, p: success(n, p, elapsed_ms=value))
                 self.assertEqual(result['stop_reason'], 'invalid_result')
@@ -236,6 +236,30 @@ class BoundedSteps(unittest.TestCase):
             result, events, _, _, _ = self.execute(lambda n, p: success(n, p, error=error))
             self.assertEqual(result['stop_reason'], 'invalid_result')
             self.assertNotIn(SECRET, json.dumps(events))
+
+    def test_timing_and_safe_correlation_survive_step_output(self):
+        probe_id = '67d9086c-b119-4c3c-bcaf-d9fed74b0c17'
+        raw = success(1, client_probe_id=probe_id,
+                      timing_ms={'dns': 4.5, 'tls_handshake': 120.0, 'body': SECRET},
+                      correlation={'app_request_id': probe_id,
+                                   'gateway_extended_request_id': 'AbcdEFgh123=',
+                                   'Authorization': SECRET},
+                      headers={'Authorization': SECRET})
+        record = probe._record(raw, 1, 'step', 1)
+        self.assertEqual(record['client_probe_id'], probe_id)
+        self.assertEqual(record['timing_ms']['dns'], 4.5)
+        self.assertEqual(record['timing_ms']['tls_handshake'], 120.0)
+        self.assertEqual(record['correlation']['app_request_id'], probe_id)
+        self.assertNotIn(SECRET, json.dumps(record))
+
+    def test_diagnostics_cannot_override_stop_threshold_or_core_status(self):
+        result, events, _, _, _ = self.execute(
+            lambda n, p: success(n, p, elapsed_ms=2054.693 if p == 'step' else 100,
+                                 timing_ms={'response_headers_wait': 1},
+                                 phase_at_failure=SECRET, failed_phase_elapsed_ms=float('inf')))
+        self.assertEqual(result['stop_reason'], 'latency_limit')
+        self.assertEqual(result['sent_step_requests'], 1)
+        self.assertNotIn(SECRET, json.dumps(events))
 
 
 class Cli(unittest.TestCase):

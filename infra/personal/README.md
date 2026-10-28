@@ -214,6 +214,16 @@ p95는 관측 응답의 95%가 이 값 이하였다는 뜻이다. 표의 시간�
 
 종료 기준은 기존 2026-10-29 04:45:03 KST에서 연장하지 않았다. 02:30 KST에 저장된 삭제 계획 98개 항목 적용과 [후속 실제 조회 59/59](../../docs/observability/results/2026-10-29-step-demo/cleanup-verification.json)를 확인했다. 시험용 실행 자원·DB/백업·캐시·API·네트워크·로그·Secrets를 정리했고 Terraform 관리 자원은 0개다. Cognito·ECR과 기존 LambdaOps는 유지하며 수집 연결은 Disabled다. 중지된 작업 이력과 과거 CloudWatch 지표는 남을 수 있으며 계정 전체 비용 0을 뜻하지 않는다. DB 장애 주입·세 Alarm 전이·M3 Incident 종단 검증은 수행하지 않았다.
 
+## 지연 관측 설정 보강 — 아직 배포하지 않음
+
+2,054.693ms 요청 이후 클라이언트 구간별 측정과 앱 완료 로그를 추가했다. Terraform은 개인 API 컨테이너에 `PERSONAL_REQUEST_TIMING_ENABLED=true`를 넣고, GET `/me`의 `X-Slash-Gateway-Request-Id`를 `context.extendedRequestId`로 매핑한다. 기존 proxy 경로·인증·IP 제한·여섯 지표는 유지하며 새 AWS 자원이나 IAM 권한은 추가하지 않았다. 앱은 기본 꺼짐이고 개인 프로필·앱 포트·지정 GET 경로에서만 관찰한다.
+
+요청·보고서 69개, 앱 회귀 47개, 인프라 검사 35개와 Terraform 형식·구성 검사가 통과했다. [실제 로컬 TLS 지연 주입 근거](../../docs/observability/results/2026-10-29-latency-instrumentation.json)와 [측정 범위·사용법](../../observability/personal/requests/README.md#지연-구간과-같은-요청의-앱-기록-비교)을 따른다. 2.05초의 과거 원인과 새 계측의 AWS 동작은 검증하지 않았다.
+
+읽기 전용 조회로 서울 REST Gateway의 `cloudWatchRoleArn` 미설정을 확인했다. 이 계정 공용 설정을 일회성 experiment가 소유하거나 정리 시 삭제하지 않도록, Gateway access log 역할과 요청별 latency 기록은 별도 계획에 남긴다. 앱 JSON은 기존 ECS stdout 로그 경로를 사용하며 원문 IP·URI 등을 포함하는 ALB access log는 켜지 않았다.
+
+이번 변경을 시험하려면 새 API 이미지 생성·보안 확인·ECR 게시 → 제한된 재배포 계획 검토 → 실제 헤더·앱 로그 연결 확인이 필요하다. 이전 이미지에는 새 필터가 없다. 현재 experiment는 정리된 상태이며 이번 작업에서는 이미지 게시·AWS apply·부하 재시험을 실행하지 않았다. 기존 Cognito·ECR·LambdaOps는 유지한다.
+
 ## 검증의 범위
 
 Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험, 임시 TLS PostgreSQL 동작 검사를 실행한다. Grafana의 `/m2/grafana/` 로그인·정적 파일·보안 쿠키는 로컬 이미지로 확인했다. GitHub CI도 AWS 자원 생성 없이 같은 종류의 검사를 수행한다.

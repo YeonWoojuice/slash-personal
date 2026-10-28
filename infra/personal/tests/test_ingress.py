@@ -193,6 +193,42 @@ class IngressBoundary(unittest.TestCase):
         self.assertEqual(self.g['aws_api_gateway_gateway_response']['cors']['response_templates'],
                          {'application/json': '{"message":$context.error.messageString}'})
 
+    def test_request_correlation_uses_gateway_context_only_on_baseline_get(self):
+        # A client-controlled request ID is unsuitable for joining the runner
+        # to the application's timing log. The REST-generated extended ID is
+        # also returned to the client as x-amz-apigw-id. This verifies the
+        # declared mapping, not AWS's runtime header forwarding behavior.
+        headers = self.ingress['locals']['ingress_request_headers']
+        self.assertEqual(headers, {
+            'me_get': {
+                'integration.request.header.X-Slash-Gateway-Request-Id':
+                    'context.extendedRequestId'
+            }
+        })
+        mapping = self.g['aws_api_gateway_integration']['baseline']['request_parameters']
+        self.assertIn('merge(', mapping)
+        self.assertIn('lookup(local.ingress_request_headers, each.key, {})', mapping)
+        self.assertIn('"integration.request.path.proxy"="method.request.path.proxy"', mapping)
+        self.assertEqual(self.g['aws_api_gateway_integration']['baseline']['type'], 'HTTP_PROXY')
+        for route in ['me_options', 'grafana', 'grafana_proxy']:
+            self.assertEqual(headers.get(route, {}), {})
+        # The existing HTTP proxy forwards the bounded probe header normally;
+        # it is neither used as the trusted Gateway ID nor placed in metrics.
+        self.assertNotIn('method.request.header', json.dumps(headers))
+        self.assertEqual(self.main['locals']['api_environment']['SPRING_PROFILES_ACTIVE'], 'personal')
+        self.assertEqual(self.main['locals']['api_environment']['PERSONAL_REQUEST_TIMING_ENABLED'], 'true')
+
+    def test_timing_does_not_enable_sensitive_or_account_wide_logging(self):
+        self.assertNotIn('access_log_settings', self.g['aws_api_gateway_stage']['test'])
+        settings = self.g['aws_api_gateway_method_settings']['test']['settings']
+        self.assertEqual(settings['logging_level'], 'OFF')
+        self.assertFalse(settings['data_trace_enabled'])
+        self.assertFalse(settings['metrics_enabled'])
+        self.assertFalse(self.g['aws_api_gateway_stage']['test']['xray_tracing_enabled'])
+        self.assertNotIn('aws_api_gateway_account', self.g)
+        self.assertNotIn('aws_api_gateway_account', self.r)
+        self.assertNotIn('access_logs', self.r['aws_lb']['test'])
+
     def test_cors_and_forwarded_headers_do_not_weaken_authentication(self):
         env = self.main['locals']['api_environment']
         self.assertEqual(env['CORS_ALLOWED_ORIGINS'], '${var.cors_allowed_origin}')
