@@ -1,7 +1,7 @@
 # Slash Personal
 
 Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독립 모노레포입니다.
-현재는 로컬 소스 스냅샷을 가져온 상태이며, 아키텍처 변경이나 AWS 배포는 수행하지 않았습니다.
+개인용 로컬 관측 환경과 일회성 AWS 테스트용 Terraform 설계를 추가했습니다. 실제 AWS 배포는 수행하지 않았습니다.
 
 ## 구성
 
@@ -14,6 +14,7 @@ Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독�
 | apps/agent | PC Agent |
 | docs/original | 기존 프로젝트 문서 |
 | docs/legacy-automation | 기존 CI/CD 참고 자료, 자동 실행되지 않음 |
+| infra/personal | 필요할 때 생성하고 삭제하는 개인 AWS 테스트 Terraform |
 | infra/reference | 기존 인프라 참고 자료, Terraform 파일은 `.reference`로 비활성화 |
 | docs/migration | 출처, 가져온 파일 목록, 분리 점검 결과 |
 
@@ -24,7 +25,7 @@ Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독�
 - 원본 주소·기준 커밋·로컬 변경은 `docs/migration/sources.json`에 기록했습니다.
 - 팀 코드의 저작·기여 출처를 유지하며 새 라이선스를 임의로 부여하지 않았습니다.
 - 실제 `.env`, 비밀 키, Terraform state, 설치 의존성, 빌드 결과는 가져오지 않았습니다.
-- GitHub remote와 개인 AWS 계정은 아직 연결하지 않았습니다.
+- GitHub는 `YeonWoojuice/slash-personal`을 사용합니다. 개인 AWS 배포 대상은 확인했으며 Slash 자원은 아직 생성하지 않았습니다.
 
 ## 개발 시작 전
 
@@ -35,3 +36,16 @@ Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독�
 
 [분리 점검 및 다음 작업](docs/migration/ISOLATION.md)을 먼저 읽어 주세요.
 [아키텍처 개선 후보](infra/reference/docs/architecture-improvement-proposals.md)는 참고 자료이며 구현된 구성이 아닙니다.
+
+[일회성 AWS 테스트 환경과 생성·삭제 절차](infra/personal/README.md)를 참고하세요. 앱 클라우드 계약을 검증하기 전에는 workload 실행이 기본 비활성화됩니다.
+
+
+## LambdaOps M2 시험 준비
+
+이 저장소는 LambdaOps의 장애 수집 기능을 검증하는 Slash 시험 대상이다. Incident 저장·조회 코드는 [LambdaOps](https://github.com/YeonWoojuice/LambdaOps)에 있다.
+
+- [개인 Terraform](infra/personal/README.md): 도메인 없는 HTTPS 접속과 로그인·이미지 저장소·임시 시험 환경.
+- [CloudWatch 계약](docs/observability/M2_CLOUDWATCH.md): 같은 서비스·환경의 지표와 세 Alarm 검증 기준.
+- [제한된 DB 시험](observability/personal/db-test/README.md), [작업 실행](observability/personal/task/README.md), [요청 기록](observability/personal/requests/README.md), [LambdaOps 로그인·조회 확인](observability/personal/auth/README.md).
+
+`main`에 push하면 GitHub Actions가 Java 인증·계측, Python 도구, 임시 TLS PostgreSQL, Terraform 구성을 검사한다. CI에는 AWS 자격증명·배포·이미지 게시 단계가 없다. 개인 AWS 환경은 별도의 검토한 계획으로 배포한다. 로컬·CI 검사 통과와 실제 AWS 로그인·Alarm·Incident 검증 결과를 구분한다.

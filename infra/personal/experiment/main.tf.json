@@ -1,0 +1,1136 @@
+{
+  "data": {
+    "aws_availability_zones": {
+      "available": {
+        "state": "available",
+        "filter": [
+          {
+            "name": "zone-id",
+            "values": [
+              "apne2-az1",
+              "apne2-az2",
+              "apne2-az3"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "locals": {
+    "api_environment": {
+      "SPRING_PROFILES_ACTIVE": "personal",
+      "SPRING_DATASOURCE_URL": "jdbc:postgresql://${aws_db_instance.test.address}:5432/slash?sslmode=require",
+      "SPRING_DATASOURCE_USERNAME": "slashadmin",
+      "SPRING_DATA_REDIS_HOST": "${aws_elasticache_replication_group.test.primary_endpoint_address}",
+      "SPRING_DATA_REDIS_PORT": "6379",
+      "SPRING_DATA_REDIS_SSL_ENABLED": "true",
+      "NLU_BASE_URL": "http://127.0.0.1:8001",
+      "LLM_BASE_URL": "http://inference.${var.name}.internal:8000",
+      "TRUSTED_PROXY_HOPS": "0",
+      "AGENT_WS_URL": "ws://127.0.0.1:8080/ws/agent",
+      "USER_WS_URL": "ws://127.0.0.1:8080/ws/user",
+      "SPRING_FLYWAY_ENABLED": "true",
+      "MANAGEMENT_ENDPOINT_HEALTH_SHOWDETAILS": "never",
+      "MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE": "health,prometheus",
+      "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI": "${var.cognito.issuer_uri}",
+      "SLASH_AUTH_COGNITO_CLIENTID": "${var.cognito.client_id}",
+      "COGNITO_USER_INFO_URI": "${var.cognito.user_info_uri}",
+      "MANAGEMENT_SERVER_PORT": "9091",
+      "SLASH_OBSERVABILITY_QUERYMETRICS_ENABLED": "true",
+      "SLASH_OBSERVABILITY_FAULTS_ENABLED": "false",
+      "SLASH_AUTH_LOCALDEVTOKEN_ENABLED": "false",
+      "SLASH_OBSERVABILITY_CLOUDWATCH_ENABLED": "${tostring(var.enable_cloudwatch_metrics)}",
+      "COGNITO_ISSUER_URI": "${var.cognito.issuer_uri}",
+      "COGNITO_CLIENT_ID": "${var.cognito.client_id}",
+      "AWS_REGION": "ap-northeast-2",
+      "SLASH_OBSERVABILITY_CLOUDWATCH_NAMESPACE": "${local.cloudwatch_namespace}",
+      "SLASH_OBSERVABILITY_CLOUDWATCH_SERVICE": "slash-api",
+      "SLASH_OBSERVABILITY_CLOUDWATCH_ENVIRONMENT": "dev",
+      "SLASH_OBSERVABILITY_CLOUDWATCH_PUBLISHINTERVALMS": "60000",
+      "SERVER_FORWARD_HEADERS_STRATEGY": "none",
+      "CORS_ALLOWED_ORIGINS": "${var.cors_allowed_origin}"
+    },
+    "inference_containers": [
+      {
+        "name": "inference",
+        "image": "${try(var.images.inference, \"unset\")}",
+        "essential": true,
+        "cpu": 256,
+        "memory": 512,
+        "portMappings": [
+          {
+            "containerPort": 8000
+          }
+        ],
+        "environment": [
+          {
+            "name": "AWS_REGION",
+            "value": "ap-northeast-2"
+          },
+          {
+            "name": "BEDROCK_MODEL_ID",
+            "value": "${var.bedrock_model_id}"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+            "awslogs-region": "ap-northeast-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        },
+        "healthCheck": {
+          "command": [
+            "CMD-SHELL",
+            "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)\""
+          ],
+          "interval": 30,
+          "timeout": 5,
+          "retries": 3,
+          "startPeriod": 30
+        }
+      }
+    ],
+    "full_mode": "${var.experiment_mode == \"full\"}",
+    "monitoring_enabled": "${var.enable_workloads && var.enable_monitoring}",
+    "api_container": {
+      "name": "api",
+      "image": "${try(var.images.api, \"unset\")}",
+      "essential": true,
+      "cpu": 768,
+      "memory": 2048,
+      "portMappings": [
+        {
+          "containerPort": 8080
+        },
+        {
+          "containerPort": 9091
+        }
+      ],
+      "environment": "${[for k,v in merge(var.api_environment, local.api_environment) : {name=k,value=v}]}",
+      "secrets": [
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "valueFrom": "${aws_db_instance.test.master_user_secret[0].secret_arn}:password::"
+        },
+        {
+          "name": "SPRING_DATA_REDIS_PASSWORD",
+          "valueFrom": "${aws_secretsmanager_secret.cache.arn}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "stopTimeout": 60
+    },
+    "nlu_container": {
+      "name": "nlu",
+      "image": "${try(var.images.nlu, \"unset\")}",
+      "essential": true,
+      "cpu": 256,
+      "memory": 1024,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2)\""
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    },
+    "core_containers": "${concat([local.api_container], local.full_mode ? [local.nlu_container] : [])}",
+    "prometheus_config": {
+      "global": {
+        "scrape_interval": "15s",
+        "evaluation_interval": "15s"
+      },
+      "scrape_configs": [
+        {
+          "job_name": "slash-api-personal",
+          "metrics_path": "/actuator/prometheus",
+          "scrape_timeout": "5s",
+          "dns_sd_configs": [
+            {
+              "names": [
+                "core.${var.name}.internal"
+              ],
+              "type": "A",
+              "port": 9091,
+              "refresh_interval": "10s"
+            }
+          ]
+        }
+      ]
+    },
+    "monitoring_containers": [
+      {
+        "name": "prometheus",
+        "image": "${try(var.images.prometheus,\"unset\")}",
+        "essential": true,
+        "cpu": 512,
+        "memory": 1024,
+        "entryPoint": [
+          "/bin/sh",
+          "-ec"
+        ],
+        "command": [
+          "printf %s \"$PROMETHEUS_CONFIG_B64\" | base64 -d > /tmp/prometheus.yml; exec /bin/prometheus --config.file=/tmp/prometheus.yml --web.listen-address=127.0.0.1:9090 --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=6h --storage.tsdb.retention.size=2GB"
+        ],
+        "environment": [
+          {
+            "name": "PROMETHEUS_CONFIG_B64",
+            "value": "${base64encode(yamlencode(local.prometheus_config))}"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+            "awslogs-region": "ap-northeast-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      },
+      {
+        "name": "grafana",
+        "image": "${try(var.images.grafana,\"unset\")}",
+        "essential": true,
+        "cpu": 512,
+        "memory": 1024,
+        "portMappings": [
+          {
+            "containerPort": 3000
+          }
+        ],
+        "environment": [
+          {
+            "name": "GF_SERVER_ROOT_URL",
+            "value": "${local.api_base_url}/grafana/"
+          },
+          {
+            "name": "GF_SERVER_SERVE_FROM_SUB_PATH",
+            "value": "true"
+          },
+          {
+            "name": "GF_SECURITY_ADMIN_USER",
+            "value": "admin"
+          },
+          {
+            "name": "GF_USERS_ALLOW_SIGN_UP",
+            "value": "false"
+          },
+          {
+            "name": "GF_AUTH_ANONYMOUS_ENABLED",
+            "value": "false"
+          },
+          {
+            "name": "GF_SECURITY_COOKIE_SECURE",
+            "value": "true"
+          },
+          {
+            "name": "GF_ANALYTICS_REPORTING_ENABLED",
+            "value": "false"
+          },
+          {
+            "name": "GF_ANALYTICS_CHECK_FOR_UPDATES",
+            "value": "false"
+          },
+          {
+            "name": "GF_PLUGINS_CHECK_FOR_UPDATES",
+            "value": "false"
+          },
+          {
+            "name": "GF_SERVER_DOMAIN",
+            "value": "${local.api_hostname}"
+          },
+          {
+            "name": "GF_SERVER_PROTOCOL",
+            "value": "http"
+          },
+          {
+            "name": "GF_LIVE_MAX_CONNECTIONS",
+            "value": "0"
+          }
+        ],
+        "secrets": [
+          {
+            "name": "GF_SECURITY_ADMIN_PASSWORD",
+            "valueFrom": "${aws_secretsmanager_secret.grafana.arn}"
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+            "awslogs-region": "ap-northeast-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      }
+    ],
+    "cloudwatch_namespace": "LambdaOps/Slash",
+    "api_hostname": "${aws_api_gateway_rest_api.test.id}.execute-api.ap-northeast-2.amazonaws.com",
+    "api_base_url": "https://${local.api_hostname}/${var.api_stage_name}"
+  },
+  "resource": {
+    "aws_vpc": {
+      "test": {
+        "cidr_block": "10.83.0.0/16",
+        "enable_dns_support": true,
+        "enable_dns_hostnames": true,
+        "tags": {
+          "ExpiresAt": "${var.expires_at}"
+        }
+      }
+    },
+    "aws_internet_gateway": {
+      "test": {
+        "vpc_id": "${aws_vpc.test.id}"
+      }
+    },
+    "aws_subnet": {
+      "public": {
+        "count": 2,
+        "vpc_id": "${aws_vpc.test.id}",
+        "availability_zone": "${data.aws_availability_zones.available.names[count.index]}",
+        "cidr_block": "${cidrsubnet(aws_vpc.test.cidr_block, 8, count.index + 0)}",
+        "map_public_ip_on_launch": false
+      },
+      "data": {
+        "count": 2,
+        "vpc_id": "${aws_vpc.test.id}",
+        "availability_zone": "${data.aws_availability_zones.available.names[count.index]}",
+        "cidr_block": "${cidrsubnet(aws_vpc.test.cidr_block, 8, count.index + 10)}",
+        "map_public_ip_on_launch": false
+      }
+    },
+    "aws_route_table": {
+      "public": {
+        "vpc_id": "${aws_vpc.test.id}"
+      }
+    },
+    "aws_route_table_association": {
+      "public": {
+        "count": 2,
+        "subnet_id": "${aws_subnet.public[count.index].id}",
+        "route_table_id": "${aws_route_table.public.id}"
+      }
+    },
+    "aws_security_group": {
+      "alb": {
+        "name_prefix": "${var.name}-alb-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Slash test alb"
+      },
+      "core": {
+        "name_prefix": "${var.name}-core-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Slash test core"
+      },
+      "inference": {
+        "name_prefix": "${var.name}-inference-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Slash test inference"
+      },
+      "db": {
+        "name_prefix": "${var.name}-db-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Slash test db"
+      },
+      "cache": {
+        "name_prefix": "${var.name}-cache-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Slash test cache"
+      },
+      "monitoring": {
+        "name_prefix": "${var.name}-monitoring-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "Only ALB can reach Grafana; Prometheus stays inside task"
+      },
+      "vpc_link": {
+        "name_prefix": "${var.name}-vpc-link-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "API Gateway VPC Link V2 can only reach the internal ALB"
+      }
+    },
+    "aws_vpc_security_group_ingress_rule": {
+      "api": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.alb.id}",
+        "from_port": 8080,
+        "to_port": 8080,
+        "ip_protocol": "tcp"
+      },
+      "inference": {
+        "security_group_id": "${aws_security_group.inference.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 8000,
+        "to_port": 8000,
+        "ip_protocol": "tcp"
+      },
+      "db": {
+        "security_group_id": "${aws_security_group.db.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 5432,
+        "to_port": 5432,
+        "ip_protocol": "tcp"
+      },
+      "cache": {
+        "security_group_id": "${aws_security_group.cache.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 6379,
+        "to_port": 6379,
+        "ip_protocol": "tcp"
+      },
+      "metrics": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.monitoring.id}",
+        "from_port": 9091,
+        "to_port": 9091,
+        "ip_protocol": "tcp"
+      },
+      "health": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.alb.id}",
+        "from_port": 9091,
+        "to_port": 9091,
+        "ip_protocol": "tcp"
+      },
+      "grafana": {
+        "security_group_id": "${aws_security_group.monitoring.id}",
+        "referenced_security_group_id": "${aws_security_group.alb.id}",
+        "from_port": 3000,
+        "to_port": 3000,
+        "ip_protocol": "tcp"
+      },
+      "alb_from_vpc_link": {
+        "security_group_id": "${aws_security_group.alb.id}",
+        "referenced_security_group_id": "${aws_security_group.vpc_link.id}",
+        "from_port": 80,
+        "to_port": 80,
+        "ip_protocol": "tcp"
+      }
+    },
+    "aws_vpc_security_group_egress_rule": {
+      "api": {
+        "security_group_id": "${aws_security_group.alb.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 8080,
+        "to_port": 8080,
+        "ip_protocol": "tcp"
+      },
+      "inference": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.inference.id}",
+        "from_port": 8000,
+        "to_port": 8000,
+        "ip_protocol": "tcp"
+      },
+      "db": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.db.id}",
+        "from_port": 5432,
+        "to_port": 5432,
+        "ip_protocol": "tcp"
+      },
+      "cache": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "referenced_security_group_id": "${aws_security_group.cache.id}",
+        "from_port": 6379,
+        "to_port": 6379,
+        "ip_protocol": "tcp"
+      },
+      "core_https": {
+        "security_group_id": "${aws_security_group.core.id}",
+        "cidr_ipv4": "0.0.0.0/0",
+        "from_port": 443,
+        "to_port": 443,
+        "ip_protocol": "tcp"
+      },
+      "inference_https": {
+        "security_group_id": "${aws_security_group.inference.id}",
+        "cidr_ipv4": "0.0.0.0/0",
+        "from_port": 443,
+        "to_port": 443,
+        "ip_protocol": "tcp"
+      },
+      "metrics": {
+        "security_group_id": "${aws_security_group.monitoring.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 9091,
+        "to_port": 9091,
+        "ip_protocol": "tcp"
+      },
+      "health": {
+        "security_group_id": "${aws_security_group.alb.id}",
+        "referenced_security_group_id": "${aws_security_group.core.id}",
+        "from_port": 9091,
+        "to_port": 9091,
+        "ip_protocol": "tcp"
+      },
+      "grafana": {
+        "security_group_id": "${aws_security_group.alb.id}",
+        "referenced_security_group_id": "${aws_security_group.monitoring.id}",
+        "from_port": 3000,
+        "to_port": 3000,
+        "ip_protocol": "tcp"
+      },
+      "monitoring_https": {
+        "security_group_id": "${aws_security_group.monitoring.id}",
+        "cidr_ipv4": "0.0.0.0/0",
+        "from_port": 443,
+        "to_port": 443,
+        "ip_protocol": "tcp"
+      },
+      "vpc_link_to_alb": {
+        "security_group_id": "${aws_security_group.vpc_link.id}",
+        "referenced_security_group_id": "${aws_security_group.alb.id}",
+        "from_port": 80,
+        "to_port": 80,
+        "ip_protocol": "tcp"
+      }
+    },
+    "aws_db_subnet_group": {
+      "test": {
+        "name": "${var.name}",
+        "subnet_ids": "${aws_subnet.data[*].id}"
+      }
+    },
+    "aws_db_instance": {
+      "test": {
+        "identifier": "${var.name}",
+        "engine": "postgres",
+        "instance_class": "db.t4g.small",
+        "allocated_storage": 20,
+        "storage_type": "gp3",
+        "storage_encrypted": true,
+        "db_name": "slash",
+        "username": "slashadmin",
+        "manage_master_user_password": true,
+        "db_subnet_group_name": "${aws_db_subnet_group.test.name}",
+        "vpc_security_group_ids": [
+          "${aws_security_group.db.id}"
+        ],
+        "publicly_accessible": false,
+        "multi_az": false,
+        "backup_retention_period": 0,
+        "delete_automated_backups": true,
+        "deletion_protection": false,
+        "skip_final_snapshot": true,
+        "apply_immediately": true
+      }
+    },
+    "random_password": {
+      "cache": {
+        "length": 32,
+        "special": false
+      },
+      "grafana": {
+        "length": 32,
+        "special": false
+      }
+    },
+    "aws_secretsmanager_secret": {
+      "cache": {
+        "name_prefix": "${var.name}-cache-",
+        "recovery_window_in_days": 0
+      },
+      "grafana": {
+        "name_prefix": "${var.name}-grafana-",
+        "recovery_window_in_days": 0
+      }
+    },
+    "aws_secretsmanager_secret_version": {
+      "cache": {
+        "secret_id": "${aws_secretsmanager_secret.cache.id}",
+        "secret_string": "${random_password.cache.result}"
+      },
+      "grafana": {
+        "secret_id": "${aws_secretsmanager_secret.grafana.id}",
+        "secret_string": "${random_password.grafana.result}"
+      }
+    },
+    "aws_elasticache_subnet_group": {
+      "test": {
+        "name": "${var.name}",
+        "subnet_ids": "${aws_subnet.data[*].id}"
+      }
+    },
+    "aws_elasticache_replication_group": {
+      "test": {
+        "replication_group_id": "${var.name}",
+        "description": "Disposable Slash synthetic-data experiment",
+        "engine": "valkey",
+        "engine_version": "8.0",
+        "node_type": "cache.t4g.micro",
+        "num_cache_clusters": 1,
+        "automatic_failover_enabled": false,
+        "multi_az_enabled": false,
+        "port": 6379,
+        "subnet_group_name": "${aws_elasticache_subnet_group.test.name}",
+        "security_group_ids": [
+          "${aws_security_group.cache.id}"
+        ],
+        "transit_encryption_enabled": true,
+        "transit_encryption_mode": "required",
+        "at_rest_encryption_enabled": true,
+        "auth_token": "${random_password.cache.result}",
+        "auth_token_update_strategy": "SET",
+        "snapshot_retention_limit": 0,
+        "apply_immediately": true
+      }
+    },
+    "aws_lb": {
+      "test": {
+        "name": "${var.name}",
+        "load_balancer_type": "application",
+        "internal": true,
+        "subnets": "${aws_subnet.data[*].id}",
+        "security_groups": [
+          "${aws_security_group.alb.id}"
+        ],
+        "idle_timeout": 120,
+        "enable_deletion_protection": false,
+        "drop_invalid_header_fields": true
+      }
+    },
+    "aws_lb_target_group": {
+      "api": {
+        "name": "${var.name}",
+        "port": 8080,
+        "protocol": "HTTP",
+        "target_type": "ip",
+        "vpc_id": "${aws_vpc.test.id}",
+        "deregistration_delay": 30,
+        "health_check": {
+          "path": "/actuator/health/liveness",
+          "matcher": "200",
+          "interval": 30,
+          "timeout": 5,
+          "port": "9091"
+        }
+      },
+      "grafana": {
+        "name": "${var.name}-grafana",
+        "port": 3000,
+        "protocol": "HTTP",
+        "target_type": "ip",
+        "vpc_id": "${aws_vpc.test.id}",
+        "deregistration_delay": 15,
+        "health_check": {
+          "path": "/${var.api_stage_name}/grafana/api/health",
+          "matcher": "200",
+          "interval": 30,
+          "timeout": 5
+        }
+      }
+    },
+    "aws_lb_listener": {
+      "http": {
+        "load_balancer_arn": "${aws_lb.test.arn}",
+        "port": 80,
+        "protocol": "HTTP",
+        "default_action": {
+          "type": "fixed-response",
+          "fixed_response": {
+            "content_type": "text/plain",
+            "status_code": "404",
+            "message_body": "Not found"
+          }
+        }
+      }
+    },
+    "aws_lb_listener_rule": {
+      "deny_0": {
+        "listener_arn": "${aws_lb_listener.http.arn}",
+        "priority": 1,
+        "action": {
+          "type": "fixed-response",
+          "fixed_response": {
+            "content_type": "text/plain",
+            "status_code": "404",
+            "message_body": "Not found"
+          }
+        },
+        "condition": {
+          "path_pattern": {
+            "values": [
+              "/${var.api_stage_name}/internal*"
+            ]
+          }
+        }
+      },
+      "deny_1": {
+        "listener_arn": "${aws_lb_listener.http.arn}",
+        "priority": 2,
+        "action": {
+          "type": "fixed-response",
+          "fixed_response": {
+            "content_type": "text/plain",
+            "status_code": "404",
+            "message_body": "Not found"
+          }
+        },
+        "condition": {
+          "path_pattern": {
+            "values": [
+              "/${var.api_stage_name}/actuator*"
+            ]
+          }
+        }
+      },
+      "deny_2": {
+        "listener_arn": "${aws_lb_listener.http.arn}",
+        "priority": 3,
+        "action": {
+          "type": "fixed-response",
+          "fixed_response": {
+            "content_type": "text/plain",
+            "status_code": "404",
+            "message_body": "Not found"
+          }
+        },
+        "condition": {
+          "path_pattern": {
+            "values": [
+              "/${var.api_stage_name}/api/v1/health/dependencies*"
+            ]
+          }
+        }
+      },
+      "baseline_me": {
+        "listener_arn": "${aws_lb_listener.http.arn}",
+        "priority": 20,
+        "action": {
+          "type": "forward",
+          "target_group_arn": "${aws_lb_target_group.api.arn}"
+        },
+        "condition": [
+          {
+            "path_pattern": {
+              "values": [
+                "/${var.api_stage_name}/api/v1/me"
+              ]
+            }
+          },
+          {
+            "http_request_method": {
+              "values": [
+                "GET",
+                "OPTIONS"
+              ]
+            }
+          }
+        ],
+        "transform": {
+          "type": "url-rewrite",
+          "url_rewrite_config": {
+            "rewrite": {
+              "regex": "^/${var.api_stage_name}/api/v1/me(.*)$",
+              "replace": "/api/v1/me$1"
+            }
+          }
+        }
+      },
+      "grafana": {
+        "count": "${local.monitoring_enabled ? 1 : 0}",
+        "listener_arn": "${aws_lb_listener.http.arn}",
+        "priority": 10,
+        "action": {
+          "type": "forward",
+          "target_group_arn": "${aws_lb_target_group.grafana.arn}"
+        },
+        "condition": {
+          "path_pattern": {
+            "values": [
+              "/${var.api_stage_name}/grafana",
+              "/${var.api_stage_name}/grafana/*"
+            ]
+          }
+        }
+      }
+    },
+    "aws_ecs_cluster": {
+      "test": {
+        "name": "${var.name}",
+        "setting": {
+          "name": "containerInsights",
+          "value": "disabled"
+        }
+      }
+    },
+    "aws_cloudwatch_log_group": {
+      "test": {
+        "name": "/slash/${var.name}",
+        "retention_in_days": 1
+      }
+    },
+    "aws_service_discovery_private_dns_namespace": {
+      "test": {
+        "name": "${var.name}.internal",
+        "vpc": "${aws_vpc.test.id}"
+      }
+    },
+    "aws_service_discovery_service": {
+      "inference": {
+        "name": "inference",
+        "dns_config": {
+          "namespace_id": "${aws_service_discovery_private_dns_namespace.test.id}",
+          "dns_records": {
+            "ttl": 10,
+            "type": "A"
+          },
+          "routing_policy": "MULTIVALUE"
+        },
+        "health_check_custom_config": {}
+      },
+      "core": {
+        "name": "core",
+        "dns_config": {
+          "namespace_id": "${aws_service_discovery_private_dns_namespace.test.id}",
+          "dns_records": {
+            "ttl": 10,
+            "type": "A"
+          },
+          "routing_policy": "MULTIVALUE"
+        },
+        "health_check_custom_config": {}
+      }
+    },
+    "aws_iam_role": {
+      "core_execution": {
+        "name_prefix": "${var.name}-core-exec-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "core_task": {
+        "name_prefix": "${var.name}-core-task-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "inference_execution": {
+        "name_prefix": "${var.name}-inference-exec-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "inference_task": {
+        "name_prefix": "${var.name}-inference-task-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "monitoring_execution": {
+        "name_prefix": "${var.name}-monitoring-execution-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "monitoring_task": {
+        "name_prefix": "${var.name}-monitoring-task-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      }
+    },
+    "aws_iam_role_policy_attachment": {
+      "core": {
+        "role": "${aws_iam_role.core_execution.name}",
+        "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      },
+      "inference": {
+        "role": "${aws_iam_role.inference_execution.name}",
+        "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      },
+      "monitoring": {
+        "role": "${aws_iam_role.monitoring_execution.name}",
+        "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      }
+    },
+    "aws_iam_role_policy": {
+      "core_secrets": {
+        "role": "${aws_iam_role.core_execution.id}",
+        "policy": "${jsonencode({Version=\"2012-10-17\", Statement=[{Effect=\"Allow\", Action=[\"secretsmanager:GetSecretValue\"], Resource=[aws_db_instance.test.master_user_secret[0].secret_arn, aws_secretsmanager_secret.cache.arn]}]})}"
+      },
+      "bedrock": {
+        "count": "${var.enable_workloads && local.full_mode ? 1 : 0}",
+        "role": "${aws_iam_role.inference_task.id}",
+        "policy": "${jsonencode({Version=\"2012-10-17\", Statement=[{Effect=\"Allow\", Action=[\"bedrock:InvokeModel\"], Resource=[var.bedrock_model_arn]}]})}"
+      },
+      "monitoring_secret": {
+        "role": "${aws_iam_role.monitoring_execution.id}",
+        "policy": "${jsonencode({Version=\"2012-10-17\",Statement=[{Effect=\"Allow\",Action=[\"secretsmanager:GetSecretValue\"],Resource=[aws_secretsmanager_secret.grafana.arn]}]})}"
+      },
+      "core_cloudwatch": {
+        "count": "${var.enable_cloudwatch_metrics ? 1 : 0}",
+        "role": "${aws_iam_role.core_task.id}",
+        "policy": "${jsonencode({Version=\"2012-10-17\", Statement=[{Effect=\"Allow\", Action=[\"cloudwatch:PutMetricData\"], Resource=\"*\", Condition={StringEquals={\"cloudwatch:namespace\"=local.cloudwatch_namespace, \"aws:RequestedRegion\"=\"ap-northeast-2\"}}}]})}"
+      }
+    },
+    "aws_ecs_task_definition": {
+      "core": {
+        "count": "${var.enable_workloads ? 1 : 0}",
+        "family": "${var.name}-core",
+        "network_mode": "awsvpc",
+        "requires_compatibilities": [
+          "FARGATE"
+        ],
+        "cpu": "1024",
+        "memory": "3072",
+        "execution_role_arn": "${aws_iam_role.core_execution.arn}",
+        "task_role_arn": "${aws_iam_role.core_task.arn}",
+        "runtime_platform": {
+          "operating_system_family": "LINUX",
+          "cpu_architecture": "X86_64"
+        },
+        "container_definitions": "${jsonencode(local.core_containers)}",
+        "depends_on": [
+          "terraform_data.contract"
+        ]
+      },
+      "inference": {
+        "count": "${var.enable_workloads && local.full_mode ? 1 : 0}",
+        "family": "${var.name}-inference",
+        "network_mode": "awsvpc",
+        "requires_compatibilities": [
+          "FARGATE"
+        ],
+        "cpu": "256",
+        "memory": "512",
+        "execution_role_arn": "${aws_iam_role.inference_execution.arn}",
+        "task_role_arn": "${aws_iam_role.inference_task.arn}",
+        "runtime_platform": {
+          "operating_system_family": "LINUX",
+          "cpu_architecture": "X86_64"
+        },
+        "container_definitions": "${jsonencode(local.inference_containers)}",
+        "depends_on": [
+          "terraform_data.contract"
+        ]
+      },
+      "monitoring": {
+        "count": "${local.monitoring_enabled ? 1 : 0}",
+        "family": "${var.name}-monitoring",
+        "network_mode": "awsvpc",
+        "requires_compatibilities": [
+          "FARGATE"
+        ],
+        "cpu": "1024",
+        "memory": "2048",
+        "execution_role_arn": "${aws_iam_role.monitoring_execution.arn}",
+        "task_role_arn": "${aws_iam_role.monitoring_task.arn}",
+        "runtime_platform": {
+          "operating_system_family": "LINUX",
+          "cpu_architecture": "X86_64"
+        },
+        "container_definitions": "${jsonencode(local.monitoring_containers)}",
+        "depends_on": [
+          "terraform_data.contract"
+        ]
+      }
+    },
+    "aws_ecs_service": {
+      "core": {
+        "count": "${var.enable_workloads ? 1 : 0}",
+        "name": "core",
+        "cluster": "${aws_ecs_cluster.test.id}",
+        "task_definition": "${aws_ecs_task_definition.core[0].arn}",
+        "desired_count": 1,
+        "launch_type": "FARGATE",
+        "platform_version": "1.4.0",
+        "wait_for_steady_state": true,
+        "deployment_minimum_healthy_percent": 0,
+        "deployment_maximum_percent": 100,
+        "deployment_circuit_breaker": {
+          "enable": true,
+          "rollback": true
+        },
+        "network_configuration": {
+          "subnets": "${aws_subnet.public[*].id}",
+          "security_groups": [
+            "${aws_security_group.core.id}"
+          ],
+          "assign_public_ip": true
+        },
+        "depends_on": [
+          "aws_lb_listener.http",
+          "aws_iam_role_policy_attachment.core",
+          "aws_iam_role_policy_attachment.inference",
+          "aws_iam_role_policy.core_secrets",
+          "aws_iam_role_policy.bedrock",
+          "aws_secretsmanager_secret_version.cache",
+          "aws_route_table_association.public",
+          "aws_elasticache_replication_group.test",
+          "aws_route.internet",
+          "aws_iam_role_policy.core_cloudwatch",
+          "aws_lb_listener_rule.baseline_me"
+        ],
+        "timeouts": {
+          "create": "15m",
+          "update": "15m",
+          "delete": "15m"
+        },
+        "load_balancer": {
+          "target_group_arn": "${aws_lb_target_group.api.arn}",
+          "container_name": "api",
+          "container_port": 8080
+        },
+        "health_check_grace_period_seconds": 120,
+        "service_registries": {
+          "registry_arn": "${aws_service_discovery_service.core.arn}"
+        }
+      },
+      "inference": {
+        "count": "${var.enable_workloads && local.full_mode ? 1 : 0}",
+        "name": "inference",
+        "cluster": "${aws_ecs_cluster.test.id}",
+        "task_definition": "${aws_ecs_task_definition.inference[0].arn}",
+        "desired_count": 1,
+        "launch_type": "FARGATE",
+        "platform_version": "1.4.0",
+        "wait_for_steady_state": true,
+        "deployment_minimum_healthy_percent": 0,
+        "deployment_maximum_percent": 100,
+        "deployment_circuit_breaker": {
+          "enable": true,
+          "rollback": true
+        },
+        "network_configuration": {
+          "subnets": "${aws_subnet.public[*].id}",
+          "security_groups": [
+            "${aws_security_group.inference.id}"
+          ],
+          "assign_public_ip": true
+        },
+        "depends_on": [
+          "aws_lb_listener.http",
+          "aws_iam_role_policy_attachment.core",
+          "aws_iam_role_policy_attachment.inference",
+          "aws_iam_role_policy.core_secrets",
+          "aws_iam_role_policy.bedrock",
+          "aws_secretsmanager_secret_version.cache",
+          "aws_route_table_association.public",
+          "aws_route.internet"
+        ],
+        "timeouts": {
+          "create": "15m",
+          "update": "15m",
+          "delete": "15m"
+        },
+        "service_registries": {
+          "registry_arn": "${aws_service_discovery_service.inference.arn}"
+        }
+      },
+      "monitoring": {
+        "count": "${local.monitoring_enabled ? 1 : 0}",
+        "name": "monitoring",
+        "cluster": "${aws_ecs_cluster.test.id}",
+        "task_definition": "${aws_ecs_task_definition.monitoring[0].arn}",
+        "desired_count": 1,
+        "launch_type": "FARGATE",
+        "platform_version": "1.4.0",
+        "wait_for_steady_state": true,
+        "deployment_minimum_healthy_percent": 0,
+        "deployment_maximum_percent": 100,
+        "deployment_circuit_breaker": {
+          "enable": true,
+          "rollback": true
+        },
+        "network_configuration": {
+          "subnets": "${aws_subnet.public[*].id}",
+          "security_groups": [
+            "${aws_security_group.monitoring.id}"
+          ],
+          "assign_public_ip": true
+        },
+        "depends_on": [
+          "aws_lb_listener_rule.grafana",
+          "aws_iam_role_policy_attachment.monitoring",
+          "aws_iam_role_policy.monitoring_secret",
+          "aws_secretsmanager_secret_version.grafana",
+          "aws_route.internet",
+          "aws_route_table_association.public"
+        ],
+        "timeouts": {
+          "create": "15m",
+          "update": "15m",
+          "delete": "15m"
+        },
+        "load_balancer": {
+          "target_group_arn": "${aws_lb_target_group.grafana.arn}",
+          "container_name": "grafana",
+          "container_port": 3000
+        },
+        "health_check_grace_period_seconds": 120
+      }
+    },
+    "terraform_data": {
+      "contract": {
+        "input": "${var.enable_workloads}",
+        "lifecycle": {
+          "precondition": [
+            {
+              "condition": "${!var.enable_workloads || alltrue([for k in concat([\"api\"], local.full_mode ? [\"nlu\", \"inference\"] : [], var.enable_monitoring ? [\"prometheus\", \"grafana\"] : []) : contains(keys(var.images), k)])}",
+              "error_message": "Supply immutable images for all enabled services (baseline: api/prometheus/grafana)."
+            },
+            {
+              "condition": "${!var.enable_workloads || !local.full_mode || (can(regex(\"^arn:aws:bedrock:ap-northeast-2::foundation-model/\", var.bedrock_model_arn)) && var.bedrock_model_id != \"\")}",
+              "error_message": "Select a Seoul foundation model and adapter contract."
+            },
+            {
+              "condition": "${!var.enable_workloads || var.cloud_contract_verified}",
+              "error_message": "Verify the authentication/metrics contract before baseline, plus job/Bedrock safety before full mode."
+            },
+            {
+              "condition": "${!var.enable_workloads || (can(regex(\"^https://cognito-idp.ap-northeast-2.amazonaws.com/\", var.cognito.issuer_uri)) && var.cognito.client_id != \"\" && can(regex(\"^https://\", var.cognito.user_info_uri)))}",
+              "error_message": "Supply your personal Cognito settings."
+            },
+            {
+              "condition": "${!local.full_mode}",
+              "error_message": "Domain-free REST ingress supports api-baseline only. Full mode requires a separately reviewed WebSocket-capable ingress; no full API routes are exposed here."
+            }
+          ]
+        }
+      }
+    },
+    "aws_route": {
+      "internet": {
+        "route_table_id": "${aws_route_table.public.id}",
+        "destination_cidr_block": "0.0.0.0/0",
+        "gateway_id": "${aws_internet_gateway.test.id}"
+      }
+    }
+  },
+  "output": {
+    "alb_dns_name": {
+      "value": "${aws_lb.test.dns_name}",
+      "description": "Internal ALB address; use api_base_url for HTTPS access."
+    },
+    "cluster": {
+      "value": "${aws_ecs_cluster.test.name}"
+    },
+    "db_endpoint": {
+      "value": "${aws_db_instance.test.endpoint}"
+    },
+    "cleanup_deadline": {
+      "value": "${var.expires_at}"
+    },
+    "grafana_url": {
+      "value": "${local.monitoring_enabled ? \"${local.api_base_url}/grafana/\" : null}"
+    },
+    "grafana_secret_arn": {
+      "value": "${aws_secretsmanager_secret.grafana.arn}",
+      "description": "Retrieve the generated password from your account; password is not output."
+    },
+    "api_base_url": {
+      "value": "${local.api_base_url}",
+      "description": "AWS-managed HTTPS base URL including the stage; append /api/v1/me. Restricted to allowed_cidrs."
+    }
+  }
+}

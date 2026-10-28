@@ -1,0 +1,37 @@
+account_id      = "123456789012" # 반드시 본인 계정으로 교체
+name            = "slash-test"
+allowed_cidrs   = ["203.0.113.10/32"] # 실제 시험자 공인 IP
+api_stage_name = "m2" # AWS execute-api HTTPS URL에 붙는 시험 경로
+cors_allowed_origin = "http://localhost:5173" # 브라우저의 단일 허용 출처
+expires_at      = "2026-10-01T09:00:00Z" # 테스트 종료 예정시각. 자동 삭제 아님
+
+# false여도 ALB/RDS/Valkey 비용 발생. 검토만 할 때는 apply하지 않음.
+enable_workloads        = false
+cloud_contract_verified = false
+images                  = {} # api/nlu/inference: ECR URL@sha256:64자리
+cognito = {
+  issuer_uri    = "" # foundation output cognito
+  client_id     = ""
+  user_info_uri = ""
+}
+api_environment = {} # CORS는 위 cors_allowed_origin으로만 설정
+bedrock_model_id  = "" # 서울에서 접근/호출 검증한 모델
+bedrock_model_arn = "" # arn:aws:bedrock:ap-northeast-2::foundation-model/...
+
+# First AWS test: only GET /api/v1/me plus Grafana.
+experiment_mode = "api-baseline"
+enable_monitoring = true
+# enable_workloads=true requires api, prometheus, grafana image digests.
+# Domain-free REST ingress supports baseline only. Full mode is intentionally blocked
+# until a WebSocket-capable ingress has been reviewed. No ACM certificate/DNS is needed.
+
+# LambdaOps M2 test: sends at most six series only when workloads run.
+# Keep false for Prometheus-only experiments. This flag also controls task IAM.
+enable_cloudwatch_metrics = true
+
+# Optional one-off DB delay task definition. This does NOT run a test.
+# Requires enabled M2 baseline and images["db-test"] from this account's ECR.
+enable_db_test_task = false
+db_test_pulses = 1
+db_test_interval_seconds = 10
+db_test_start_delay_seconds = 15

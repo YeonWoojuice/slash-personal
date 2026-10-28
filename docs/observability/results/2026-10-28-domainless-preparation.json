@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-28",
+  "scope": "Local preparation and read-only Terraform plan; no Slash AWS apply, ECR push, AWS faults or real Cognito login.",
+  "account_id": "642935793048",
+  "region": "ap-northeast-2",
+  "foundation_plan": {
+    "create": 17,
+    "update": 0,
+    "delete": 0,
+    "applied": false,
+    "local_plan": "/private/tmp/slash-foundation-auth-2026-10-28.tfplan",
+    "changes_since_prior_plan": "Add Cognito resource server and separate operator client; old 15-resource plan superseded."
+  },
+  "experiment_plan": {
+    "deployable_plan_created": false,
+    "remaining_inputs": [
+      "Actual Cognito outputs",
+      "ECR manifest digests",
+      "Tester IPv4 CIDR",
+      "Cleanup deadline"
+    ]
+  },
+  "validation": {
+    "java": {
+      "passed": 27,
+      "failed": 0,
+      "errors": 0,
+      "bootJar": "passed",
+      "scope": "observability.*, PersonalRuntimeConfigTest, CognitoJwtConfigTest; cancellation error mapping uses mock, not live app/RDS"
+    },
+    "infra_offline": {
+      "passed": 24
+    },
+    "task_tools": {
+      "passed": 20
+    },
+    "request_tools": {
+      "passed": 19
+    },
+    "operator_auth_tools": {
+      "passed": 13
+    },
+    "tls_postgresql": {
+      "passed": 12,
+      "scope": "Disposable local Docker PostgreSQL with synthetic data; includes actual single-query cancellation and refusal cases",
+      "cleaned_up": true
+    },
+    "grafana_local": {
+      "health": 200,
+      "login_page": 200,
+      "static_assets": 200,
+      "login_post": 200,
+      "cookie_path": "/m2/grafana",
+      "secure_cookie": true,
+      "cleaned_up": true
+    },
+    "terraform": {
+      "foundation_validate": "passed",
+      "experiment_validate": "passed",
+      "fmt": "passed"
+    },
+    "workflow_actionlint": "passed"
+  },
+  "review_fixes": [
+    "Detail probe accepts consistent canonical redirection without changing the Incident ID contract",
+    "Gradle --tests options belong to test before bootJar",
+    "Cancellation rechecks the exact blocked query before signalling"
+  ],
+  "not_verified": [
+    "Actual AWS ingress and IP restriction",
+    "Real Cognito token issuance and API Gateway verification",
+    "Slash ECS/RDS application response and metrics",
+    "Three CloudWatch Alarm transitions",
+    "M3 EventBridge/SQS/Lambda/DSQL and real authenticated Detail end-to-end"
+  ],
+  "ci": "Workflow added; remote outcome belongs to the GitHub run for the published commit.",
+  "db_test_image": {
+    "tag": "slash-personal-db-test:preparation",
+    "id": "sha256:4829ca4c1ef6dd210ea5d7b25910151b2a781f26ed37177f310a526a7154a0ea",
+    "platform": "linux/amd64",
+    "ecr_pushed": false,
+    "note": "Local image ID; not an ECR manifest digest."
+  }
+}

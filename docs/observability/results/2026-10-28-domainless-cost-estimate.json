@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-28",
+  "region": "ap-northeast-2",
+  "currency": "USD",
+  "source": "AWS Price List Query API GetProducts (read-only), plus same-day prior regional infrastructure price evidence",
+  "sources": [
+    "https://aws.amazon.com/api-gateway/pricing/",
+    "https://docs.aws.amazon.com/whitepapers/latest/best-practices-api-gateway-private-apis-integration/cost-optimization.html",
+    "https://github.com/YeonWoojuice/LambdaOps/blob/main/docs/testing/evidence/2026-10-28-slash-cost-estimate.json"
+  ],
+  "scope": "Estimate, not a bill. Baseline API+monitoring 2 task/2 public IP; internal ALB, no API cache, NAT or interface VPC endpoint. Domainless ingress only; existing LambdaOps costs excluded.",
+  "regional_rest_api": {
+    "service": "AmazonApiGateway",
+    "attributes": {
+      "regionCode": "ap-northeast-2",
+      "servicecode": "AmazonApiGateway",
+      "usagetype": "APN2-ApiGatewayRequest",
+      "description": "API calls received",
+      "locationType": "AWS Region",
+      "location": "Asia Pacific (Seoul)",
+      "servicename": "Amazon API Gateway",
+      "operation": "ApiGatewayRequest"
+    },
+    "unit": "Requests",
+    "USD": "0.0000035000",
+    "begin": "0",
+    "description": "$3.50/million requests - first 333 million requests/month"
+  },
+  "baseline_hourly": {
+    "fargate_2_vcpu_5_GiB": 0.11867,
+    "rds_db_t4g_small": 0.051,
+    "valkey_cache_t4g_micro": 0.0192,
+    "internal_alb": 0.0225,
+    "two_task_public_IPv4": 0.01,
+    "subtotal": 0.22137
+  },
+  "variable_rates": {
+    "alb_LCU_hour": 0.008,
+    "rest_per_request": 3.5e-06,
+    "db_test_task_and_one_IP_per_hour": 0.019195
+  },
+  "example": {
+    "main_resource_hours": 4,
+    "request_count_including_Grafana": 10000,
+    "db_test_task_minutes": 10,
+    "base_plus_api_plus_db_task": 0.9236791667,
+    "average_LCU_range": [
+      0,
+      1
+    ],
+    "subtotal_range_before_other_costs": [
+      0.9236791667,
+      0.9556791667
+    ]
+  },
+  "not_in_example": [
+    "RDS storage",
+    "Secrets Manager",
+    "Cloud Map/private DNS",
+    "ECR stored image bytes",
+    "CloudWatch metrics/alarms/log ingestion and retention",
+    "API Gateway/other network data transfer",
+    "Cognito active users/SMS if used",
+    "tax and discounts/free tier",
+    "creation/deletion delays beyond chosen 4 hours",
+    "existing LambdaOps DSQL/Lambda/SQS/state"
+  ],
+  "no_budget_cap": true,
+  "comparison": "Previous public ALB required two additional public IPv4 addresses. With equal task counts hourly subtotal decreases by $0.01; REST requests and data transfer are added. Prior monthly total is not reused."
+}

@@ -1,0 +1,246 @@
+{
+  "date": "2026-10-28",
+  "scope": "read-only AWS inventory, local image preparation and unapplied foundation plan",
+  "user_domain": "none",
+  "aws_applied": false,
+  "ecr_pushed": false,
+  "foundation_plan": {
+    "account_id": "642935793048",
+    "region": "ap-northeast-2",
+    "name": "slash-lab",
+    "plan_file": "/private/tmp/slash-foundation-2026-10-28.tfplan",
+    "applied": false,
+    "resource_changes": [
+      {
+        "address": "aws_cognito_user_pool.test",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_cognito_user_pool_client.web",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_cognito_user_pool_domain.test",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"api\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"db-test\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"grafana\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"inference\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"nlu\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_lifecycle_policy.images[\"prometheus\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"api\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"db-test\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"grafana\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"inference\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"nlu\"]",
+        "actions": [
+          "create"
+        ]
+      },
+      {
+        "address": "aws_ecr_repository.images[\"prometheus\"]",
+        "actions": [
+          "create"
+        ]
+      }
+    ],
+    "create": 15,
+    "update": 0,
+    "delete": 0
+  },
+  "inventory_and_images": {
+    "checked_at": "2026-10-28T07:34:41.482748+00:00",
+    "region": "ap-northeast-2",
+    "read_only": true,
+    "identity": {
+      "Account": "642935793048",
+      "Arn": "arn:aws:iam::642935793048:user/Yeonu"
+    },
+    "cognito_pools": [],
+    "acm_certificates": [],
+    "hosted_zones": [],
+    "slash_ecr": [],
+    "local_images": [
+      {
+        "tags": [
+          "slash-personal-api:cloud-check"
+        ],
+        "os": "linux",
+        "architecture": "amd64",
+        "created": "2026-10-07T09:31:44.292633007Z",
+        "local_digest_refs": [
+          "slash-personal-api@sha256:fd4275db104ffa40e6ee3eef083cb8c18b1be18bf0ef86124b90f5d1ecf47721"
+        ],
+        "ecr_published": false
+      },
+      {
+        "tags": [
+          "slash-personal-grafana:observability-check"
+        ],
+        "os": "linux",
+        "architecture": "arm64",
+        "created": "2026-10-07T09:21:02.18654638Z",
+        "local_digest_refs": [
+          "slash-personal-grafana@sha256:36b77d9f3b89d28af9688ba521b4c467868a42784bd3731ca36ea408fa763643"
+        ],
+        "ecr_published": false
+      },
+      {
+        "tags": [
+          "prom/prometheus:v3.15.0"
+        ],
+        "os": "linux",
+        "architecture": "arm64",
+        "created": "2026-09-25T08:06:31.271609036Z",
+        "local_digest_refs": [
+          "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e"
+        ],
+        "ecr_published": false
+      }
+    ],
+    "local_configuration": {
+      "real_personal_tfvars": false,
+      "personal_state_files": false,
+      "web_env_local": false,
+      "api_actual_env": false,
+      "callback_route": "/callback",
+      "callback_url_configured_in_terraform": "http://localhost:5173/callback",
+      "logout_url_configured_in_terraform": "http://localhost:5173",
+      "oauth_response_type": "code",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "client_secret_in_terraform": false,
+      "pkce_implementation": "oidc-client-ts UserManager; default PKCE not disabled",
+      "code": {
+        "callback": "apps/web/src/features/auth/CallbackPage.tsx",
+        "oidc": "apps/web/src/lib/oidc.ts",
+        "route": "apps/web/src/App.tsx",
+        "foundation": "infra/personal/foundation/main.tf.json"
+      }
+    },
+    "readiness": {
+      "foundation_plan": "Can prepare read-only plan with approved account and chosen personal name; this does not create resources. Need verify globally unique Cognito domain at actual create time.",
+      "experiment_plan": "Real deployment plan blocked: no issued ACM cert/APIhostname decision, Cognito outputs, ECR images/digests, tester CIDR and execution/cleanup time. Do not substitute made-up values and label deployable.",
+      "image_action": "Local API rebuilt from current source; Grafana rebuilt linux/amd64; Prometheus3.15.0 amd64 pulled by upstream manifest digest. Next create personal ECR, push and record ECR digests; not yet published.",
+      "domain_limit": "User confirmed no owned domain. Existing public ALB HTTPS plan is not deployable; domain-free REST API/VPC Link proposal requires implementation and review.",
+      "runtime_auth": "Code callback matches Terraform. Real login is untested because no pool/client exist in account."
+    },
+    "image_preparation": {
+      "status": "All three local linux/amd64 images ready",
+      "source_api_sha256": "13bca55862871081a70fc89cc73fea38617e40b5094a72994dcb01e5e036361d",
+      "source_api_files": 216,
+      "prometheus_upstream_amd64_manifest": "sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa",
+      "old_arm64_tags_preserved": true,
+      "no_ecr_push": true,
+      "smoke": [
+        "Grafana12.4.0 amd64 version command passed with network disabled",
+        "Prometheus3.15.0 amd64 version command passed with network disabled",
+        "API Java21 runtime command passed with network disabled; Spring/Cognito/DB integration not executed"
+      ],
+      "images": [
+        {
+          "tag": "slash-personal-api:m2-amd64",
+          "id": "sha256:9e448708fdaaa7b2d308209fd46bca4ebcd104228bd73487d9111ca5e22a6153",
+          "os": "linux",
+          "architecture": "amd64",
+          "created": "2026-10-28T07:39:23.615350507Z"
+        },
+        {
+          "tag": "slash-personal-grafana:m2-amd64",
+          "id": "sha256:e860853030cbc448a0638e618b0c2689bd56d3781eb07852343bee56683b1569",
+          "os": "linux",
+          "architecture": "amd64",
+          "created": "2026-10-28T07:37:45.194196128Z"
+        },
+        {
+          "tag": "slash-personal-prometheus:m2-amd64",
+          "id": "sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa",
+          "os": "linux",
+          "architecture": "amd64",
+          "created": "2026-09-25T08:06:23.137236845Z"
+        }
+      ]
+    }
+  },
+  "experiment_plan": "not generated: domain-free ingress is a proposal; real Cognito/ECR/CIDR/deadline inputs pending",
+  "db_test_image": {
+    "tag": "slash-personal-db-test:preparation",
+    "local_id": "sha256:5daf51dffdaadb1d8f001e3056b507b09209709ab833a6ebe66abe7471af1c20",
+    "os": "linux",
+    "architecture": "amd64",
+    "ecr_published": false
+  },
+  "validation": {
+    "terraform_foundation": "validate passed; actual unapplied plan 15 create/0 update/0 delete",
+    "terraform_experiment": "fmt/validate passed; no deployable plan generated",
+    "infra_tests": 15,
+    "task_lifecycle_tests": 14,
+    "request_runner_tests": 14,
+    "db_runner_integration_tests": 6,
+    "local_https_smoke_cases": 4,
+    "aws_execution": false,
+    "temporary_test_resources": "local DB/HTTPS containers and test networks cleaned up",
+    "review": "main plus independent agents; launch-interruption cleanup fixed and regression tested"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "terraform": {
+    "required_version": ">= 1.5.0, < 2.0.0",
+    "required_providers": {
+      "aws": {
+        "source": "hashicorp/aws",
+        "version": "~> 6.0"
+      },
+      "random": {
+        "source": "hashicorp/random",
+        "version": "~> 3.7"
+      }
+    }
+  },
+  "provider": {
+    "aws": {
+      "region": "ap-northeast-2",
+      "allowed_account_ids": [
+        "${var.account_id}"
+      ],
+      "default_tags": {
+        "tags": {
+          "Project": "slash-personal",
+          "ManagedBy": "terraform",
+          "Environment": "${var.name}"
+        }
+      }
+    }
+  },
+  "variable": {
+    "account_id": {
+      "type": "string",
+      "validation": {
+        "condition": "${can(regex(\"^[0-9]{12}$\", var.account_id))}",
+        "error_message": "Use your personal 12-digit AWS account ID."
+      }
+    },
+    "name": {
+      "type": "string",
+      "default": "slash-test",
+      "validation": {
+        "condition": "${can(regex(\"^[a-z][a-z0-9-]{2,19}$\", var.name))}",
+        "error_message": "Use 3-20 lowercase letters, digits or hyphens."
+      }
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "variable": {
+    "enable_db_test_task": {
+      "type": "bool",
+      "default": false,
+      "description": "Prepare a bounded one-off DB delay task for the disposable M2 baseline. Terraform never runs this task."
+    },
+    "db_test_pulses": {
+      "type": "number",
+      "default": 1,
+      "validation": {
+        "condition": "${var.db_test_pulses == floor(var.db_test_pulses) && var.db_test_pulses >= 1 && var.db_test_pulses <= 18}",
+        "error_message": "db_test_pulses must be an integer between 1 and 18."
+      }
+    },
+    "db_test_interval_seconds": {
+      "type": "number",
+      "default": 10,
+      "validation": {
+        "condition": "${var.db_test_interval_seconds == floor(var.db_test_interval_seconds) && var.db_test_interval_seconds >= 6 && var.db_test_interval_seconds <= 30}",
+        "error_message": "db_test_interval_seconds must be an integer between 6 and 30."
+      }
+    },
+    "db_test_start_delay_seconds": {
+      "type": "number",
+      "default": 15,
+      "validation": {
+        "condition": "${var.db_test_start_delay_seconds == floor(var.db_test_start_delay_seconds) && var.db_test_start_delay_seconds >= 0 && var.db_test_start_delay_seconds <= 60}",
+        "error_message": "db_test_start_delay_seconds must be an integer between 0 and 60."
+      }
+    }
+  },
+  "locals": {
+    "db_test_container": {
+      "name": "db-test",
+      "image": "${try(var.images[\"db-test\"], \"unset\")}",
+      "essential": true,
+      "readonlyRootFilesystem": true,
+      "mountPoints": [
+        {
+          "sourceVolume": "scratch",
+          "containerPath": "/tmp",
+          "readOnly": false
+        }
+      ],
+      "environment": [
+        {
+          "name": "PGHOST",
+          "value": "${aws_db_instance.test.address}"
+        },
+        {
+          "name": "PGPORT",
+          "value": "5432"
+        },
+        {
+          "name": "PGDATABASE",
+          "value": "slash"
+        },
+        {
+          "name": "PGUSER",
+          "value": "${aws_db_instance.test.username}"
+        },
+        {
+          "name": "CONFIRM_DISPOSABLE",
+          "value": "slash-m2"
+        },
+        {
+          "name": "DB_TEST_PULSES",
+          "value": "${tostring(var.db_test_pulses)}"
+        },
+        {
+          "name": "DB_TEST_INTERVAL_SECONDS",
+          "value": "${tostring(var.db_test_interval_seconds)}"
+        },
+        {
+          "name": "DB_TEST_START_DELAY_SECONDS",
+          "value": "${tostring(var.db_test_start_delay_seconds)}"
+        },
+        {
+          "name": "DB_TEST_MODE",
+          "value": "delay"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "PGPASSWORD",
+          "valueFrom": "${aws_db_instance.test.master_user_secret[0].secret_arn}:password::"
+        }
+      ],
+      "stopTimeout": 30,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.test.name}",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "db-test"
+        }
+      }
+    },
+    "db_test_repository_arn": "arn:aws:ecr:ap-northeast-2:${var.account_id}:repository/${try(split(\"@\", split(\".amazonaws.com/\", var.images[\"db-test\"])[1])[0], \"unset\")}"
+  },
+  "resource": {
+    "terraform_data": {
+      "db_test_contract": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "lifecycle": {
+          "precondition": [
+            {
+              "condition": "${var.enable_workloads && var.enable_cloudwatch_metrics && var.experiment_mode == \"api-baseline\"}",
+              "error_message": "DB tests require the enabled M2 API baseline and CloudWatch metrics."
+            },
+            {
+              "condition": "${can(regex(format(\"^%s[.]dkr[.]ecr[.]ap-northeast-2[.]amazonaws[.]com/[a-z0-9/._-]+@sha256:[a-f0-9]{64}$\", var.account_id), try(var.images[\"db-test\"], \"\")))}",
+              "error_message": "Supply the db-test image digest in your Seoul private ECR registry."
+            },
+            {
+              "condition": "${var.db_test_start_delay_seconds + var.db_test_pulses * 17 + (var.db_test_pulses - 1) * var.db_test_interval_seconds <= 600}",
+              "error_message": "The worst-case DB experiment duration must fit within 600 seconds."
+            }
+          ]
+        }
+      }
+    },
+    "aws_security_group": {
+      "db_test": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "name_prefix": "${var.name}-db-test-",
+        "vpc_id": "${aws_vpc.test.id}",
+        "description": "One-off DB test; no inbound ports"
+      }
+    },
+    "aws_vpc_security_group_ingress_rule": {
+      "db_from_test": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "security_group_id": "${aws_security_group.db.id}",
+        "referenced_security_group_id": "${aws_security_group.db_test[0].id}",
+        "from_port": 5432,
+        "to_port": 5432,
+        "ip_protocol": "tcp"
+      }
+    },
+    "aws_vpc_security_group_egress_rule": {
+      "db_test_postgres": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "security_group_id": "${aws_security_group.db_test[0].id}",
+        "referenced_security_group_id": "${aws_security_group.db.id}",
+        "from_port": 5432,
+        "to_port": 5432,
+        "ip_protocol": "tcp"
+      },
+      "db_test_https": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "security_group_id": "${aws_security_group.db_test[0].id}",
+        "cidr_ipv4": "0.0.0.0/0",
+        "from_port": 443,
+        "to_port": 443,
+        "ip_protocol": "tcp"
+      }
+    },
+    "aws_iam_role": {
+      "db_test_execution": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "name_prefix": "${var.name}-db-test-exec-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      },
+      "db_test_task": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "name_prefix": "${var.name}-db-test-task-",
+        "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+      }
+    },
+    "aws_iam_role_policy": {
+      "db_test_execution": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "role": "${aws_iam_role.db_test_execution[0].id}",
+        "policy": "${jsonencode({Version=\"2012-10-17\", Statement=[{Effect=\"Allow\",Action=[\"ecr:GetAuthorizationToken\"],Resource=\"*\"},{Effect=\"Allow\",Action=[\"ecr:BatchCheckLayerAvailability\",\"ecr:GetDownloadUrlForLayer\",\"ecr:BatchGetImage\"],Resource=local.db_test_repository_arn},{Effect=\"Allow\",Action=[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],Resource=\"${aws_cloudwatch_log_group.test.arn}:*\"},{Effect=\"Allow\",Action=[\"secretsmanager:GetSecretValue\"],Resource=aws_db_instance.test.master_user_secret[0].secret_arn}]})}"
+      }
+    },
+    "aws_ecs_task_definition": {
+      "db_test": {
+        "count": "${var.enable_db_test_task ? 1 : 0}",
+        "family": "${var.name}-db-test",
+        "network_mode": "awsvpc",
+        "requires_compatibilities": [
+          "FARGATE"
+        ],
+        "cpu": "256",
+        "memory": "512",
+        "execution_role_arn": "${aws_iam_role.db_test_execution[0].arn}",
+        "task_role_arn": "${aws_iam_role.db_test_task[0].arn}",
+        "runtime_platform": {
+          "operating_system_family": "LINUX",
+          "cpu_architecture": "X86_64"
+        },
+        "volume": [
+          {
+            "name": "scratch"
+          }
+        ],
+        "container_definitions": "${jsonencode([local.db_test_container])}",
+        "depends_on": [
+          "terraform_data.contract",
+          "terraform_data.db_test_contract",
+          "aws_iam_role_policy.db_test_execution"
+        ]
+      }
+    }
+  },
+  "output": {
+    "db_test": {
+      "description": "Non-secret launch inputs. Creating this task definition does not run a DB experiment.",
+      "value": "${var.enable_db_test_task ? {account_id=var.account_id,region=\"ap-northeast-2\",cluster_arn=aws_ecs_cluster.test.arn,core_service_arn=aws_ecs_service.core[0].id,task_definition_arn=aws_ecs_task_definition.db_test[0].arn,subnets=aws_subnet.public[*].id,security_groups=[aws_security_group.db_test[0].id],assign_public_ip=\"ENABLED\",container=\"db-test\",log_group=aws_cloudwatch_log_group.test.name,expires_at=var.expires_at} : null}"
+    }
+  }
+}

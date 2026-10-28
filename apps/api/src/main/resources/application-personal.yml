@@ -1,0 +1,52 @@
+# Personal AWS only. Standard datasource/Redis env vars are injected by ECS.
+server:
+  port: 8080
+  address: 0.0.0.0
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${COGNITO_ISSUER_URI:}
+management:
+  server:
+    port: 9091
+    address: 0.0.0.0
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      service: slash-api
+      environment: personal
+      version: ${SLASH_VERSION:unknown}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        slash.db.query: true
+slash:
+  auth:
+    local-dev-token:
+      enabled: false
+    cognito:
+      client-id: ${COGNITO_CLIENT_ID:}
+      user-info-uri: ${COGNITO_USER_INFO_URI:}
+  observability:
+    query-metrics:
+      enabled: true
+    faults:
+      enabled: false
+    cloudwatch:
+      # ECS enable_cloudwatch_metrics overrides this opt-in default.
+      # Service/Environment and the 60s interval are pinned in the Terraform task.
+      enabled: false
+logging:
+  level:
+    com.likelion.slash: INFO
+    org.jooq.tools.LoggerListener: WARN

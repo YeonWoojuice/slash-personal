@@ -1,0 +1,103 @@
+name: Personal M2 checks
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-m2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API authentication and metrics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          cache-dependency-path: |
+            apps/api/*.gradle.kts
+            apps/api/gradle/wrapper/gradle-wrapper.properties
+      - name: Check personal runtime, metrics and JWT validation
+        working-directory: apps/api
+        run: >-
+          ./gradlew --no-daemon test
+          --tests 'com.likelion.slash.observability.*'
+          --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'
+          --tests 'com.likelion.slash.config.CognitoJwtConfigTest'
+          bootJar
+
+  tools:
+    name: Bounded request and task tools
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Request tools
+        run: python -m unittest discover -s observability/personal/requests -p 'test_*.py' -v
+      - name: Task lifecycle
+        run: python -m unittest discover -s observability/personal/task -p 'test_*.py' -v
+      - name: Local login and read verification tools
+        run: python -m unittest discover -s observability/personal/auth -p 'test_*.py' -v
+
+  database:
+    name: Disposable TLS PostgreSQL fault tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Build bounded DB test image
+        run: >-
+          docker build --platform linux/amd64
+          -f observability/personal/db-test/Dockerfile
+          -t slash-personal-db-test:preparation .
+      - name: Verify against disposable local PostgreSQL
+        run: python -m unittest discover -s observability/personal/db-test/tests -v
+
+  terraform:
+    name: Terraform and infrastructure boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '1.5.7'
+      - name: Format and boundary checks
+        run: |
+          terraform fmt -check -recursive infra/personal
+          python -m unittest discover -s infra/personal/tests -v
+      - name: Validate foundation
+        run: |
+          terraform -chdir=infra/personal/foundation init -backend=false -input=false -lockfile=readonly
+          terraform -chdir=infra/personal/foundation validate -no-color
+      - name: Validate experiment
+        run: |
+          terraform -chdir=infra/personal/experiment init -backend=false -input=false -lockfile=readonly
+          terraform -chdir=infra/personal/experiment validate -no-color

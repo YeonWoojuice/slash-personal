@@ -1,0 +1,96 @@
+{
+  "variable": {
+    "allowed_cidrs": {
+      "type": "set(string)",
+      "description": "Tester public IPv4 CIDRs; never open the demo to all Internet.",
+      "validation": {
+        "condition": "${length(var.allowed_cidrs) > 0 && alltrue([for c in var.allowed_cidrs : can(cidrnetmask(c)) && try(tonumber(split(\"/\", c)[1]) >= 24, false)])}",
+        "error_message": "Provide at least one IPv4 CIDR with prefix /24 or narrower."
+      }
+    },
+    "expires_at": {
+      "type": "string",
+      "description": "UTC RFC3339 cleanup deadline. Tag only, NOT automatic deletion.",
+      "validation": {
+        "condition": "${can(formatdate(\"YYYY-MM-DD\", var.expires_at))}",
+        "error_message": "Use RFC3339 timestamp."
+      }
+    },
+    "enable_workloads": {
+      "type": "bool",
+      "default": false,
+      "description": "Start verified API baseline; full mode additionally requires NLU/Bedrock/job acceptance checks."
+    },
+    "images": {
+      "type": "map(string)",
+      "default": {},
+      "validation": {
+        "condition": "${alltrue([for v in values(var.images) : can(regex(\"@sha256:[a-f0-9]{64}$\", v))])}",
+        "error_message": "Images must be immutable digest references."
+      }
+    },
+    "api_environment": {
+      "type": "map(string)",
+      "default": {},
+      "description": "Personal profile auth/CORS configuration. No secrets. Reserved infrastructure variables cannot be overridden."
+    },
+    "bedrock_model_arn": {
+      "type": "string",
+      "default": "",
+      "description": "One Seoul foundation-model ARN; no cross-region inference profiles."
+    },
+    "bedrock_model_id": {
+      "type": "string",
+      "default": ""
+    },
+    "cloud_contract_verified": {
+      "type": "bool",
+      "default": false,
+      "description": "Baseline: personal authentication and metrics isolation verified. Full: additionally verify adapter/job/quotas."
+    },
+    "cognito": {
+      "type": "object({issuer_uri=string, client_id=string, user_info_uri=string})",
+      "default": {
+        "issuer_uri": "",
+        "client_id": "",
+        "user_info_uri": ""
+      }
+    },
+    "experiment_mode": {
+      "type": "string",
+      "default": "api-baseline",
+      "validation": {
+        "condition": "${contains([\"api-baseline\", \"full\"], var.experiment_mode)}",
+        "error_message": "Select api-baseline or full."
+      },
+      "description": "This domain-free REST ingress currently supports api-baseline only; full is retained for compatibility but rejected by the deployment contract."
+    },
+    "enable_monitoring": {
+      "type": "bool",
+      "default": true
+    },
+    "enable_cloudwatch_metrics": {
+      "type": "bool",
+      "default": false,
+      "description": "Opt in to LambdaOps M2 metrics (LambdaOps/Slash, slash-api/dev, 60 seconds) and the matching task-role permission. Does not start workloads or create alarms."
+    },
+    "api_stage_name": {
+      "type": "string",
+      "default": "m2",
+      "description": "Single URL path segment used by REST API, ALB routing and Grafana root_url.",
+      "validation": {
+        "condition": "${can(regex(\"^[A-Za-z0-9_-]{1,32}$\", var.api_stage_name))}",
+        "error_message": "Use 1-32 letters, digits, underscores or hyphens for the stage."
+      }
+    },
+    "cors_allowed_origin": {
+      "type": "string",
+      "default": "http://localhost:5173",
+      "description": "Single browser origin for the baseline API, without a trailing slash. Not an authentication bypass.",
+      "validation": {
+        "condition": "${can(regex(\"^https?://[A-Za-z0-9.-]+(:[0-9]{1,5})?$\", var.cors_allowed_origin))}",
+        "error_message": "Use one HTTP(S) origin without path, wildcard, credentials or trailing slash."
+      }
+    }
+  }
+}

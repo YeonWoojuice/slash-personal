@@ -1,0 +1,178 @@
+{
+  "locals": {
+    "ingress_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Sid": "AllowTesterAddresses",
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": "execute-api:Invoke",
+          "Resource": "execute-api:/*",
+          "Condition": {
+            "IpAddress": {
+              "aws:SourceIp": "${sort(tolist(var.allowed_cidrs))}"
+            }
+          }
+        },
+        {
+          "Sid": "DenyOtherAddresses",
+          "Effect": "Deny",
+          "Principal": "*",
+          "Action": "execute-api:Invoke",
+          "Resource": "execute-api:/*",
+          "Condition": {
+            "NotIpAddress": {
+              "aws:SourceIp": "${sort(tolist(var.allowed_cidrs))}"
+            }
+          }
+        }
+      ]
+    },
+    "ingress_routes": "${merge({me_get={resource_id=aws_api_gateway_resource.me.id,http_method=\"GET\",proxy=false},me_options={resource_id=aws_api_gateway_resource.me.id,http_method=\"OPTIONS\",proxy=false}},local.monitoring_enabled ? {grafana={resource_id=aws_api_gateway_resource.grafana[0].id,http_method=\"ANY\",proxy=false},grafana_proxy={resource_id=aws_api_gateway_resource.grafana_proxy[0].id,http_method=\"ANY\",proxy=true}} : {})}",
+    "ingress_gateway_cors": {
+      "gatewayresponse.header.Access-Control-Allow-Origin": "'${var.cors_allowed_origin}'",
+      "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+      "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type'"
+    }
+  },
+  "resource": {
+    "aws_apigatewayv2_vpc_link": {
+      "test": {
+        "name": "${var.name}",
+        "security_group_ids": [
+          "${aws_security_group.vpc_link.id}"
+        ],
+        "subnet_ids": "${aws_subnet.data[*].id}",
+        "depends_on": [
+          "aws_vpc_security_group_egress_rule.vpc_link_to_alb",
+          "aws_vpc_security_group_ingress_rule.alb_from_vpc_link"
+        ]
+      }
+    },
+    "aws_api_gateway_rest_api": {
+      "test": {
+        "name": "${var.name}",
+        "description": "CIDR-restricted Slash baseline HTTPS; Cognito JWT is validated by the API application.",
+        "endpoint_configuration": {
+          "types": [
+            "REGIONAL"
+          ],
+          "ip_address_type": "ipv4"
+        },
+        "disable_execute_api_endpoint": false,
+        "binary_media_types": [
+          "*/*"
+        ],
+        "policy": "${jsonencode(local.ingress_policy)}"
+      }
+    },
+    "aws_api_gateway_resource": {
+      "api": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "parent_id": "${aws_api_gateway_rest_api.test.root_resource_id}",
+        "path_part": "api"
+      },
+      "v1": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "parent_id": "${aws_api_gateway_resource.api.id}",
+        "path_part": "v1"
+      },
+      "me": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "parent_id": "${aws_api_gateway_resource.v1.id}",
+        "path_part": "me"
+      },
+      "grafana": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "parent_id": "${aws_api_gateway_rest_api.test.root_resource_id}",
+        "path_part": "grafana",
+        "count": "${local.monitoring_enabled ? 1 : 0}"
+      },
+      "grafana_proxy": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "parent_id": "${aws_api_gateway_resource.grafana[0].id}",
+        "path_part": "{proxy+}",
+        "count": "${local.monitoring_enabled ? 1 : 0}"
+      }
+    },
+    "aws_api_gateway_method": {
+      "baseline": {
+        "for_each": "${local.ingress_routes}",
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "resource_id": "${each.value.resource_id}",
+        "http_method": "${each.value.http_method}",
+        "authorization": "NONE",
+        "api_key_required": false,
+        "request_parameters": "${each.value.proxy ? {\"method.request.path.proxy\"=true} : {}}"
+      }
+    },
+    "aws_api_gateway_integration": {
+      "baseline": {
+        "for_each": "${local.ingress_routes}",
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "resource_id": "${each.value.resource_id}",
+        "http_method": "${aws_api_gateway_method.baseline[each.key].http_method}",
+        "integration_http_method": "${each.value.http_method}",
+        "type": "HTTP_PROXY",
+        "connection_type": "VPC_LINK",
+        "connection_id": "${aws_apigatewayv2_vpc_link.test.id}",
+        "integration_target": "${aws_lb.test.arn}",
+        "uri": "http://${local.api_hostname}",
+        "timeout_milliseconds": 29000,
+        "depends_on": [
+          "aws_lb_listener.http",
+          "aws_lb_listener_rule.baseline_me",
+          "aws_lb_listener_rule.grafana"
+        ]
+      }
+    },
+    "aws_api_gateway_gateway_response": {
+      "cors": {
+        "for_each": "${toset([\"DEFAULT_4XX\",\"DEFAULT_5XX\"])}",
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "response_type": "${each.value}",
+        "response_parameters": "${local.ingress_gateway_cors}"
+      }
+    },
+    "aws_api_gateway_deployment": {
+      "test": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "triggers": {
+          "configuration": "${sha256(jsonencode({routes=local.ingress_routes,methods=aws_api_gateway_method.baseline,integrations=aws_api_gateway_integration.baseline,policy=local.ingress_policy,gateway_cors=local.ingress_gateway_cors,binary_media_types=aws_api_gateway_rest_api.test.binary_media_types,resources=aws_api_gateway_resource.me.path,stage=var.api_stage_name}))}"
+        },
+        "lifecycle": {
+          "create_before_destroy": true
+        },
+        "depends_on": [
+          "aws_api_gateway_integration.baseline",
+          "aws_api_gateway_gateway_response.cors"
+        ]
+      }
+    },
+    "aws_api_gateway_stage": {
+      "test": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "deployment_id": "${aws_api_gateway_deployment.test.id}",
+        "stage_name": "${var.api_stage_name}",
+        "cache_cluster_enabled": false,
+        "xray_tracing_enabled": false
+      }
+    },
+    "aws_api_gateway_method_settings": {
+      "test": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "stage_name": "${aws_api_gateway_stage.test.stage_name}",
+        "method_path": "*/*",
+        "settings": {
+          "metrics_enabled": false,
+          "logging_level": "OFF",
+          "data_trace_enabled": false,
+          "caching_enabled": false,
+          "throttling_burst_limit": 100,
+          "throttling_rate_limit": 50
+        }
+      }
+    }
+  }
+}

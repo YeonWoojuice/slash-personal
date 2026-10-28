@@ -43,3 +43,100 @@ SDK 기본 자격증명 체인을 사용하며 자격증명은 저장소에 쓰�
 DB 집계에는 앱의 주기 작업 쿼리도 들어간다. 따라서 13:55의 DB 평균 약 87.26 ms는 장애 주입 쿼리 3개의 지연을 그대로 나타내지 않는다. 실제 트래픽에서 임계값과 최소 표본 수를 정해야 한다. 로컬 API와 테스트 컨테이너는 실측 후 종료했다. Terraform Alarm의 AWS `apply`와 ALARM/OK 전이, AWS에 배치한 API·DB의 동작은 아직 검증하지 않았다.
 
 같은 구간에 CloudWatch `GetMetricData`의 Metric Math를 직접 조회해 5xx 비율 33.33%, 평균 API 지연 616.71 ms, 평균 DB 쿼리 지연 87.26 ms를 확인했다. 이 값은 수식 동작 검증이며 Alarm 임계값의 근거로 사용하지 않는다.
+
+## AWS 시험 준비 — 2026-10-28
+
+이 절은 개인 ECS 시험 환경의 설정과 실행 방법을 정의한다. AWS 배포·실제 지표 수신·Alarm 전이는 별도 환경 검증이다. 기존 `local,m1` 장애 API와 `personal`의 인증·프로필 제한은 유지한다.
+
+### 발행 설정과 IAM을 함께 켜기
+
+`infra/personal/experiment`에 `enable_cloudwatch_metrics`를 추가했다. 기본값은 `false`이며 LambdaOps용 `terraform.tfvars.example`에는 `true`를 명시했다. 실제 사용하려면 개인 tfvars에 값을 옮긴 뒤 계획을 검토한다. 이 값만으로 task를 시작하거나 Alarm을 생성하지 않는다. `enable_workloads` 등 기존 실행 조건을 만족한 후 배포해야 지표가 발행된다.
+
+| 설정 | 이번 시험 값 | 이유 |
+| --- | --- | --- |
+| 리전 | `ap-northeast-2` | LambdaOps와 같은 서울 리전에서 관측한다. |
+| Namespace | `LambdaOps/Slash` | 기존 Alarm이 읽는 지표 묶음과 일치시킨다. |
+| 차원 | `Service=slash-api`, `Environment=dev` | 다른 서비스·환경의 데이터가 섞이지 않게 한다. |
+| 주기 | 60,000 ms | 기존 60초 `Sum` 기반 Alarm 계약을 사용한다. |
+| DB 계측 | `query-metrics.enabled=true` | DB 쿼리 수와 소요 시간 합계를 실제 앱에서 측정한다. |
+| Prometheus | 기존 `environment=personal` 유지 | 별도 관측 체계의 태그이며 CloudWatch 차원과 독립적이다. |
+
+Terraform이 ECS 환경변수 `SLASH_OBSERVABILITY_CLOUDWATCH_ENABLED/NAMESPACE/SERVICE/ENVIRONMENT/PUBLISHINTERVALMS`와 `AWS_REGION`을 넣는다. 예약된 값은 `api_environment`의 같은 키보다 우선한다. YAML의 기본값을 직접 켜지 않으므로 개인 앱을 로컬에서 실행하는 것만으로 AWS 전송을 시작하지 않는다. 과거에는 ECS에서 `false`를 강제했지만 이제 전용 변수로 발행과 IAM을 함께 제어한다.
+
+권한은 앱이 AWS SDK를 사용할 때 받는 `core_task`에 부여한다. 이미지를 받거나 로그·비밀번호를 주입하는 `core_execution` 역할과 구분한다.
+
+| 정책 항목 | 허용 범위 |
+| --- | --- |
+| Action | `cloudwatch:PutMetricData`만 허용 |
+| Resource | `*` — 이 작업은 개별 metric ARN으로 범위를 제한하지 않음 |
+| Condition | `StringEquals`로 namespace=`LambdaOps/Slash`, 요청 리전=`ap-northeast-2` |
+| 생성 조건 | `enable_cloudwatch_metrics=true` |
+| 제외 | Alarm 생성·변경, 다른 namespace 전송, DB 관리 권한 |
+
+`Resource=*`의 범위는 조건으로 제한한다. AWS 액세스 키를 앱 환경변수나 저장소에 넣지 않고 ECS task 자격증명을 사용한다. 하나의 task 안의 컨테이너는 task 역할을 공유하므로, 이 권한을 API 컨테이너만의 격리 권한으로 설명하지 않는다. 기본 `api-baseline`은 API 하나만 실행한다.
+
+근거: [CloudWatch namespace 제한](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/iam-cw-condition-keys-namespace.html), [ECS task 역할](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html).
+
+### 첫 장애 시험: DB 조회 대기
+
+첫 시험 대상은 합성 데이터만 있는 개인 RDS PostgreSQL과 `GET /api/v1/me`다. LambdaOps Incident 저장소인 Aurora DSQL에는 장애 SQL을 실행하지 않는다. 정상 Cognito 토큰으로 `/me`를 먼저 호출해 사용자 생성과 외부 userInfo 호출을 마친 뒤 기준선을 측정한다. 이후 `/me`는 `public.users`를 조회하므로, 이 테이블을 잠깐 잠그면 앱의 실제 DB 쿼리와 API 응답이 함께 늦어진다.
+
+```text
+VPC 안의 일회성 DB 작업 → users 잠금 → 3초 후 ROLLBACK
+                                  ↑
+정상 로그인 /me 요청 → DB 조회 대기 → HTTP 200
+                                  ↓
+앱의 쿼리·HTTP 타이머 → CloudWatch → 지연 Alarm 판단
+```
+
+SQL은 [db-query-delay.sql](../../observability/personal/sql/db-query-delay.sql)에 있다. 데이터나 스키마는 수정하지 않는다. 한 번 실행할 때 잠금 획득 대기는 최대 1초, 정상 보유 시간은 3초다. 문장 제한 5초와 트랜잭션 유휴 제한 5초를 둔다. SQL 파일은 `psql -X --file=db-query-delay.sql`로 비대화형 실행한다. 정상 종료는 `ROLLBACK`, 오류 시 `ON_ERROR_STOP`에 따라 `psql`이 종료되어 연결을 반납한다. 대화형으로 붙여넣어 실행하는 방식은 사용하지 않는다. 실행 클라이언트가 멈춘 경우에도 유휴 제한으로 잠금이 해제되지만, 모든 실패 상황이 정확히 3초 이내에 끝난다는 뜻은 아니다.
+
+AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS task**로 준비한다. 기존 VPC에서 private RDS로 TLS 접속하며, 전용 실행 역할에 그 실험 DB secret 읽기만 허용하고 비밀번호는 ECS가 주입한다. DB 접속용 보안 그룹도 별도로 제한한다. 실행 이미지는 digest로 고정한다. 후속 준비에서 이 작업의 Terraform·이미지·실행 도구를 작성했다. [배포 준비 현황](../../infra/personal/README.md#2026-10-28-배포-준비와-실제-계획-범위)을 따른다. 실제 AWS 실행은 아직 검증하지 않았다. 현재 API task에 ECS Exec가 설정됐다고 가정하지 않는다.
+
+| 순서 | 작업 | 남길 근거 |
+| --- | --- | --- |
+| 1 | `/me` 정상 200과 실제 CloudWatch 지표 수신 확인 | 시간, 요청 수, 정상 API·DB 평균, JWT 만료 여유 |
+| 2 | DB 작업 한 개가 잠금을 획득한 뒤 정상 `/me` 요청을 보냄 | 잠금 획득·요청 시작 시각, 대상 DB/task 식별자 |
+| 3 | SQL 종료 후 지연된 200과 다음 요청의 정상 200 확인 | 응답 시간, HTTP 상태, 잠금 해제와 작업 종료 |
+| 4 | 같은 60초 구간의 API·DB 수와 시간 합계를 대조 | CloudWatch 원본 값, 평균 수식 결과, 앱 지표 |
+| 5 | 실측 기준과 최소 표본 수를 정한 뒤, 횟수·총 시간을 제한해 반복 | ALARM/OK 이력 또는 전이하지 않은 이유 |
+
+직접 실행한 `pg_sleep`는 앱 계측 대상이 아니다. 반드시 동시에 `/me`가 DB를 기다려야 한다. 기존 `me-baseline.js`는 정상 기준선용이며 p95 500ms 제한이 있으므로 장애 시험에 그대로 사용해 성공 판정을 내리지 않는다. 장애용 요청 실행기는 별도로 준비하고 요청 수·타임아웃·실패 응답을 기록해야 한다.
+
+### 세 Alarm과 시험 증거의 관계
+
+| Alarm | 시험 방법 | 현재 준비 수준·한계 |
+| --- | --- | --- |
+| 평균 DB 지연 | 위 잠금으로 실제 `/me` 쿼리를 기다리게 함 | SQL 작성 및 로컬 잠금 동작 확인. 실제 앱/RDS 실행은 후속 검증 |
+| 평균 API 지연 | 같은 요청의 HTTP 소요 시간 관측 | DB 지연에 따른 API 지연이다. 독립적인 API 처리 지연 실험은 아님 |
+| 5xx 비율 | 후속: 시험 잠금 때문에 기다리는 앱 쿼리 한 건을 선별 취소 | 제한된 취소 실행기·로컬 검증 준비. 실제 AWS 500·오류 지표는 미검증 |
+
+5xx 시험은 DB·앱 DB 사용자·정확한 core task IP·앱 이름·Lock 대기 상태와 `pg_blocking_pids`의 시험 잠금 PID를 함께 확인해 **정확히 한 세션**만 일치할 때 `pg_cancel_backend`로 현재 쿼리만 취소하는 방식으로 구현했다. 0개/복수이면 취소하지 않고 잠금을 해제한다. 기본 JDBC 앱 이름만으로 세션을 고르지 않는다. 취소 신호 성공은 HTTP 500 증거가 아니므로 실제 응답과 `ServerErrorCount` 증가를 따로 검증한다. 기본 지연 SQL과 분리된 `db-query-cancel-one.sql`을 명시적 `--mode cancel-one`에서만 실행한다. 실행 방법과 로컬 검증 범위는 [DB 이미지](../../observability/personal/db-test/README.md)를 참고한다.
+
+세 Alarm의 최종 검증은 모두 필요하다. 단발 3초 지연만으로 완료 처리하지 않는다. 기존 M2 기본값은 최근 세 개의 60초 구간 중 두 구간 초과이며, 최소 요청/쿼리 수는 실측 후 입력한다. DB 집계에는 주기 작업도 포함되어 평균이 희석될 수 있다. publisher는 분 경계에 정확히 맞추는 방식이 아니므로 준비·종료 구간을 구분한다. 요청이 적어서 수식이 0이 되거나 데이터가 누락되어 OK가 된 것을 서비스 복구 증거로 사용하지 않는다.
+
+[PostgreSQL 잠금과 해제](https://www.postgresql.org/docs/16/sql-lock.html), [문장·유휴 제한](https://www.postgresql.org/docs/16/runtime-config-client.html)을 기준으로 작성했다.
+
+### 검증 상태
+
+2026-10-28 로컬 확인 결과다. AWS `apply`, 지표 전송, 부하·장애 주입은 실행하지 않았다.
+
+| 검사 | 결과 | 검증 범위 |
+| --- | --- | --- |
+| Java 설정·발행·개인 환경 제한 | 19개 통과, 실패·건너뜀 0 | 실제 personal YAML 및 ECS 환경변수 바인딩, AWS client mock, 기존 지표 재전송·관리 포트·프로필 제한 |
+| Terraform 인프라 경계 | 11개 통과 | 새 namespace/리전 제한·역할 분리·opt-in과 기존 네트워크·수명 제한 |
+| Terraform | `fmt -check`·experiment `validate` 통과 | 잠금 파일의 AWS 6.66.0/random 3.9.1 사용. plan/apply는 미실행 |
+| 임시 PostgreSQL 18.4 | 3가지 동작 통과 | 실제 조회 약 2.973초 대기 후 데이터 불변, 잠금 획득 실패 시 종료, 멈춘 연결 약 5.001초 뒤 자동 해제 |
+| 임시 DB 정리 | 완료 | 서버 종료 및 테스트 데이터 디렉터리 삭제 |
+| 메인·서브 검토 | 완료 | 지표 계약 일치, IAM 범위, 기존 제한 유지 및 검증 한계 확인 |
+
+Java 검사는 `apps/api`에서 `./gradlew test --offline --tests 'com.likelion.slash.observability.*' --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'`로, 인프라 검사는 저장소 루트에서 `python3 -m unittest discover -s infra/personal/tests -v`로 실행할 수 있다. DB 검증은 별도 임시 DB에 합성 `users` 한 행을 만들고 같은 SQL 파일을 비대화형 `psql`로 실행한 결과다. 앱 HTTP·Cognito·RDS의 검증은 포함하지 않는다.
+
+위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 다음 단계는 Cognito/ECR 생성과 실제 이미지·로그인 입력 확보, experiment 계획 검토다. 이후에만 AWS 지표 수신·정상 기준선·세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
+
+
+### 후속 준비: 일회성 작업과 요청 실행기
+
+2026-10-28 `observability/personal/db-test`, `task`, `requests`에 실행기와 검증을 추가했다. DB 작업은 기본 3초 지연 한 번이며, 반복 설정도 전체 시간 제한을 적용한다. 실제 요청은 정상 Cognito 토큰으로 HTTPS `/me`를 호출하고 시각·상태·시간만 기록한다. 새 작업 정의와 전용 SG/IAM은 `infra/personal/experiment/db-test.tf.json`에 있다. 생성과 실행은 분리했다.
+
+로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 최신 foundation 계획은 operator client와 scope를 포함해 생성 17·변경 0·삭제 0이며 적용하지 않았다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 실제 ECR 게시·로그인·Fargate/RDS·CloudWatch·Alarm 전이는 아직 미검증이다.

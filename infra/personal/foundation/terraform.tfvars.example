@@ -1,0 +1,7 @@
+account_id = "123456789012" # 반드시 본인 계정으로 교체
+name       = "slash-lab"
+
+# The same pool serves two public code-flow clients:
+# - Slash web: http://localhost:5173/callback, openid/email/profile
+# - LambdaOps operator: http://localhost:8765/callback, openid/lambdaops/incidents.read
+# lambdaops_auth and lambdaops_m3_auth_tfvars outputs contain no token or secret.
