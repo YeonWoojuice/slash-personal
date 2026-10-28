@@ -69,6 +69,17 @@ psql 버전은 16이지만 libpq 버전은 18이다. 두 버전은 기존 이미
 
 **이미지 축소가 모든 High 취약점의 수정을 뜻하지는 않는다.** 2026-10-28 검토에서 남아 있는 glibc 2건·zlib 1건·Cyrus SASL 1건은 Debian 13 수정 패키지가 제공되지 않았다. SASL의 해당 DIGEST-MD5 플러그인은 설치하지 않았지만 소스 패키지 단위 검사 결과와 구분해 기록한다. zlib는 영향 버전 설명과 Debian tracker 표기가 달라 적용 여부를 확정하지 않았다. 실제 ECR Basic 재검사에서 High 4·Medium 9·Low 3건을 확인했다. 이전 High 12건 중 8건은 제거한 소스 패키지와 함께 사라졌다. 남은 4건은 자동 위험 수락이나 해결 완료로 처리하지 않는다. 공식 근거: [glibc DNS 출력](https://security-tracker.debian.org/tracker/CVE-2026-5435), [glibc 통화 출력](https://security-tracker.debian.org/tracker/CVE-2026-19499), [zlib](https://security-tracker.debian.org/tracker/CVE-2026-85091), [Cyrus SASL](https://security-tracker.debian.org/tracker/CVE-2026-107161).
 
+추가 재검토에서는 같은 이미지의 실행 파일과 연결 라이브러리 28개를 검사했다. 대상 함수의 외부 호출 참조는 발견되지 않았지만, 내부 호출·동적 로딩까지 모두 배제한 것은 아니다. 이미지와 SQL을 바꾸면 아래 판단도 다시 확인한다.
+
+| 남은 High | 확인한 적용 조건 | 현재 판단 |
+| --- | --- | --- |
+| glibc `CVE-2026-5435` | 일반 DNS 조회가 아닌 DNS 패킷 디버그 출력 기능. 함수는 설치되어 있으나 조사한 실행 파일의 참조는 없음 | 현재 고정 SQL 경로에서 호출 근거 없음. 수정 완료는 아님 |
+| glibc `CVE-2026-19499` | 특정 버퍼·형식의 금액 출력 기능. 고정 SQL과 조사한 클라이언트에서 사용 근거 없음 | 전체 실행 경로의 안전을 입증한 것은 아님 |
+| zlib `CVE-2026-85091` | 비동기 압축 파일 쓰기 뒤 출력 처리. 대상 함수 참조 없음 | Debian은 현재 버전을 영향 대상으로 기록하므로 낮은 버전이라는 이유로 오탐 처리하지 않음 |
+| SASL `CVE-2026-107161` | DIGEST-MD5 플러그인 처리 | 해당 플러그인은 실제 이미지에 없음. libpq→LDAP→SASL 의존성의 기본 패키지 finding은 유지 |
+
+세부 출처와 버전은 [기존 이미지 근거의 `remaining_high_followup_review`](../../../docs/observability/results/2026-10-28-image-publication.json)에 기록했다. 안정 버전 수정판이 제공되면 이미지 갱신 → 통합 테스트 15개 → ECR 재검사 순서로 확인한다. 필수 라이브러리를 강제로 삭제하거나 미해결 항목을 자동 수락하지 않는다.
+
 기존 `preparation` 태그는 비교 대상으로 보존한다. AWS에는 검증한 새 이미지를 개인 ECR에 게시하고 **ECR에서 확인한 digest**를 `images["db-test"]`에 입력한다. 로컬 이미지 ID는 ECR 게시 완료 증거가 아니다.
 
 서버 인바운드 포트는 필요 없다. 기존 환경에 NAT나 VPC endpoint가 없으므로 task는 public subnet/public IP를 통해 이미지·로그에 접근한다. DB 통신은 VPC의 private RDS로만 연결한다. task 실행은 Terraform apply와 분리된 명시적 일회성 실행으로 한다. 자동 재시작 service나 반복 일정을 만들지 않는다.

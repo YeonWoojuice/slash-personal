@@ -1,0 +1,170 @@
+{
+  "at": "2026-10-28T14:55:39.184781+00:00",
+  "account_id": "642935793048",
+  "region": "ap-northeast-2",
+  "scope": "Real Cognito web client + local personal API; no AWS server deployment",
+  "before_fix": {
+    "image_id": "sha256:5ffdcf488d0bc6c447d27e7f4b36fa97481775001a43c50b987465d4fbe83a4f",
+    "status": "FAIL",
+    "passed_checks": 18,
+    "failed_checks": [
+      {
+        "case": "authenticated_app_port_has_no_metrics_endpoint",
+        "passed": false,
+        "actual_status": 500
+      }
+    ],
+    "login_and_first_repeat_me_passed": true,
+    "cleanup": "completed"
+  },
+  "after_fix": {
+    "at": "2026-10-28T14:55:39.184781+00:00",
+    "scope": "Actual Cognito login with local personal API and disposable DB/cache",
+    "image_id": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+    "profile": "personal",
+    "aws_servers_created": false,
+    "cloudwatch_enabled": false,
+    "aws_credentials_in_container": false,
+    "host_api_or_db_ports_published": false,
+    "checks": [
+      {
+        "case": "expected_api_image_matches",
+        "passed": true
+      },
+      {
+        "case": "personal_api_health",
+        "passed": true
+      },
+      {
+        "case": "no_api_host_ports",
+        "passed": true
+      },
+      {
+        "case": "empty_disposable_users_table",
+        "passed": true
+      },
+      {
+        "case": "missing_token",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "local_fake_token",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "metrics_not_public_on_app_port",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "forwarded_headers_do_not_expose_metrics",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "internal_management_metrics",
+        "passed": true,
+        "actual_status": 200
+      },
+      {
+        "case": "other_management_endpoints_denied",
+        "passed": true,
+        "actual_status": 403
+      },
+      {
+        "case": "real_web_client_access_token_received",
+        "passed": true
+      },
+      {
+        "case": "access_token_requires_userinfo_for_email",
+        "passed": true
+      },
+      {
+        "case": "real_cognito_me_first",
+        "passed": true,
+        "actual_status": 200
+      },
+      {
+        "case": "profile_shape_and_userinfo_email",
+        "passed": true
+      },
+      {
+        "case": "first_request_creates_one_local_user",
+        "passed": true
+      },
+      {
+        "case": "real_cognito_me_repeat",
+        "passed": true,
+        "actual_status": 200
+      },
+      {
+        "case": "tampered_signature",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "id_token_used_as_access",
+        "passed": true,
+        "actual_status": 401
+      },
+      {
+        "case": "authenticated_app_port_has_no_metrics_endpoint",
+        "passed": true,
+        "actual_status": 404
+      },
+      {
+        "case": "management_port_does_not_serve_me",
+        "passed": true,
+        "actual_status": 403
+      },
+      {
+        "case": "valid_token_still_works_after_negative_checks",
+        "passed": true,
+        "actual_status": 200
+      }
+    ],
+    "status": "PASS",
+    "real_cognito_userinfo_path": "Access token without email + first /me on an empty local DB returned a profile matching the real Cognito ID token. The unchanged authentication implementation obtains it from HTTPS userInfo.",
+    "cleanup": "completed",
+    "token_saved_to_disk": false,
+    "temporary_user_data_destroyed": true,
+    "limits": [
+      "Local HTTP on an isolated Docker network, not AWS ingress/RDS TLS validation.",
+      "No ECS/RDS/ALB servers created, no fault trial or CloudWatch metric publication.",
+      "No check of a genuinely expired token or another signed client token in this run.",
+      "Cognito email verification attribute is not changed or assumed verified."
+    ]
+  },
+  "code_change": {
+    "files": [
+      "apps/api/src/main/java/com/likelion/slash/common/error/GlobalExceptionHandler.java",
+      "apps/api/src/test/java/com/likelion/slash/observability/MissingEndpointContractTest.java"
+    ],
+    "behavior": "Missing MVC resource or handler returns existing RESOURCE_NOT_FOUND/404. Real exceptions retain INTERNAL_ERROR/500. Authentication implementation unchanged.",
+    "source_sha256": "40d4a227b367d058023a10a922e82ad5087c6597ea2e3182d36f6e2dc934b2eb",
+    "local_ci_selection_tests": 30,
+    "new_regression_tests": 3,
+    "before_fix_regression_failures": 2,
+    "bootJar": "PASS"
+  },
+  "readiness": {
+    "local_authentication_and_metrics_contract": "verified for the corrected candidate image",
+    "terraform_variables_changed": false,
+    "new_terraform_plan_created": false,
+    "previous_blocked_plan_reusable": false,
+    "aws_apply": false,
+    "aws_fault_test": false,
+    "remaining_db_high": 4,
+    "remaining_db_high_accepted": false
+  },
+  "published_api_image": {
+    "tag": "m2-20261028-authfix1",
+    "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+    "manifest_digest": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+    "scan_digest": "sha256:6650541066c85bb74663249f02e5ecd5fedfacd9bd6c3e65efb30c3763ddf72b",
+    "scan_status": "COMPLETE",
+    "scan_counts": {}
+  }
+}

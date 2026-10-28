@@ -1,4 +1,4 @@
-# LambdaOps 조회 인증 준비
+# 개인 Cognito 로그인·조회 검증
 
 Slash 웹 로그인과 LambdaOps 장애 조회는 같은 개인 Cognito pool을 사용하되 app client와 scope를 구분한다. 로그인 성공만으로 장애 조회 권한을 확인했다고 기록하지 않는다.
 
@@ -10,6 +10,28 @@ Slash 웹 로그인과 LambdaOps 장애 조회는 같은 개인 Cognito pool을 
 Cognito resource server `lambdaops`와 `incidents.read` scope를 추가한다. 발급된 전체 scope는 `lambdaops/incidents.read`다. operator client에는 client secret을 만들지 않으며 authorization code + PKCE(S256)로 로그인한다. 비밀번호는 Cognito 화면에서만 입력한다.
 
 현재 개인 pool은 초대된 사용자만 로그인할 수 있다. **별도 public client는 사용자별 관리자 권한 경계가 아니다.** 이 pool의 로그인 사용자는 operator client가 허용하는 읽기 scope를 요청할 수 있다. 현재 1인 프로젝트의 계정 전체 읽기 범위이며, 다중 사용자·조직별 소유권이나 그룹 승인은 이번 변경에서 도입하지 않는다.
+
+## 실제 Slash 로그인 — 로컬 검증 결과
+
+2026-10-28 기존 웹 client의 code+PKCE 로그인과 **실제 Cognito → 로컬 personal API → 임시 PostgreSQL** 경로를 확인했다. API의 서명·발급자·만료·client·토큰 종류 검증은 그대로 사용했다. 비밀번호는 Cognito 화면에서 입력했으며 토큰은 프로세스 메모리로만 다루고 파일·명령 인자·공개 결과에 남기지 않았다.
+
+| 확인 항목 | 결과 |
+| --- | --- |
+| 실제 access token의 첫 `/api/v1/me` | 200, 실제 UserInfo의 이메일과 일치하는 프로필, 임시 사용자 1건 생성 |
+| 같은 토큰의 반복 조회 | 200, 같은 사용자 반환, DB는 계속 1건 |
+| 토큰 없음·가짜 토큰·서명 변조·ID token 대용 | 모두 401 |
+| 일반 API 포트의 `/actuator/prometheus` | 무인증 401, 인증 후 404. 지표 미노출 |
+| 전달 헤더로 지표 포트 위장 | 401, 지표 미노출 |
+| 내부 관리 포트 | 지표 200, `/me`와 허용하지 않은 관리 경로는 403 |
+| 오류 요청 후 정상 토큰 재조회 | 200 |
+
+최초 실행에서는 인증된 없는 경로가 500으로 응답해 전체 검증이 실패했다. `NoResourceFoundException`·`NoHandlerFoundException` 두 경우만 기존 `RESOURCE_NOT_FOUND / 404`로 처리하도록 보완했다. 진짜 SQL 취소 등 서버 오류는 계속 500이며 인증 코드와 권한 규칙은 바꾸지 않았다. 수정 전 회귀 테스트 2개가 실패했고 수정 후 관련 30개 테스트·JAR 빌드가 통과했다. 수정 이미지를 사용한 실제 Cognito 재검증은 **21개 확인 항목 모두 통과**했다.
+
+[실제 검증 근거](../../../docs/observability/results/2026-10-28-slash-cognito-local-verification.json)에 첫 실패와 최종 통과를 구분했다. API 이미지는 ECR `m2-20261028-authfix1`으로 게시했으며 Basic 검사 검출 0건을 확인했다. 이는 지원 OS 패키지 검사 범위다.
+
+이 시험은 임시 DB·캐시와 내부 Docker 네트워크에서 수행했고 API·DB 포트를 호스트에 공개하지 않았다. 첫 조회 때 생성된 사용자 정보는 임시 DB와 함께 삭제했고 컨테이너·네트워크 정리도 확인했다. 인증 callback은 기존 웹 client의 `localhost:5173`을 사용했다. 아래 `auth.py` 명령은 **LambdaOps operator client 전용**이며 이 Slash 웹 로그인 시험 명령으로 바꿔 쓰지 않는다.
+
+AWS ingress·ECS·RDS TLS·CloudWatch 발행·Alarm·실제 Incident 상세는 이 결과에 포함되지 않는다. 실제 만료 토큰이나 다른 client가 발급한 토큰의 통합 검증도 이번 실행에는 포함하지 않았다. 이메일 소유 확인 속성을 변경하지 않았으며, 로그인 성공을 이메일 검증 완료로 해석하지 않는다.
 
 ## 배포 후 연결할 값
 

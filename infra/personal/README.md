@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성했고 실제 로그인과 LambdaOps 조회 API의 기본 인증을 검증했다.** ECR에는 시험 이미지 4개를 게시했다. 후속 보완에서 Grafana 패키지 갱신, Prometheus의 셸 제거, DB 시험 이미지의 클라이언트 전용 구성을 적용해 High를 21건에서 4건으로 줄였다. 남은 DB High와 Slash 실제 토큰 검증이 있어 배포 준비 완료로 판단하지 않는다. Slash 실행 환경인 experiment와 부하·장애 시험은 아직 실행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성했고 실제 로그인과 LambdaOps 조회 API의 기본 인증을 검증했다.** ECR에는 시험 이미지 4개를 게시했다. 후속 보완에서 Grafana 패키지 갱신, Prometheus의 셸 제거, DB 시험 이미지의 클라이언트 전용 구성을 적용해 High를 21건에서 4건으로 줄였다. 후속 실제 Cognito·로컬 Slash 검증 21개가 통과했다. 남은 DB High의 처리 방침과 최신 배포 계획 검토는 아직 필요하다. Slash 실행 환경인 experiment와 부하·장애 시험은 아직 실행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -70,11 +70,11 @@ foundation은 **생성 17·변경 0·삭제 0으로 적용 완료**했으며, �
 
 실제 Cognito 출력과 ECR 저장소 주소를 확보했다. Cognito domain은 ACTIVE이며 초대 사용자의 첫 로그인과 code+PKCE 토큰 발급에 성공했다. 사용자의 `CONFIRMED` 상태와 이메일 소유 확인은 별개다. 현재 `email_verified=false`이므로 이메일 검증 완료로 기록하지 않는다.
 
-API·Prometheus·Grafana·DB 시험 이미지 4개를 ECR에 게시했다. 이번 보완 이미지는 `m2-20261028-highfix1` 태그이며 API는 기존 `m2-20261028-osfix1`을 유지한다. 실제 게시 manifest와 이전 검사 기록은 [기존 이미지 근거의 `high_remediation_followup`](../../docs/observability/results/2026-10-28-image-publication.json)에 연결했다. ECR Basic은 지원 OS 패키지 검사이며 앱 전체의 안전을 보장하지 않는다.
+API·Prometheus·Grafana·DB 시험 이미지 4개를 ECR에 게시했다. Grafana·Prometheus·DB 보완 이미지는 `m2-20261028-highfix1`, 로그인 검증에서 발견한 오류 처리를 수정한 API는 `m2-20261028-authfix1`이다. 최신 참조는 [기존 이미지 근거의 `current_image_selection`](../../docs/observability/results/2026-10-28-image-publication.json)에 연결했다. ECR Basic은 지원 OS 패키지 검사이며 앱 전체의 안전을 보장하지 않는다.
 
 | 이미지 | 보완한 내용 | 재검사 결과 | 로컬 확인 |
 | --- | --- | --- | --- |
-| API | 이번 변경 없음 | 이전 검사 0건 | 앞선 임시 DB·Valkey·OIDC fixture의 연결·상태·지표·미인증 401 |
+| API | 없는 경로를 500 대신 기존 404 오류로 처리 | 새 이미지 검출 0건 | 실제 Cognito·로컬 API의 정상/반복 조회·인증 거부·지표 격리 등 21개 확인 |
 | Grafana 12.4.0 | zlib·musl 등 6개 설치 패키지 갱신 | High 5→0, 전체 검출 0건 | 로그인·정적 파일·보안 쿠키·대시보드·실제 Prometheus 조회 |
 | Prometheus 3.15.0 | 공식 distroless 기반으로 BusyBox·셸 제거, 설정을 빌드 시 포함 | High 4→0, 전체 검출 0건 | DNS 수집·TSDB 쓰기와 재시작·loopback·비루트 등 11개 확인 |
 | DB 시험 클라이언트 | PostgreSQL 서버·libxml2·GnuPG 제거, 설치 패키지 142→101개 | High 12→4, Medium 9·Low 3 | TLS·대상 제한·정확한 쿼리 선택·강제 종료 등 15개 테스트 |
@@ -83,11 +83,11 @@ DB의 남은 High는 glibc 2건·zlib 1건·Cyrus SASL 1건이다. 검토 시 De
 
 Prometheus 설정은 [이미지 준비 도구](../../observability/personal/prometheus/README.md)로 빌드한다. 게시 후 같은 ECR digest를 확인하고 `image.py contract`로 이름·설정 해시를 검증해 만든 입력 파일을 계획에 함께 전달한다. 이미지와 대상 이름·설정이 다르면 계획이 거부된다. 로컬 image ID만으로 게시 완료를 판단하지 않는다.
 
-### 이번 Terraform 검토 결과
+### 로그인 검증 전 Terraform 검토와 후속 결과
 
 실제 Cognito 출력, 게시된 ECR digest 4개, 현재 시험자 IPv4 `/32`를 사용해 계획을 실행했다. **생성 후보 100개·변경 0개·삭제 0개가 계산됐지만, 인증 사전 검증 조건에서 계획이 실패했다.** 적용 가능한 최종 계획이 아니며 `apply`·서버 생성·AWS 장애 시험은 실행하지 않았다. [기존 준비 근거의 `experiment_review_after_high_remediation`](../../docs/observability/results/2026-10-28-deployment-preparation.json)에 계획 종료 코드와 차단 원인을 기록했다. 실제 IP·tfvars·원본 계획 출력은 공개하지 않는다.
 
-`cloud_contract_verified=false`를 유지했다. 기존 JWT 단위 테스트·가짜 OIDC의 401 검사는 **실제 Cognito 토큰을 사용하는 Slash `/me` 성공**을 증명하지 않는다. LambdaOps operator client의 조회 성공도 Slash 웹 client 검증을 대신하지 않는다. 다음 단계에서 로컬 personal API와 실제 Slash용 토큰으로 정상 200·잘못된 토큰 거부·지표 격리를 확인한 뒤 이 조건을 재검토한다. 배포 후 ECS의 실제 경로 검증은 별도로 수행한다.
+`cloud_contract_verified=false`를 유지했다. 기존 JWT 단위 테스트·가짜 OIDC의 401 검사는 **실제 Cognito 토큰을 사용하는 Slash `/me` 성공**을 증명하지 않는다. LambdaOps operator client의 조회 성공도 Slash 웹 client 검증을 대신하지 않는다. 후속 작업에서 실제 Slash용 토큰으로 로컬 personal API의 정상·반복 200, 잘못된 토큰 401, 지표 격리까지 21개 항목을 확인했다. [실제 로그인 결과](../../observability/personal/auth/README.md)에 근거를 기록했다. 로컬 인증 사전 검증은 충족했지만 이번에는 실제 tfvars의 조건 값을 바꾸거나 계획을 다시 만들지 않았다. 수정 API digest·현재 IP·종료 시각을 반영한 새 계획이 필요하며 이전 차단 계획은 재사용하지 않는다. 배포 후 ECS의 실제 경로 검증은 별도로 수행한다.
 
 이번 계획의 종료 시각은 비용 비교를 위한 4시간 가정이며 실행 예약이 아니다. 실제 배포 직전 시험자 IP·종료 시각·계정·이미지 검사와 남은 High 처리 방침을 다시 확인하고 새 계획을 만든다. DB 시험 task definition은 준비 대상일 뿐 자동 실행되지 않는다. 수정판이 없다는 이유로 DB 시험 실행까지 승인된 것으로 해석하지 않는다.
 
@@ -107,7 +107,7 @@ terraform show /private/tmp/slash-experiment.tfplan
 
 experiment의 배포 가능한 최종 plan은 아직 없다. 다음 순서로 준비한다.
 
-1. 남은 Grafana·Prometheus·DB 시험 이미지 High 항목의 적용 조건·수정 버전을 검토하고 필요한 보완을 마친다.
+1. DB 시험 이미지의 High 4건 처리 방침을 검토한다. 정상 동작용 baseline과 일회성 장애 작업은 구분할 수 있으며, 장애 작업을 준비하지 않을 때는 기존 `enable_db_test_task=false`를 사용한다.
 2. 실제 Cognito 출력, 최종 ECR digest 네 개, 시험자 CIDR과 종료 시각을 입력해 새 plan을 만든다.
 3. 생성 자원·실행 시간·비용을 검토한 뒤 Slash experiment를 배포하고 정상 요청부터 확인한다.
 
@@ -151,6 +151,6 @@ Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험,
 
 foundation 생성과 실제 Cognito code+PKCE 로그인을 확인했다. 활성화한 **LambdaOps HTTP API → 조회 Lambda → DSQL** 경로에서 빈 목록 200(`items` 0개), 무토큰·잘못된 토큰 401, 같은 client의 읽기 scope 없는 토큰 403, 미존재 상세 404를 확인했다. 실제 존재하는 Incident의 상세 200은 아직 검증하지 않았다. LambdaOps의 M2 Alarm·수집 연결도 아직 활성화하지 않았다.
 
-Slash의 REST API·ECS·RDS·ALB는 experiment에 속하며 아직 배포하지 않았다. Slash의 stage 경로 전달·IP 정책·ECR pull·정상 `/me`·CloudWatch·Alarm·부하와 장애 시험은 후속 환경 검증이다. LambdaOps 조회 API 인증 성공을 Slash 앱 로그인이나 장애 시험 성공으로 대신하지 않는다. M2·M3는 아직 In Progress다.
+Slash의 REST API·ECS·RDS·ALB는 experiment에 속하며 아직 배포하지 않았다. Slash의 stage 경로 전달·IP 정책·ECR pull·AWS에서의 정상 `/me`·CloudWatch·Alarm·부하와 장애 시험은 후속 환경 검증이다. 실제 Cognito와 로컬 personal API의 `/me`·지표 격리는 별도 검증을 통과했다. LambdaOps 조회 API 인증 성공을 Slash 앱 로그인이나 장애 시험 성공으로 대신하지 않는다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).

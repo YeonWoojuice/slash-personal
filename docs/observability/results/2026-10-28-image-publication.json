@@ -352,7 +352,7 @@
     "scope": "Published candidates and local checks; no experiment apply, ECS/RDS creation, fault trial or M2 connection",
     "previous_high_total": 21,
     "remaining_high_total": 4,
-    "current_selection": "Use API reference in original images plus the three images below; original section is historical evidence.",
+    "current_selection": "Historical selection after High remediation. Use root current_image_selection for latest verified candidates, including API local_auth_followup.",
     "images": [
       {
         "at": "2026-10-28T11:48:45.958545+00:00",
@@ -605,6 +605,156 @@
       "No unstable/sid packages mixed into the stable DB client image.",
       "Dependency repositories can change; ECR manifest pins this tested build.",
       "Remaining DB High findings require review or stable patches before any requested fault-task execution."
-    ]
+    ],
+    "remaining_high_followup_review": {
+      "reviewed_at": "2026-10-28",
+      "image_id": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+      "new_ecr_scan_performed": false,
+      "findings": [
+        {
+          "id": "CVE-2026-5435",
+          "stable_candidate": "2.41-12+deb13u4",
+          "stable_fix_available": false,
+          "condition": "Deprecated DNS debug-print routines print TSIG records without enforcing caller buffer size. Upstream states these are not in the normal DNS resolver execution path.",
+          "confirmed": [
+            "libresolv.so.2 contains __fp_nquery, ns_sprintrr, ns_sprintrrf exports.",
+            "None of the 28 inspected runtime ELF files imports the targeted functions.",
+            "Fixed SQL scripts do not request DNS packet debug printing."
+          ],
+          "assessment": "No affected execution path identified within the current fixed SQL/psql/TLS contract; complete runtime unreachability is not proven.",
+          "sources": [
+            "https://security-tracker.debian.org/tracker/CVE-2026-5435",
+            "https://packages.debian.org/trixie/libc6",
+            "https://sourceware.org/pipermail/libc-alpha/2026-April/176990.html"
+          ],
+          "resolved": false,
+          "risk_accepted": false
+        },
+        {
+          "id": "CVE-2026-19499",
+          "stable_candidate": "2.41-12+deb13u4",
+          "stable_fix_available": false,
+          "condition": "strfmon/strfmon_l right-justified monetary formatting into a buffer with a susceptible width/size combination.",
+          "confirmed": [
+            "libc.so.6 exports strfmon, strfmon_l and __strfmon_l.",
+            "None of the 28 inspected runtime ELF files imports these functions.",
+            "The fixed SQL scripts only lock, wait, identify a query and optionally cancel one query; no client-side monetary formatting requested."
+          ],
+          "assessment": "No affected execution path identified within the current fixed SQL/psql/TLS contract; complete runtime unreachability is not proven.",
+          "sources": [
+            "https://security-tracker.debian.org/tracker/CVE-2026-19499",
+            "https://packages.debian.org/trixie/libc6",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-19499"
+          ],
+          "resolved": false,
+          "risk_accepted": false
+        },
+        {
+          "id": "CVE-2026-85091",
+          "stable_candidate": "1:1.3.dfsg+really1.3.1-1+b1",
+          "stable_fix_available": false,
+          "condition": "Nonblocking gzwrite error/stall followed by gzprintf/gzvprintf with retained input state. Published affected range and Debian old-version classification differ.",
+          "confirmed": [
+            "libz.so.1 exports gzwrite, gzprintf, gzvprintf.",
+            "None of the 28 inspected runtime ELF files imports these functions.",
+            "Debian bug 1146895 explicitly lists the current source version 1:1.3.dfsg+really1.3.1-1 as found.",
+            "On 2026-10-04 Debian maintainer carnil asked upstream about reproducer issues before the nonblocking-support introduction; no reviewed upstream resolution for the old-version scope.",
+            "Upstream fix commit df84af25dc1942490e1d1c899a07619152a46148 is confirmed but is not a trixie package."
+          ],
+          "assessment": "Applicability to the exact old-version implementation remains uncertain; do not dismiss as a false positive from version comparison. No targeted gz* call identified in the inspected execution closure.",
+          "sources": [
+            "https://security-tracker.debian.org/tracker/CVE-2026-85091",
+            "https://packages.debian.org/trixie/zlib1g",
+            "https://bugs.debian.org/1146895",
+            "https://github.com/madler/zlib/issues/1310",
+            "https://github.com/madler/zlib/commit/df84af25dc1942490e1d1c899a07619152a46148"
+          ],
+          "resolved": false,
+          "risk_accepted": false
+        },
+        {
+          "id": "CVE-2026-107161",
+          "stable_candidate": "2.1.28+dfsg1-9",
+          "stable_fix_available": false,
+          "condition": "Cyrus SASL DIGEST-MD5 plugin add_to_challenge handles an attacker-supplied challenge requiring quoting.",
+          "confirmed": [
+            "libsasl2-2 is an indirect psql dependency via libpq -> libldap -> libsasl2.",
+            "The separately packaged libsasl2-modules is not installed.",
+            "Only libsasldb.so.2.0.25 is present as a regular file in /usr/lib/x86_64-linux-gnu/sasl2; no libdigestmd5 plugin.",
+            "Official Debian file list assigns libdigestmd5.so and its versioned files to absent libsasl2-modules.",
+            "Upstream PR 892 was closed after deletion of its source repository; the reviewed page does not establish an upstream merge/release. Debian unstable nonetheless records a fixed version."
+          ],
+          "assessment": "Vulnerable plugin absent from this exact image; package-level finding is not a demonstrated affected runtime path. Keep recorded without claiming patched package, automatic risk acceptance or blanket suppression.",
+          "sources": [
+            "https://security-tracker.debian.org/tracker/CVE-2026-107161",
+            "https://packages.debian.org/trixie/libsasl2-2",
+            "https://packages.debian.org/trixie/amd64/libsasl2-modules/filelist",
+            "https://github.com/cyrusimap/cyrus-sasl/pull/892"
+          ],
+          "resolved": false,
+          "risk_accepted": false
+        }
+      ],
+      "runtime_evidence": {
+        "elf_files_inspected": 28,
+        "targeted_function_imports": [],
+        "code_sha256": {
+          "observability/personal/db-test/entrypoint.sh": "a7c9bd9754e377f5c8f018049a2a5cfd032996bbd60355d6fcfae7f4c8cf3c9f",
+          "observability/personal/db-test/pulses.sh": "e24cb98f031064f05682afd96eb54b596b3bc3044f8b8a186d45f275536d77a9",
+          "observability/personal/sql/db-query-delay.sql": "6537633f6c606f80f0b991948b435415aced5e69b3ca04359baf8d1410ee87f1",
+          "observability/personal/sql/db-query-cancel-one.sql": "6eaad63bffd1a5c4149fc26f556209c7c1e3da0d036012c74d92990a2db0d24b"
+        },
+        "controls": [
+          "No arbitrary SQL or command arguments.",
+          "Seoul RDS hostname and slash database only.",
+          "TLS verify-full with bundled RDS CA and connection timeout.",
+          "Service/address/options override variables unset.",
+          "psql -X --no-password reads fixed SQL files.",
+          "Finite SQL pulse count, statement/transaction limits, GNU timeout and signal cleanup."
+        ]
+      },
+      "next_actions": [
+        "Keep four findings open with these applicability notes and exact image/package versions.",
+        "When official trixie security/point-release fixes arrive, explicitly update pins/base as needed, rebuild, rerun the 15 local integration tests and rescan before claiming resolution.",
+        "For SASL, preserve the absent-plugin evidence; do not force-remove required libldap/libsasl dependencies.",
+        "For zlib, follow Debian bug 1146895/upstream 1310 for old-version applicability or a supported backport.",
+        "Do not mix unstable libc/libxml packages into Debian 13. A different base/source backport would be a separate implementation and compatibility decision."
+      ],
+      "limitations": [
+        "Static dynamic-symbol evidence does not cover every hidden/internal call, dlsym use or later dynamically loaded module.",
+        "No exploit executed and no runtime trace against a real RDS endpoint.",
+        "No global safe/not-affected claim for all usages of the installed glibc/zlib libraries.",
+        "Direct sourceware git advisory URLs were inaccessible to the browser; Debian records, upstream sourceware mailing list and GNU CNA NVD record supplied the cited glibc evidence."
+      ]
+    }
+  },
+  "local_auth_followup": {
+    "api_image": {
+      "at": "2026-10-28T14:57:55.318825+00:00",
+      "name": "api",
+      "tag": "m2-20261028-authfix1",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+      "manifest_digest": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+      "scan_digest": "sha256:6650541066c85bb74663249f02e5ecd5fedfacd9bd6c3e65efb30c3763ddf72b",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+      "local_image_id": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+      "platform": "linux/amd64",
+      "size_bytes": 131118453,
+      "scan_status": "COMPLETE",
+      "scan_counts": {},
+      "scan_type": "BASIC"
+    },
+    "reason": "Actual Cognito local verification found missing endpoint returned 500; scoped 404 mapping applied and verified.",
+    "actual_login_evidence": "2026-10-28-slash-cognito-local-verification.json",
+    "checks_passed": 21,
+    "regression_tests_passed": 30,
+    "aws_servers_created": false,
+    "aws_fault_trial": false
+  },
+  "current_image_selection": {
+    "grafana": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+    "prometheus": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+    "db-test": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+    "api": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735"
   }
 }

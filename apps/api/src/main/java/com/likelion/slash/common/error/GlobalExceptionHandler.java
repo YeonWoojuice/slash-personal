@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 모든 오류를 개발문서 3.1.3 형식으로 변환한다.
@@ -39,6 +41,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(code.httpStatus())
                 .body(ErrorResponse.of(code, code.defaultMessage(), fieldErrors));
+    }
+
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(Exception e) {
+        ErrorCode code = ErrorCode.RESOURCE_NOT_FOUND;
+        return ResponseEntity
+                .status(code.httpStatus())
+                .body(ErrorResponse.of(code, code.defaultMessage()));
     }
 
     @ExceptionHandler(Exception.class)
