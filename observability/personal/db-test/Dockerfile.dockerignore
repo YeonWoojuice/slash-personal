@@ -1,0 +1,18 @@
+# Repository-root context: include only this image's five COPY inputs.
+**
+
+# Permit traversal, then exclude every child unless explicitly listed below.
+!observability/
+observability/**
+!observability/personal/
+observability/personal/**
+!observability/personal/db-test/
+observability/personal/db-test/**
+!observability/personal/sql/
+observability/personal/sql/**
+
+!observability/personal/db-test/entrypoint.sh
+!observability/personal/db-test/pulses.sh
+!observability/personal/db-test/rds-ap-northeast-2-bundle.crt
+!observability/personal/sql/db-query-delay.sql
+!observability/personal/sql/db-query-cancel-one.sql

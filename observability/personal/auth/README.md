@@ -22,7 +22,18 @@ foundation의 두 출력에는 비밀값이 없다.
 
 `jwt_audience`에는 operator client ID를 넣는다. Cognito access token에 `aud`가 없으면 API Gateway JWT authorizer는 `client_id`를 검사한다. `read_authorization_scope`는 API Gateway 경로와 조회 Lambda의 `REQUIRED_READ_SCOPE`에 같은 값으로 전달된다. 백엔드의 일반 기본값 `incidents:read`는 바꾸지 않았으며 이 Cognito 배포에서만 명시적으로 설정한다.
 
-foundation 생성과 Cognito 설정·로그인 폼 확인을 완료했다. 사용자는 아직 등록하지 않았고 M3 조회 HTTP API도 활성화하지 않았다. 아래 명령으로 실제 출력을 다시 얻을 수 있으며, 사용자 로그인·토큰 발급·프로브는 다음 단계에서 검증한다.
+foundation 생성과 초대 사용자의 첫 로그인, code+PKCE 토큰 발급을 완료했다. 사용자는 `CONFIRMED` 상태지만 `email_verified=false`이므로 이메일 소유 확인까지 끝난 것은 아니다. 비밀번호·이메일 주소·사용자 식별자·토큰은 문서나 Git에 기록하지 않는다.
+
+LambdaOps M3 조회 HTTP API를 활성화했고 실제 API Gateway → 조회 Lambda → DSQL 경로를 다음과 같이 확인했다.
+
+| 요청 | 실제 결과 | 확인한 범위 |
+| --- | --- | --- |
+| 읽기 scope를 가진 operator 토큰으로 목록 조회 | 200, `items` 0개 | 인증과 빈 DSQL 목록 조회 |
+| 토큰 없음 또는 잘못된 토큰 | 401 | 유효한 인증 없는 요청 거부 |
+| 같은 operator client의 읽기 scope 없는 토큰 | 403 | 읽기 권한 없는 요청 거부 |
+| 유효한 읽기 토큰으로 미존재 ID 상세 조회 | 404 | 없는 기록의 오류 응답 |
+
+**실제 존재하는 Incident 상세 200은 아직 검증하지 않았다.** M2 Alarm·수집 연결과 Slash experiment도 아직 실행하지 않았다. 아래 명령은 현재 출력을 다시 얻을 때 사용한다.
 
 ```sh
 umask 077
@@ -30,7 +41,7 @@ terraform -chdir=infra/personal/foundation output -json lambdaops_auth > /privat
 terraform -chdir=infra/personal/foundation output -json lambdaops_m3_auth_tfvars > /private/tmp/lambdaops-m3-auth.tfvars.json
 ```
 
-LambdaOps 저장소에서는 기존 `dev.tfvars`와 위 인증 변수 파일을 함께 검토한다. `dsql_schema_ready=true`와 실제 issuer/client가 준비된 뒤 `enable_http_api=true`를 별도로 설정한다. 출력 파일을 얻었다는 이유만으로 API를 자동 활성화하지 않는다. Slash web client ID를 M3 audience에 복사하지 않는다.
+LambdaOps dev에는 `dsql_schema_ready=true`, 실제 issuer/operator client, `enable_http_api=true`를 적용했다. 구성을 다시 적용할 때도 기존 `dev.tfvars`와 위 인증 변수 파일을 함께 검토하며, Slash web client ID를 M3 audience에 복사하지 않는다. 이후 실제 Incident가 준비되면 아래 프로브에 그 ID를 넣어 상세 200과 권한 거부를 확인한다.
 
 ## 로컬 로그인
 
@@ -84,6 +95,6 @@ python3 observability/personal/auth/auth.py \
 python3 -m unittest discover -s observability/personal/auth -p 'test_*.py' -v
 ```
 
-오프라인 테스트는 PKCE 기준 벡터, callback state, 같은 client의 scope 차이, 계정·호스트 제한, 토큰 파일 권한, redirect 차단과 최소 응답 형태, 기존 ID의 정상 대표 연결 및 모순된 상세 응답 거부를 확인한다. fixture JWT는 실제 서명된 토큰이 아니다. 실제 Cognito 로그인·API Gateway JWT 검증·인증된 DSQL 상세 조회는 배포 후 별도 환경 검증이다.
+오프라인 테스트는 PKCE 기준 벡터, callback state, 같은 client의 scope 차이, 계정·호스트 제한, 토큰 파일 권한, redirect 차단과 최소 응답 형태, 기존 ID의 정상 대표 연결 및 모순된 상세 응답 거부를 확인한다. fixture JWT는 실제 서명된 토큰이 아니다. 실제 환경에서는 Cognito 로그인·API Gateway JWT 검증·빈 DSQL 목록과 미존재 상세의 오류 응답까지 확인했다. 존재하는 Incident 상세 200과 전체 장애 수집 흐름은 다음 환경 검증으로 남아 있다.
 
 공식 근거: [Cognito authorization code·PKCE](https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html), [token endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html), [Cognito resource server scope](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html), [HTTP API JWT authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html).

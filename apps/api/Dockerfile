@@ -10,7 +10,8 @@
 # -----------------------------------------------------------------------------
 # 1단계 — 빌드
 # -----------------------------------------------------------------------------
-FROM eclipse-temurin:21-jdk-alpine AS build
+# 같은 Java 21 / Alpine 3.24 베이스를 재사용하도록 digest를 고정한다.
+FROM eclipse-temurin:21-jdk-alpine@sha256:fd52084c35bbac78890d95d57707d31ffc9d7a3324199e89c06be2a9dc71bfa0 AS build
 
 WORKDIR /workspace
 
@@ -39,7 +40,10 @@ RUN java -Djarmode=tools -jar build/libs/*.jar extract --layers --launcher --des
 # -----------------------------------------------------------------------------
 # 2단계 — 실행
 # -----------------------------------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine@sha256:b48e02e0ea88d7bfb305335df94923bdef394905f4147dccd52e873cf17b1088
+
+# CVE-2026-111497 수정. 같은 Alpine 저장소에서 Brotli만 지정 버전으로 갱신한다.
+RUN apk add --no-cache brotli-libs=1.2.1-r0
 
 # 이 프로젝트의 시각 기준은 한국 시각이다. 애플리케이션은 스스로 Asia/Seoul 을 쓰지만
 # (SlashTime · Jackson · JDBC Session) 컨테이너 기본값이 UTC 면 로그만 9시간 어긋나

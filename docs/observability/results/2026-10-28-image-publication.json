@@ -1,0 +1,350 @@
+{
+  "at": "2026-10-28T10:53:52.917868+00:00",
+  "account_id": "642935793048",
+  "region": "ap-northeast-2",
+  "images": [
+    {
+      "name": "api",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+      "tag": "m2-20261028-osfix1",
+      "manifest_digest": "sha256:5ffdcf488d0bc6c447d27e7f4b36fa97481775001a43c50b987465d4fbe83a4f",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:5ffdcf488d0bc6c447d27e7f4b36fa97481775001a43c50b987465d4fbe83a4f",
+      "platform": "linux/amd64",
+      "size_bytes": 131118324,
+      "scan_type": "BASIC",
+      "scan_status": "COMPLETE",
+      "scan_counts": {},
+      "initial_scan_counts": {
+        "CRITICAL": 1
+      },
+      "patched_this_step": true,
+      "superseded_manifest_digest": "sha256:9e448708fdaaa7b2d308209fd46bca4ebcd104228bd73487d9111ca5e22a6153",
+      "remaining_high_findings": []
+    },
+    {
+      "name": "grafana",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana",
+      "tag": "m2-20261028-osfix1",
+      "manifest_digest": "sha256:c8d2a8a6001f56d09ec0e52a63830614b5b18a9017edc3de8b7b978d12a4705e",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:c8d2a8a6001f56d09ec0e52a63830614b5b18a9017edc3de8b7b978d12a4705e",
+      "platform": "linux/amd64",
+      "size_bytes": 217332088,
+      "scan_type": "BASIC",
+      "scan_status": "COMPLETE",
+      "scan_counts": {
+        "HIGH": 5,
+        "MEDIUM": 3
+      },
+      "initial_scan_counts": {
+        "HIGH": 45,
+        "MEDIUM": 22,
+        "LOW": 2,
+        "UNDEFINED": 23,
+        "CRITICAL": 15
+      },
+      "patched_this_step": true,
+      "superseded_manifest_digest": "sha256:e860853030cbc448a0638e618b0c2689bd56d3781eb07852343bee56683b1569",
+      "remaining_high_findings": [
+        {
+          "id": "CVE-2026-85091",
+          "package": "zlib",
+          "version": "1.3.1-r2"
+        },
+        {
+          "id": "CVE-2026-40200",
+          "package": "musl",
+          "version": "1.2.5-r21"
+        },
+        {
+          "id": "CVE-2026-4878",
+          "package": "libcap",
+          "version": "2.77-r0"
+        },
+        {
+          "id": "CVE-2026-27135",
+          "package": "nghttp2",
+          "version": "1.68.0-r0"
+        },
+        {
+          "id": "CVE-2026-33630",
+          "package": "c-ares",
+          "version": "1.34.6-r0"
+        }
+      ]
+    },
+    {
+      "name": "prometheus",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus",
+      "tag": "m2-20261028-b918ca8",
+      "manifest_digest": "sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa",
+      "platform": "linux/amd64",
+      "size_bytes": 114040522,
+      "scan_type": "BASIC",
+      "scan_status": "COMPLETE",
+      "scan_counts": {
+        "HIGH": 4
+      },
+      "initial_scan_counts": {
+        "HIGH": 4
+      },
+      "patched_this_step": false,
+      "remaining_high_findings": [
+        {
+          "id": "CVE-2026-38753",
+          "package": "BusyBox",
+          "version": "1.38.0"
+        },
+        {
+          "id": "CVE-2026-38755",
+          "package": "BusyBox",
+          "version": "1.38.0"
+        },
+        {
+          "id": "CVE-2026-38754",
+          "package": "BusyBox",
+          "version": "1.38.0"
+        },
+        {
+          "id": "CVE-2026-38752",
+          "package": "BusyBox",
+          "version": "1.38.0"
+        }
+      ]
+    },
+    {
+      "name": "db-test",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test",
+      "tag": "m2-20261028-b918ca8",
+      "manifest_digest": "sha256:4829ca4c1ef6dd210ea5d7b25910151b2a781f26ed37177f310a526a7154a0ea",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:4829ca4c1ef6dd210ea5d7b25910151b2a781f26ed37177f310a526a7154a0ea",
+      "platform": "linux/amd64",
+      "size_bytes": 160325673,
+      "scan_type": "BASIC",
+      "scan_status": "COMPLETE",
+      "scan_counts": {
+        "HIGH": 12,
+        "MEDIUM": 11,
+        "LOW": 6
+      },
+      "initial_scan_counts": {
+        "HIGH": 12,
+        "MEDIUM": 11,
+        "LOW": 6
+      },
+      "patched_this_step": false,
+      "remaining_high_findings": [
+        {
+          "id": "CVE-2026-86139",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-86143",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-85091",
+          "package": "zlib",
+          "version": "1.3.dfsg+really1.3.1-1"
+        },
+        {
+          "id": "CVE-2026-74860",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-5435",
+          "package": "glibc",
+          "version": "2.41-12+deb13u4"
+        },
+        {
+          "id": "CVE-2026-86140",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-24882",
+          "package": "gnupg2",
+          "version": "2.4.7-21+deb13u1"
+        },
+        {
+          "id": "CVE-2026-86138",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-107161",
+          "package": "cyrus-sasl2",
+          "version": "2.1.28+dfsg1-9"
+        },
+        {
+          "id": "CVE-2026-86142",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-86144",
+          "package": "libxml2",
+          "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+        },
+        {
+          "id": "CVE-2026-19499",
+          "package": "glibc",
+          "version": "2.41-12+deb13u4"
+        }
+      ]
+    }
+  ],
+  "application_versions_preserved": true,
+  "patched_os_packages": {
+    "api": {
+      "brotli-libs": "1.2.1-r0"
+    },
+    "grafana": {
+      "brotli-libs": "1.2.1-r0",
+      "curl": "8.23.0-r0",
+      "libcurl": "8.23.0-r0",
+      "libcrypto3": "3.5.9-r0",
+      "libssl3": "3.5.9-r0"
+    }
+  },
+  "dockerfile_sha256": {
+    "apps/api/Dockerfile": "ee611fab754faccba7786859e4c36481e74750461d9aef42c208feb168a70dc2",
+    "observability/personal/grafana/Dockerfile": "5ead038c30a624e408a4dcd3e51bd6cb65c7572bc8e6f5aab0a7bcd2fdadc809"
+  },
+  "db_test_context_verification": {
+    "method": "BuildKit scratch COPY local export with Dockerfile-specific ignore",
+    "allowed_file_count": 5,
+    "unexpected_file_count": 0,
+    "copied_bytes_match_sources": true,
+    "runtime_image_rebuilt": false
+  },
+  "security_limitations": [
+    "ECR Basic scan covers supported OS packages; zero findings does not establish complete application security.",
+    "Remaining HIGH findings need supplier applicability and fixed-version review before experiment deployment.",
+    "Old immutable tagged images remain as superseded evidence; use the listed patched digests when planning."
+  ],
+  "experiment_deployed": false,
+  "fault_test_executed": false,
+  "m2_connected": false,
+  "deployment_readiness_approved": false,
+  "credentials_included": false,
+  "local_verification": {
+    "date": "2026-10-28",
+    "scope": "Narrow local OS package patch, linux/amd64 builds, isolated startup/health checks; no AWS deployment or ECR push by this worker.",
+    "source_commit": "b918ca8",
+    "modified_files": [
+      "apps/api/Dockerfile",
+      "observability/personal/grafana/Dockerfile"
+    ],
+    "unrelated_worktree_changes_preserved": true,
+    "images": {
+      "api": {
+        "tag": "slash-personal-api:m2-amd64-osfix-20261028",
+        "local_image_id": "sha256:5ffdcf488d0bc6c447d27e7f4b36fa97481775001a43c50b987465d4fbe83a4f",
+        "platform": "linux/amd64",
+        "os": "Alpine 3.24.3",
+        "runtime_user": "slash",
+        "runtime_uid": 100,
+        "java_version": "21.0.12.1+1",
+        "base_build_digest": "sha256:fd52084c35bbac78890d95d57707d31ffc9d7a3324199e89c06be2a9dc71bfa0",
+        "base_runtime_digest": "sha256:b48e02e0ea88d7bfb305335df94923bdef394905f4147dccd52e873cf17b1088",
+        "package_changes": {
+          "brotli-libs": {
+            "before": "1.2.0-r1",
+            "after": "1.2.1-r0"
+          }
+        },
+        "other_os_package_changes": [],
+        "build": "passed",
+        "smoke": {
+          "status": "PASS",
+          "profile": "personal",
+          "network_internal": true,
+          "host_bind": "none",
+          "flyway_successful_migrations": 10,
+          "management_health_liveness_readiness": "UP",
+          "database": "UP",
+          "valkey": "UP",
+          "prometheus_jvm_and_query_metrics": true,
+          "unauthenticated_and_fake_token_me": 401,
+          "application_port_prometheus": 401,
+          "management_info": 403,
+          "local_oidc_discovery_and_jwks_observed": true,
+          "cloudwatch": false,
+          "aws_credentials_supplied": false,
+          "cleanup": "completed"
+        }
+      },
+      "grafana": {
+        "tag": "slash-personal-grafana:m2-amd64-osfix-20261028",
+        "local_image_id": "sha256:c8d2a8a6001f56d09ec0e52a63830614b5b18a9017edc3de8b7b978d12a4705e",
+        "platform": "linux/amd64",
+        "os": "Alpine 3.23.3",
+        "runtime_user": "472",
+        "grafana_version": "12.4.0",
+        "grafana_commit": "d1729c53a7f44e2e58947eb44eb896c2fb1c30b3",
+        "base_digest": "sha256:b0ae311af06228bcfd4a620504b653db80f5b91e94dc3dc2a5b7dab202bcde20",
+        "package_changes": {
+          "brotli-libs": {
+            "before": "1.2.0-r0",
+            "after": "1.2.1-r0"
+          },
+          "libcrypto3": {
+            "before": "3.5.5-r0",
+            "after": "3.5.9-r0"
+          },
+          "libssl3": {
+            "before": "3.5.5-r0",
+            "after": "3.5.9-r0"
+          },
+          "curl": {
+            "before": "8.17.0-r1",
+            "after": "8.23.0-r0"
+          },
+          "libcurl": {
+            "before": "8.17.0-r1",
+            "after": "8.23.0-r0"
+          }
+        },
+        "removed_unused_dependency": {
+          "nghttp3": "1.13.1-r0"
+        },
+        "other_os_package_upgrades": [],
+        "build": "passed",
+        "smoke": {
+          "status": "PASS",
+          "network": "none",
+          "host_bind": "none",
+          "database": "ok",
+          "health": 200,
+          "login_page": 200,
+          "static_asset": 200,
+          "login_post": 200,
+          "cookie_path": "/m2/grafana",
+          "secure_cookie": true,
+          "httponly_cookie": true,
+          "cleanup": "completed"
+        }
+      }
+    },
+    "verification": [
+      "git diff --check passed",
+      "Compared all installed Alpine package versions before and after the patch",
+      "Confirmed both final images are linux/amd64 and run as non-root"
+    ],
+    "limits": [
+      "Local image IDs are recorded here; use independently verified ECR manifest digests for deployment.",
+      "Local synthetic OIDC only; no real Cognito login or authenticated business-flow validation.",
+      "Isolated plaintext PostgreSQL/Valkey fixtures; production TLS was not tested.",
+      "No ECS/RDS deployment, AWS faults, CloudWatch export or end-to-end alarm validation.",
+      "Basic OS-package scan findings and application dependency security are separate; this local report does not certify complete security."
+    ],
+    "smoke_fixture_adjustments": [
+      "Corrected the temporary Valkey readiness probe to use REDISCLI_AUTH per valkey-cli help.",
+      "Probed API from inside the internal Docker network instead of publishing host ports. No application or image change was needed."
+    ]
+  }
+}

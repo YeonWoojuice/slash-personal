@@ -1,6 +1,6 @@
 # 개인 AWS API 관측 실험
 
-2026-10-28 기준. 첫 시험 대상은 Cognito 인증을 거친 Slash의 `GET /api/v1/me`다. Cognito·ECR foundation은 실제 생성했으며, Slash 실행 환경 배포·이미지 게시·장애 실행은 아직 하지 않았다. 전체 리소스·계획·비용·삭제 절차는 [개인 Terraform](../../infra/personal/README.md)을 기준으로 한다.
+2026-10-28 기준. 첫 시험 대상은 Cognito 인증을 거친 Slash의 `GET /api/v1/me`다. Cognito·ECR foundation과 이미지 4종 게시, LambdaOps 운영자 로그인·HTTP 조회 인증 검증을 완료했다. API·Grafana 보완 후 Critical 0건을 확인했고 남은 High 항목을 검토해야 하며 Slash 실행 환경 배포·장애 실행은 아직 하지 않았다. 전체 리소스·계획·비용·삭제 절차는 [개인 Terraform](../../infra/personal/README.md)을 기준으로 한다.
 
 ## 연결
 
@@ -31,7 +31,7 @@ Prometheus 웹 서버는 loopback에만 연결한다. Grafana는 로그인·Secu
 ## 실제 배포·시험 순서
 
 1. 계정 `642935793048`·서울 리전에 foundation 17개 자원을 생성했고 재계획 변경 0개를 확인했다. 다음 실행에서도 같은 계정·상태 파일을 사용한다.
-2. API·Grafana·Prometheus·DB 시험 이미지를 ECR에 게시하고 manifest digest를 확보한다. 로컬 이미지 ID를 대신 쓰지 않는다.
+2. API·Grafana·Prometheus·DB 시험 이미지의 ECR manifest digest를 확보했다. [게시·보안 검사 결과](../../docs/observability/results/2026-10-28-image-publication.json)를 검토해 사용할 digest를 정한다. 로컬 이미지 ID를 대신 쓰지 않는다.
 3. 실제 Cognito 출력, 시험자 IPv4/32, 종료시각, 이미지 digest를 experiment 입력에 넣고 새 계획을 검토한다.
 4. 배포 후 `api_base_url`을 사용한다. 기본 stage는 `m2`다. 웹은 localhost:5173의 code+PKCE callback을 사용하며 토큰은 저장소·로그·채팅에 남기지 않는다.
 5. 정상 토큰 `/me` 200, 무토큰 401, IP 제한·공개 경로 차단, Grafana 로그인, Prometheus와 CloudWatch의 실제 수집을 확인한다.
@@ -45,6 +45,6 @@ Prometheus 웹 서버는 loopback에만 연결한다. Grafana는 로그인·Secu
 
 로컬에서 personal 설정·JWT·계측, Terraform 구성, 요청·작업·로그인 도구와 임시 TLS PostgreSQL의 제한 동작을 확인한다. Grafana의 `/m2/grafana/` health·로그인·정적 파일·Secure 쿠키도 로컬에서 확인했다. CI는 AWS 자격증명이나 배포 단계를 갖지 않는다.
 
-실제 Cognito 로그인·ECR pull·Gateway stage 전달·IP 차단·ECS/RDS·CloudWatch·세 Alarm 전이·M3 전체 흐름은 아직 환경 검증 대상이다. 예전 2026-10-07 개인 도메인/ACM 기반 계획은 현재 도메인 없는 구성으로 대체했다. 당시 로컬 실측 파일은 별도 기존 결과로 남긴다.
+실제 Cognito operator 로그인과 LambdaOps의 빈 목록 200·무토큰 401·권한 없음 403은 확인했다. Slash 웹 client의 /me 로그인·ECS의 ECR pull·Gateway stage 전달·IP 차단·ECS/RDS·CloudWatch·세 Alarm 전이·M3 전체 흐름은 아직 환경 검증 대상이다. 예전 2026-10-07 개인 도메인/ACM 기반 계획은 현재 도메인 없는 구성으로 대체했다. 당시 로컬 실측 파일은 별도 기존 결과로 남긴다.
 
 참고: [Prometheus DNS discovery](https://prometheus.io/docs/prometheus/latest/configuration/configuration/), [Grafana reverse proxy](https://grafana.com/tutorials/run-grafana-behind-a-proxy/).

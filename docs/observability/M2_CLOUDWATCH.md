@@ -132,11 +132,11 @@ AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS t
 
 Java 검사는 `apps/api`에서 `./gradlew test --offline --tests 'com.likelion.slash.observability.*' --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'`로, 인프라 검사는 저장소 루트에서 `python3 -m unittest discover -s infra/personal/tests -v`로 실행할 수 있다. DB 검증은 별도 임시 DB에 합성 `users` 한 행을 만들고 같은 SQL 파일을 비대화형 `psql`로 실행한 결과다. 앱 HTTP·Cognito·RDS의 검증은 포함하지 않는다.
 
-위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 다음 단계는 Cognito/ECR 생성과 실제 이미지·로그인 입력 확보, experiment 계획 검토다. 이후에만 AWS 지표 수신·정상 기준선·세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
+위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 후속 작업에서 Cognito/ECR 생성, 이미지 게시, LambdaOps 운영자 로그인·HTTP 조회 인증을 확인했다. API·Grafana OS 패키지 보완으로 Critical 0건을 확인했다. 다음 단계는 남은 High 항목 검토·보완과 experiment 계획 검토다. 이후에만 AWS 지표 수신·정상 기준선·세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
 
 
 ### 후속 준비: 일회성 작업과 요청 실행기
 
 2026-10-28 `observability/personal/db-test`, `task`, `requests`에 실행기와 검증을 추가했다. DB 작업은 기본 3초 지연 한 번이며, 반복 설정도 전체 시간 제한을 적용한다. 실제 요청은 정상 Cognito 토큰으로 HTTPS `/me`를 호출하고 시각·상태·시간만 기록한다. 새 작업 정의와 전용 SG/IAM은 `infra/personal/experiment/db-test.tf.json`에 있다. 생성과 실행은 분리했다.
 
-로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 후속 작업에서 operator client와 scope를 포함한 foundation을 생성 17·변경 0·삭제 0으로 실제 적용했다. Cognito 설정·로그인 폼과 빈 ECR 저장소를 확인했고 재계획도 변경 0개였다. [검증 근거](results/2026-10-28-foundation-provision.json)를 참고한다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 실제 ECR 게시·로그인·Fargate/RDS·CloudWatch·Alarm 전이는 아직 미검증이다.
+로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 후속 작업에서 operator client와 scope를 포함한 foundation을 생성 17·변경 0·삭제 0으로 실제 적용했다. Cognito 설정·로그인 폼과 빈 ECR 저장소를 확인했고 재계획도 변경 0개였다. [검증 근거](results/2026-10-28-foundation-provision.json)를 참고한다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 후속 단계에서 이미지 4종을 ECR에 게시하고 실제 Cognito operator 로그인·LambdaOps 빈 목록 200·무토큰 401·읽기 권한 없음 403을 확인했다. [이미지 게시·보안 검사](results/2026-10-28-image-publication.json)의 보완 상태를 실제 배포 전에 확인한다. Slash 웹 client의 /me 로그인·Fargate/RDS·CloudWatch·Alarm 전이와 실제 Incident 상세 200은 아직 미검증이다.

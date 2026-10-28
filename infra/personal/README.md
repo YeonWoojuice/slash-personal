@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성하고 실제 설정을 검증했다.** Slash 실행 환경인 experiment·이미지 게시·장애 실행은 아직 하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성했고 실제 로그인과 LambdaOps 조회 API의 기본 인증을 검증했다.** ECR에는 시험 이미지 4개를 게시했으며 API·Grafana의 OS 패키지 수정 후 Critical 0건을 확인했다. 남은 High 항목 검토 전에는 배포 준비 완료로 판단하지 않는다. Slash 실행 환경인 experiment와 부하·장애 시험은 아직 실행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -66,9 +66,11 @@ terraform show /private/tmp/slash-foundation.tfplan
 # 생성 목록 검토가 끝난 뒤에만 apply
 ```
 
-foundation은 **생성 17·변경 0·삭제 0으로 적용 완료**했으며, 재계획 결과 추가 변경은 0개다. 기존 15개 계획에 Cognito resource server와 operator client 2개를 추가한 구성이다. ECR 6개 중 이번에 게시할 이미지는 API·Prometheus·Grafana·DB 시험 이미지 네 개다. NLU/inference 이미지는 게시하거나 실행하지 않는다. 이전 계획과 이미지 준비 결과는 [당시 근거](../../docs/observability/results/2026-10-28-deployment-preparation.json)에 남겨 두며, 코드가 바뀐 이전 계획을 적용하지 않는다.
+foundation은 **생성 17·변경 0·삭제 0으로 적용 완료**했으며, 재계획 결과 추가 변경은 0개다. 기존 15개 계획에 Cognito resource server와 operator client 2개를 추가한 구성이다. ECR 6개 중 이번에 게시한 이미지는 API·Prometheus·Grafana·DB 시험 이미지 네 개다. NLU/inference 이미지는 게시하거나 실행하지 않는다. 이전 계획과 이미지 준비 결과는 [당시 근거](../../docs/observability/results/2026-10-28-deployment-preparation.json)에 남겨 두며, 코드가 바뀐 이전 계획을 적용하지 않는다.
 
-실제 Cognito 출력과 ECR 저장소 주소를 확보했다. Cognito domain은 ACTIVE이고 로그인 폼·issuer 정보·공개 서명 키 조회가 성공했다. 사용자 0명·각 저장소 이미지 0개이며, 실제 로그인과 이미지 게시 후 manifest digest 확보는 다음 단계다. [생성·검증 근거](../../docs/observability/results/2026-10-28-foundation-provision.json)를 따른다. 로컬 Docker image ID는 ECR digest의 대체 입력이 아니다.
+실제 Cognito 출력과 ECR 저장소 주소를 확보했다. Cognito domain은 ACTIVE이며 초대 사용자의 첫 로그인과 code+PKCE 토큰 발급에 성공했다. 사용자의 `CONFIRMED` 상태와 이메일 소유 확인은 별개다. 현재 `email_verified=false`이므로 이메일 검증 완료로 기록하지 않는다.
+
+API·Prometheus·Grafana·DB 시험 이미지 4개를 ECR에 게시했다. API·Grafana의 앱 버전은 유지하고 OS 패키지만 갱신해 새 태그 `m2-20261028-osfix1`로 게시했다. ECR Basic 재검사에서 API 검출 0건, Grafana Critical 0·High 5·Medium 3건을 확인했다. Prometheus High 4건과 DB 시험 이미지 High 12건은 남아 있다. [게시·검사 근거](../../docs/observability/results/2026-10-28-image-publication.json)에 네 이미지의 실제 manifest digest와 남은 항목을 기록했다. Basic 검사는 지원되는 OS 패키지 범위이며 앱 전체의 안전을 보장하지 않는다. 남은 High 항목의 적용 조건·수정 버전 검토가 필요하다. 새 API 이미지는 AWS 자격증명 없이 임시 PostgreSQL·Valkey·OIDC fixture에서 DB 연결·상태·지표·미인증 401을 확인했다. Grafana 12.4.0의 health·로그인·정적 파일·Secure/HttpOnly 쿠키도 확인했다. 로컬 기동 성공은 실제 Cognito를 사용하는 Slash /me 검증을 대신하지 않는다. 로컬 Docker image ID는 ECR digest의 대체 입력이 아니다. [foundation 생성 당시 근거](../../docs/observability/results/2026-10-28-foundation-provision.json)의 사용자·이미지 0개는 생성 직후 기록이며 현재 상태와 구분한다.
 
 ```sh
 cd ../experiment
@@ -84,7 +86,13 @@ terraform show /private/tmp/slash-experiment.tfplan
 
 `enable_workloads=false`여도 apply하면 ALB/RDS/Valkey 등이 생성되어 과금된다. 설정 확인만 할 때는 validate/plan에서 멈춘다. workload 실행에는 `cloud_contract_verified=true`, 실제 Cognito·이미지 계약 확인이 필요하다. `enable_cloudwatch_metrics`는 지표 발행과 task IAM을 함께 켠다. `enable_db_test_task=true`는 시험 task **정의**만 생성하며 작업을 자동 실행하지 않는다.
 
-experiment의 배포 가능한 최종 plan은 아직 없다. 실제 Cognito·ECR digest·시험자 CIDR·종료 시각을 확보한 다음 작성한다. 가짜 값의 plan을 배포 가능한 계획으로 취급하지 않는다.
+experiment의 배포 가능한 최종 plan은 아직 없다. 다음 순서로 준비한다.
+
+1. 남은 Grafana·Prometheus·DB 시험 이미지 High 항목의 적용 조건·수정 버전을 검토하고 필요한 보완을 마친다.
+2. 실제 Cognito 출력, 최종 ECR digest 네 개, 시험자 CIDR과 종료 시각을 입력해 새 plan을 만든다.
+3. 생성 자원·실행 시간·비용을 검토한 뒤 Slash experiment를 배포하고 정상 요청부터 확인한다.
+
+가짜 값이나 보완 전 이미지 digest가 들어간 plan을 배포 가능한 계획으로 취급하지 않는다.
 
 ## 장애 시험과 확인 순서
 
@@ -122,6 +130,8 @@ state 목록과 실제 ECS·ALB·API Gateway·VPC Link·RDS·Valkey·ENI/IP·Clo
 
 Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험, 임시 TLS PostgreSQL 동작 검사를 실행한다. Grafana의 `/m2/grafana/` 로그인·정적 파일·보안 쿠키는 로컬 이미지로 확인했다. GitHub CI도 AWS 자원 생성 없이 같은 종류의 검사를 수행한다.
 
-foundation의 자원 생성·설정·로그인 페이지까지 실제 확인했다. 로그인 페이지 HTTP 200은 사용자 로그인 성공 증거가 아니다. 실제 AWS stage 경로 전달·IP 정책·ECR pull·Cognito 사용자 로그인·ECS health·RDS·CloudWatch·Alarm·실제 JWT 조회는 후속 환경 검증이다. M2·M3는 아직 In Progress다.
+foundation 생성과 실제 Cognito code+PKCE 로그인을 확인했다. 활성화한 **LambdaOps HTTP API → 조회 Lambda → DSQL** 경로에서 빈 목록 200(`items` 0개), 무토큰·잘못된 토큰 401, 같은 client의 읽기 scope 없는 토큰 403, 미존재 상세 404를 확인했다. 실제 존재하는 Incident의 상세 200은 아직 검증하지 않았다. LambdaOps의 M2 Alarm·수집 연결도 아직 활성화하지 않았다.
+
+Slash의 REST API·ECS·RDS·ALB는 experiment에 속하며 아직 배포하지 않았다. Slash의 stage 경로 전달·IP 정책·ECR pull·정상 `/me`·CloudWatch·Alarm·부하와 장애 시험은 후속 환경 검증이다. LambdaOps 조회 API 인증 성공을 Slash 앱 로그인이나 장애 시험 성공으로 대신하지 않는다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).

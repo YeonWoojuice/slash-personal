@@ -46,6 +46,8 @@ SQL은 한 시험 연결에서 잠금·검사·취소를 수행하고, 별도 �
 
 저장소 루트에서 실행한다.
 
+[전용 제외 설정](Dockerfile.dockerignore)은 저장소 루트를 빌드 컨텍스트로 사용해도 실행 스크립트 2개·공개 CA·SQL 2개만 이미지 입력으로 허용한다. Terraform 상태·`tfvars`·`.terraform`과 그 밖의 파일은 전달 대상에서 제외하며, Dockerfile과 제외 설정 자체는 Docker가 빌드 정의로 별도 전달한다.
+
 ```sh
 docker build --platform linux/amd64 \
   -f observability/personal/db-test/Dockerfile \

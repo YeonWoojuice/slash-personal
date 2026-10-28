@@ -1,7 +1,7 @@
 # Slash Personal
 
 Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독립 모노레포입니다.
-개인용 로컬 관측 환경과 일회성 AWS 테스트용 Terraform을 추가했습니다. Cognito·ECR 기반 자원 17개는 생성·검증했으며, Slash API·DB 실행 환경과 이미지 게시는 아직 준비 단계입니다.
+개인용 로컬 관측 환경과 일회성 AWS 테스트용 Terraform을 추가했습니다. Cognito·ECR 기반 자원 17개를 생성했고, 실제 로그인과 LambdaOps 조회 API의 기본 인증을 검증했습니다. 시험 이미지 4개는 ECR에 게시했으며 API·Grafana의 OS 패키지를 수정해 새 이미지에서 Critical 0건을 확인했습니다. 다른 High 항목 검토는 남아 있습니다. Slash API·DB 실행 환경은 아직 배포하지 않았습니다.
 
 ## 구성
 
@@ -43,6 +43,15 @@ Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독�
 ## LambdaOps M2 시험 준비
 
 이 저장소는 LambdaOps의 장애 수집 기능을 검증하는 Slash 시험 대상이다. Incident 저장·조회 코드는 [LambdaOps](https://github.com/YeonWoojuice/LambdaOps)에 있다.
+
+| 구분 | 현재 확인한 내용 | 남은 확인 |
+| --- | --- | --- |
+| 로그인·조회 | Cognito code+PKCE 로그인, LambdaOps의 빈 목록 200, 무토큰·잘못된 토큰 401, 읽기 scope 없는 토큰 403, 미존재 상세 404 | 실제 존재하는 Incident 상세 200 |
+| 이미지 | 4종 ECR 게시, API·Grafana 보완 후 Critical 0건 | Grafana High 5·Prometheus High 4·DB 시험 High 12 검토 후 배포 판단 |
+| Slash AWS 시험 | foundation 생성 완료, experiment는 미배포 | ECS·RDS·ALB 실행, 정상 요청, 지표·장애 시험 |
+| M2·M3 연결 | LambdaOps 조회 HTTP API 활성 | M2 Alarm·수집 연결과 실제 장애 이벤트 검증 |
+
+[이미지 게시·보안 검사 근거](docs/observability/results/2026-10-28-image-publication.json)를 남겼다. 다음은 남은 High 항목의 적용 조건·수정 버전을 확인하고, 확정한 digest·시험자 IP·종료 시각으로 experiment 배포 계획을 검토하는 순서다. 이미지 게시나 조회 인증 성공만으로 Slash 배포 준비 또는 M2·M3 완료를 판정하지 않는다.
 
 - [개인 Terraform](infra/personal/README.md): 도메인 없는 HTTPS 접속과 로그인·이미지 저장소·임시 시험 환경.
 - [CloudWatch 계약](docs/observability/M2_CLOUDWATCH.md): 같은 서비스·환경의 지표와 세 Alarm 검증 기준.
