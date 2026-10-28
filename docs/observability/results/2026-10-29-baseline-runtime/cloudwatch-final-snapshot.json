@@ -1,0 +1,299 @@
+{
+  "queried_at_utc": "2026-10-28T16:41:41.596676+00:00",
+  "account_id": "642935793048",
+  "region": "ap-northeast-2",
+  "aws_mutations": false,
+  "scope": "Read-only historical CloudWatch query after the completed normal trial and interrupted cleanup. No new requests or metric publication.",
+  "namespace": "LambdaOps/Slash",
+  "dimensions": [
+    {
+      "Name": "Service",
+      "Value": "slash-api"
+    },
+    {
+      "Name": "Environment",
+      "Value": "dev"
+    }
+  ],
+  "period_seconds": 60,
+  "start_utc": "2026-10-28T16:09:00+00:00",
+  "end_utc_exclusive": "2026-10-28T16:17:00+00:00",
+  "metrics": [
+    {
+      "metric": "RequestCount",
+      "statistic": "Sum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 4.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 13.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 30.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 30.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 23.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "ServerErrorCount",
+      "statistic": "Sum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "RequestDurationMsTotal",
+      "statistic": "Sum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 0.0,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 41.653294,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 0.0,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 532.896675,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 239.43537200000003,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 227.68910900000003,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 145.2362320000002,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 0.0,
+          "unit": "Milliseconds"
+        }
+      ]
+    },
+    {
+      "metric": "DBQueryCount",
+      "statistic": "Sum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 31.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 25.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 25.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 37.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 55.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 55.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 48.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 25.0,
+          "unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "DBQueryDurationMsTotal",
+      "statistic": "Sum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 164.70312300000006,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 88.85020099999997,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 89.87922200000003,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 171.507249,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 137.294483,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 147.94842299999982,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 118.67128400000001,
+          "unit": "Milliseconds"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 72.24733000000015,
+          "unit": "Milliseconds"
+        }
+      ]
+    },
+    {
+      "metric": "DBConnectionsActive",
+      "statistic": "Maximum",
+      "points": [
+        {
+          "timestamp": "2026-10-29T01:09:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:10:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:11:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:12:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:13:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:14:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:15:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        },
+        {
+          "timestamp": "2026-10-29T01:16:00+09:00",
+          "value": 0.0,
+          "unit": "Count"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "at": "2026-10-28T16:11:57.323100+00:00",
+  "region": "ap-northeast-2",
+  "services": [
+    {
+      "serviceName": "monitoring",
+      "status": "ACTIVE",
+      "desiredCount": 1,
+      "runningCount": 1,
+      "pendingCount": 0,
+      "taskDefinition": "arn:aws:ecs:ap-northeast-2:642935793048:task-definition/slash-lab-monitoring:1",
+      "deployments": [
+        {
+          "status": "PRIMARY",
+          "rolloutState": "COMPLETED",
+          "rolloutStateReason": "ECS deployment ecs-svc/8311366015476349672 completed.",
+          "failedTasks": 0,
+          "runningCount": 1,
+          "pendingCount": 0
+        }
+      ],
+      "events": [
+        {
+          "at": "2026-10-29T00:51:59.181000+09:00",
+          "message": "(service monitoring) has reached a steady state."
+        },
+        {
+          "at": "2026-10-29T00:51:59.180000+09:00",
+          "message": "(service monitoring) (deployment ecs-svc/8311366015476349672) deployment completed."
+        },
+        {
+          "at": "2026-10-29T00:51:25.181000+09:00",
+          "message": "(service monitoring) registered 1 targets in (target-group arn:aws:elasticloadbalancing:ap-northeast-2:642935793048:targetgroup/slash-lab-grafana/6a0a8f1d8ca81c1f)"
+        }
+      ]
+    },
+    {
+      "serviceName": "core",
+      "status": "ACTIVE",
+      "desiredCount": 1,
+      "runningCount": 1,
+      "pendingCount": 0,
+      "taskDefinition": "arn:aws:ecs:ap-northeast-2:642935793048:task-definition/slash-lab-core:1",
+      "deployments": [
+        {
+          "status": "PRIMARY",
+          "rolloutState": "COMPLETED",
+          "rolloutStateReason": "ECS deployment ecs-svc/2696795753685230682 completed.",
+          "failedTasks": 0,
+          "runningCount": 1,
+          "pendingCount": 0
+        }
+      ],
+      "events": [
+        {
+          "at": "2026-10-29T01:07:12.382000+09:00",
+          "message": "(service core) has reached a steady state."
+        },
+        {
+          "at": "2026-10-29T01:07:12.381000+09:00",
+          "message": "(service core) (deployment ecs-svc/2696795753685230682) deployment completed."
+        },
+        {
+          "at": "2026-10-29T01:06:39.144000+09:00",
+          "message": "(service core) registered 1 targets in (target-group arn:aws:elasticloadbalancing:ap-northeast-2:642935793048:targetgroup/slash-lab/909ecae556739537)"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "lastStatus": "RUNNING",
+      "healthStatus": "UNKNOWN",
+      "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:642935793048:task-definition/slash-lab-monitoring:1",
+      "startedAt": "2026-10-29 00:51:31.708000+09:00",
+      "containers": [
+        {
+          "name": "prometheus",
+          "lastStatus": "RUNNING",
+          "healthStatus": "UNKNOWN",
+          "imageDigest": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+          "exitCode": null,
+          "reason": null
+        },
+        {
+          "name": "grafana",
+          "lastStatus": "RUNNING",
+          "healthStatus": "UNKNOWN",
+          "imageDigest": "sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+          "exitCode": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "lastStatus": "RUNNING",
+      "healthStatus": "UNKNOWN",
+      "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:642935793048:task-definition/slash-lab-core:1",
+      "startedAt": "2026-10-29 01:06:43.549000+09:00",
+      "containers": [
+        {
+          "name": "api",
+          "lastStatus": "RUNNING",
+          "healthStatus": "UNKNOWN",
+          "imageDigest": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+          "exitCode": null,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "rds": {
+    "DBInstanceIdentifier": "slash-lab",
+    "DBInstanceStatus": "available",
+    "Engine": "postgres",
+    "EngineVersion": "18.3",
+    "PubliclyAccessible": false,
+    "StorageEncrypted": true,
+    "DBInstanceClass": "db.t4g.small"
+  },
+  "cache": {
+    "ReplicationGroupId": "slash-lab",
+    "Status": "available",
+    "TransitEncryptionEnabled": true,
+    "AtRestEncryptionEnabled": true
+  },
+  "alb": {
+    "State": {
+      "Code": "active"
+    },
+    "Scheme": "internal",
+    "Type": "application"
+  },
+  "target_groups": [
+    {
+      "name": "slash-lab",
+      "health_check_path": "/actuator/health/liveness",
+      "health": [
+        {
+          "State": "healthy"
+        }
+      ]
+    },
+    {
+      "name": "slash-lab-grafana",
+      "health_check_path": "/m2/grafana/api/health",
+      "health": [
+        {
+          "State": "healthy"
+        }
+      ]
+    }
+  ]
+}

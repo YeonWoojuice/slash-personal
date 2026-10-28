@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-28T16:23:42.582324+00:00",
+  "review_type": "read_only_local_evidence_and_publisher_source_review",
+  "overall": "PASS_WITH_SCOPE_LIMITATIONS",
+  "checks": [
+    {
+      "check": "runtime_status_pass_all_17_checks_true",
+      "passed": true
+    },
+    {
+      "check": "request_log_90_trials_plus_1_preflight",
+      "passed": true
+    },
+    {
+      "check": "every_observed_request_http_200_without_error",
+      "passed": true
+    },
+    {
+      "check": "trial_sequences_unique_complete_1_to_90",
+      "passed": true
+    },
+    {
+      "check": "summary_sent_planned_90_failed_skipped_0",
+      "passed": true
+    },
+    {
+      "check": "six_metric_series_same_six_60_second_buckets",
+      "passed": true
+    },
+    {
+      "check": "metric_values_finite_non_negative",
+      "passed": true
+    },
+    {
+      "check": "observed_server_error_count_zero",
+      "passed": true
+    },
+    {
+      "check": "dimensions_match_service_and_dev",
+      "passed": true
+    },
+    {
+      "check": "statistics_match_sum_totals_and_max_active_gauge",
+      "passed": true
+    },
+    {
+      "check": "both_ecs_services_running_one_steady_completed",
+      "passed": true
+    },
+    {
+      "check": "both_alb_target_groups_healthy",
+      "passed": true
+    },
+    {
+      "check": "application_and_schema_migration_success",
+      "passed": true
+    },
+    {
+      "check": "rds_private_encrypted_and_available",
+      "passed": true
+    },
+    {
+      "check": "cache_available_transport_and_storage_encrypted",
+      "passed": true
+    },
+    {
+      "check": "private_data_fields_and_value_patterns_absent",
+      "passed": true
+    },
+    {
+      "check": "login_url_artifact_removed",
+      "passed": true
+    }
+  ],
+  "input_sha256": {
+    "runtime-first/result.json": "bea86faeb7dc08d1ba80183dee9deb8a8973d38db4383141580e86a68ece5ec4",
+    "runtime-first/requests.jsonl": "b35477790ab007b6c56838b13ed21c096c978639fb0a73cac90c75a3a880d97c",
+    "startup-verification.json": "7e4c40ecccab2f2dca12f020ca6ad06985de4792edd83a6cc1e3bdedf1fa1af5",
+    "status.json": "ac5d645ad465301319ec73441936380e9b13864045548179359b26d6044eb68a"
+  },
+  "http": {
+    "checks_passed": 17,
+    "bounded_trials": 90,
+    "preflight": 1,
+    "total_bounded_observer_calls": 91,
+    "all_bounded_observer_calls_http_200": true,
+    "authentication_probe_http_calls_additional": 10,
+    "additional_management_route_calls_blocked_at_gateway": 2,
+    "normal_trial_client_elapsed_ms": {
+      "mean": 71.3952,
+      "minimum": 41.115,
+      "maximum": 333.106
+    },
+    "client_elapsed_mean_includes_network_tls_gateway_and_application": true
+  },
+  "cloudwatch": {
+    "namespace": "LambdaOps/Slash",
+    "dimensions": [
+      {
+        "Name": "Service",
+        "Value": "slash-api"
+      },
+      {
+        "Name": "Environment",
+        "Value": "dev"
+      }
+    ],
+    "series_count": 6,
+    "points_each": 6,
+    "snapshot_request_count_sum": 77.0,
+    "snapshot_server_error_count_sum": 0.0,
+    "snapshot_db_query_count_sum": 228.0,
+    "all_original_snapshot_tail_requests_accounted_for": false,
+    "matched_60_second_windows": [
+      {
+        "timestamp_kst": "2026-10-29T01:09:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": null,
+        "api_mean_ms": null,
+        "db_query_count": 31.0,
+        "db_mean_ms": 5.313004,
+        "sampled_db_connections_active_max": 0.0
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:10:00+09:00",
+        "request_count": 4.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": 0.0,
+        "api_mean_ms": 10.413324,
+        "db_query_count": 25.0,
+        "db_mean_ms": 3.554008,
+        "sampled_db_connections_active_max": 0.0
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:11:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": null,
+        "api_mean_ms": null,
+        "db_query_count": 25.0,
+        "db_mean_ms": 3.595169,
+        "sampled_db_connections_active_max": 0.0
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:12:00+09:00",
+        "request_count": 13.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": 0.0,
+        "api_mean_ms": 40.992052,
+        "db_query_count": 37.0,
+        "db_mean_ms": 4.635331,
+        "sampled_db_connections_active_max": 0.0
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:13:00+09:00",
+        "request_count": 30.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": 0.0,
+        "api_mean_ms": 7.981179,
+        "db_query_count": 55.0,
+        "db_mean_ms": 2.496263,
+        "sampled_db_connections_active_max": 0.0
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:14:00+09:00",
+        "request_count": 30.0,
+        "server_error_count": 0.0,
+        "server_error_rate_percent": 0.0,
+        "api_mean_ms": 7.589637,
+        "db_query_count": 55.0,
+        "db_mean_ms": 2.689971,
+        "sampled_db_connections_active_max": 0.0
+      }
+    ],
+    "calculation": "Each average = same-dimension same-60-second-bucket duration total Sum / count Sum. Zero denominator returns null, not zero. These are means, not p95.",
+    "request_count_reconciliation": [
+      "The observer log contains 91 successful requests (1 preflight + 90 trials), separate from 10 authentication/route probes.",
+      "The original metric snapshot was fetched about 20 seconds after the final authenticated request and contains publication buckets only through 01:14 KST. It totals 77 requests, so it is not evidence that all 91 observer requests have arrived.",
+      "The exporter runs at fixed delay 60000 ms and assigns the publish-time timestamp to a counter delta. A final batch may still await publication/CloudWatch visibility; no exact loss or exact tail count is inferred from this snapshot.",
+      "RequestCount includes non-actuator HTTP timers, including authentication failures that reach the application and other non-actuator requests. API Gateway-rejected unregistered paths do not reach the application.",
+      "Source explicitly excludes uri tags beginning /actuator, so management health checks and Prometheus scrapes should not be cited as the explanation for these exported RequestCount totals."
+    ],
+    "db_interpretation": [
+      "DBQueryCount measures all instrumented jOOQ queries, including scheduled sweepers, not only /me calls.",
+      "Quiet API windows still contain 25 DB queries; normal 30-request windows contain 55 DB queries. This is consistent with 25 background queries/minute plus the user reads, but per-query attribution was not separately traced.",
+      "DBConnectionsActive=0 is the instantaneous value sampled when publishing; it does not mean no DB queries or no configured DB pool."
+    ]
+  },
+  "runtime": {
+    "ecs_services_running": 2,
+    "alb_target_groups_healthy": 2,
+    "ecs_container_health_status_is_unknown": true,
+    "container_health_interpretation": "Do not label ECS container health as HEALTHY; tasks are RUNNING and ALB target health is independently healthy.",
+    "postgres_engine_version": "18.3",
+    "migration_and_startup_passed": true,
+    "postgres_version_warning_present": true,
+    "warning_interpretation": "Migration/startup succeeded; the database-version compatibility warning remains a warning, not remediated or an unsupported-database runtime failure."
+  },
+  "privacy": {
+    "inputs_scanned": 4,
+    "forbidden_key_or_secret_pattern_findings": 0,
+    "user_profile_or_raw_response_data_found": false,
+    "login_url_removed": true,
+    "aws_account_resource_identifiers_are_operational_metadata_not_user_profile": true,
+    "original_source_files_not_rewritten": true
+  },
+  "limitations": [
+    "Other-source-IP rejection not actually tested by this verifier.",
+    "No direct database row count or full end-to-end query attribution.",
+    "Original metrics snapshot does not reconcile every request through the final publication batch.",
+    "No M2 alarm threshold/ALARM/OK test, DB fault injection, M3 incident processing or recovery proof.",
+    "This review made no AWS requests and changed no repository source."
+  ],
+  "source_reference_paths": [
+    "apps/api/src/main/java/com/likelion/slash/observability/CloudWatchMetricPublisher.java",
+    "apps/api/src/main/java/com/likelion/slash/observability/QueryMetricsConfig.java",
+    "apps/api/src/main/resources/application.yml",
+    "observability/personal/requests/run.py"
+  ]
+}

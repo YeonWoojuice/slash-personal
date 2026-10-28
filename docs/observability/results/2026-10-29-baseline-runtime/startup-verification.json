@@ -1,0 +1,11 @@
+[
+  {
+    "stream": "ecs/api/9f4289ccc7004c538f7df5294a8164d0",
+    "migration_success": true,
+    "schema_validated": true,
+    "application_started": true,
+    "unsupported_database_error": false,
+    "postgres_version_warning": true,
+    "error_entries": 0
+  }
+]

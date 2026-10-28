@@ -767,8 +767,7 @@
             "type": "A"
           },
           "routing_policy": "MULTIVALUE"
-        },
-        "health_check_custom_config": {}
+        }
       },
       "core": {
         "name": "core",
@@ -779,8 +778,7 @@
             "type": "A"
           },
           "routing_policy": "MULTIVALUE"
-        },
-        "health_check_custom_config": {}
+        }
       }
     },
     "aws_iam_role": {

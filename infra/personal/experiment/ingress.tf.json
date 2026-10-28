@@ -8,7 +8,7 @@
           "Effect": "Allow",
           "Principal": "*",
           "Action": "execute-api:Invoke",
-          "Resource": "execute-api:/*",
+          "Resource": "${aws_api_gateway_rest_api.test.execution_arn}/*",
           "Condition": {
             "IpAddress": {
               "aws:SourceIp": "${sort(tolist(var.allowed_cidrs))}"
@@ -20,7 +20,7 @@
           "Effect": "Deny",
           "Principal": "*",
           "Action": "execute-api:Invoke",
-          "Resource": "execute-api:/*",
+          "Resource": "${aws_api_gateway_rest_api.test.execution_arn}/*",
           "Condition": {
             "NotIpAddress": {
               "aws:SourceIp": "${sort(tolist(var.allowed_cidrs))}"
@@ -34,6 +34,12 @@
       "gatewayresponse.header.Access-Control-Allow-Origin": "'${var.cors_allowed_origin}'",
       "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
       "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type'"
+    },
+    "ingress_paths": {
+      "me_get": "/api/v1/me",
+      "me_options": "/api/v1/me",
+      "grafana": "/grafana",
+      "grafana_proxy": "/grafana/{proxy}"
     }
   },
   "resource": {
@@ -63,8 +69,7 @@
         "disable_execute_api_endpoint": false,
         "binary_media_types": [
           "*/*"
-        ],
-        "policy": "${jsonencode(local.ingress_policy)}"
+        ]
       }
     },
     "aws_api_gateway_resource": {
@@ -118,13 +123,14 @@
         "connection_type": "VPC_LINK",
         "connection_id": "${aws_apigatewayv2_vpc_link.test.id}",
         "integration_target": "${aws_lb.test.arn}",
-        "uri": "http://${local.api_hostname}",
+        "uri": "http://${local.api_hostname}/${var.api_stage_name}${local.ingress_paths[each.key]}",
         "timeout_milliseconds": 29000,
         "depends_on": [
           "aws_lb_listener.http",
           "aws_lb_listener_rule.baseline_me",
           "aws_lb_listener_rule.grafana"
-        ]
+        ],
+        "request_parameters": "${each.value.proxy ? {\"integration.request.path.proxy\"=\"method.request.path.proxy\"} : {}}"
       }
     },
     "aws_api_gateway_gateway_response": {
@@ -132,21 +138,25 @@
         "for_each": "${toset([\"DEFAULT_4XX\",\"DEFAULT_5XX\"])}",
         "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
         "response_type": "${each.value}",
-        "response_parameters": "${local.ingress_gateway_cors}"
+        "response_parameters": "${local.ingress_gateway_cors}",
+        "response_templates": {
+          "application/json": "{\"message\":$context.error.messageString}"
+        }
       }
     },
     "aws_api_gateway_deployment": {
       "test": {
         "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
         "triggers": {
-          "configuration": "${sha256(jsonencode({routes=local.ingress_routes,methods=aws_api_gateway_method.baseline,integrations=aws_api_gateway_integration.baseline,policy=local.ingress_policy,gateway_cors=local.ingress_gateway_cors,binary_media_types=aws_api_gateway_rest_api.test.binary_media_types,resources=aws_api_gateway_resource.me.path,stage=var.api_stage_name}))}"
+          "configuration": "${sha256(jsonencode({source=filesha256(\"${path.module}/ingress.tf.json\"),name=var.name,routes=local.ingress_routes,paths=local.ingress_paths,policy=local.ingress_policy,gateway_cors=local.ingress_gateway_cors,stage=var.api_stage_name,monitoring=local.monitoring_enabled,hostname=local.api_hostname,vpc_link_id=aws_apigatewayv2_vpc_link.test.id,alb_arn=aws_lb.test.arn}))}"
         },
         "lifecycle": {
           "create_before_destroy": true
         },
         "depends_on": [
           "aws_api_gateway_integration.baseline",
-          "aws_api_gateway_gateway_response.cors"
+          "aws_api_gateway_gateway_response.cors",
+          "aws_api_gateway_rest_api_policy.test"
         ]
       }
     },
@@ -172,6 +182,12 @@
           "throttling_burst_limit": 100,
           "throttling_rate_limit": 50
         }
+      }
+    },
+    "aws_api_gateway_rest_api_policy": {
+      "test": {
+        "rest_api_id": "${aws_api_gateway_rest_api.test.id}",
+        "policy": "${jsonencode(local.ingress_policy)}"
       }
     }
   }

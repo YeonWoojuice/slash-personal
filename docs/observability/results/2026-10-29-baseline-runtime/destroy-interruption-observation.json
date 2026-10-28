@@ -1,0 +1,119 @@
+{
+  "checked_at": "2026-10-28T16:29:13.149542+00:00",
+  "mode": "read_only_after_user_requested_destroy_stop",
+  "checks": [
+    {
+      "name": "ecs_cluster",
+      "observed": {
+        "clusters": [
+          {
+            "name": "slash-lab",
+            "status": "INACTIVE",
+            "running_tasks": 0,
+            "pending_tasks": 0,
+            "active_services": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "rds",
+      "aws_error": "DBInstanceNotFound"
+    },
+    {
+      "name": "cache",
+      "aws_error": "ReplicationGroupNotFoundFault"
+    },
+    {
+      "name": "cache_nodes",
+      "observed": {
+        "nodes": []
+      }
+    },
+    {
+      "name": "alb",
+      "aws_error": "LoadBalancerNotFound"
+    },
+    {
+      "name": "rest_api",
+      "aws_error": "NotFoundException"
+    },
+    {
+      "name": "vpc_link",
+      "aws_error": "NotFoundException"
+    },
+    {
+      "name": "vpc",
+      "observed": {
+        "vpcs": [
+          {
+            "state": "available"
+          }
+        ]
+      }
+    },
+    {
+      "name": "network_interfaces",
+      "observed": {
+        "interfaces": []
+      }
+    },
+    {
+      "name": "private_subnets",
+      "observed": {
+        "count": 2
+      }
+    },
+    {
+      "name": "security_groups",
+      "observed": {
+        "count": 2
+      }
+    },
+    {
+      "name": "cloudmap_namespace",
+      "aws_error": "NamespaceNotFound"
+    },
+    {
+      "name": "private_dns_zone",
+      "aws_error": "NoSuchHostedZone"
+    },
+    {
+      "name": "log_group",
+      "observed": {
+        "count": 0
+      }
+    },
+    {
+      "name": "secret_rds_managed",
+      "aws_error": "ResourceNotFoundException"
+    },
+    {
+      "name": "secret_cache",
+      "aws_error": "ResourceNotFoundException"
+    },
+    {
+      "name": "secret_grafana",
+      "aws_error": "ResourceNotFoundException"
+    },
+    {
+      "name": "retained_cognito_pool",
+      "observed": {
+        "present": true
+      }
+    },
+    {
+      "name": "retained_ecr_repositories",
+      "observed": {
+        "count": 6
+      }
+    },
+    {
+      "name": "retained_lambdaops_dsql",
+      "observed": {
+        "status": "ACTIVE"
+      }
+    }
+  ],
+  "aws_mutations": false
+}

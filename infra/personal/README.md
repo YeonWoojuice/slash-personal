@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-29 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성했고 실제 로그인과 LambdaOps 조회 API의 기본 인증을 검증했다.** ECR에는 시험 이미지 4개를 게시했다. 후속 보완에서 Grafana 패키지 갱신, Prometheus의 셸 제거, DB 시험 이미지의 클라이언트 전용 구성을 적용해 High를 21건에서 4건으로 줄였다. 후속 실제 Cognito·로컬 Slash 검증 21개가 통과했다. DB 시험 도구를 제외한 정상 동작용 Terraform 계획은 생성 97·변경 0·삭제 0으로 성공했다. High 4건은 미해결로 유지하며 해당 도구의 이미지·작업 정의·전용 권한을 이번 계획에서 제외했다. Slash 실행 환경인 experiment와 부하·장애 시험은 아직 실행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-29 기준. Slash 정상 동작용 experiment를 AWS에 배포해 **실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신**을 확인했다. DB 장애 도구는 제외했고 남은 High 4건은 미해결로 유지한다. 검증 후 삭제를 시작했으며, 사용자의 삭제 중단 요청 뒤 01:29 KST에 실행 서버·API·DB·캐시가 제거된 상태를 확인했다. VPC·private subnet 2개·보안 그룹 2개는 남아 있어 전체 정리 완료가 아니다. Cognito·ECR foundation과 기존 LambdaOps는 유지했다. 장애 시험·세 Alarm 전이·M3 종단 검증은 아직 수행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -106,7 +106,7 @@ API·Prometheus·Grafana의 게시된 linux/amd64 manifest와 기존 완료된 E
 
 [계획·교차 검토 근거](../../docs/observability/results/2026-10-29-baseline-deployment-plan.json)에 실행 입력의 의미와 생성 목록을 정리했다. 실제 IP·tfvars·원본 계획·secret은 공개하지 않는다. 계획 통과는 AWS의 실제 기동·IP 차단·RDS 접속·지표 수신 검증과 구분한다. LambdaOps의 DSQL·Lambda·SQS와 M2 Alarm은 이번 계획에 포함하지 않는다.
 
-계획의 종료 시각은 비용 비교용 4시간 가정이며 실행 예약이 아니다. 실제 배포 승인 후 시험자 IP·종료 시각·계정·이미지 상태를 다시 확인하고 새 계획을 만든다. `expires_at`은 자동 삭제나 비용 상한을 보장하지 않는다. 실제 서버 생성과 장애 시험은 아직 실행하지 않았다.
+계획의 종료 시각은 비용 비교용 4시간 가정이며 실행 예약이 아니다. 실제 배포 승인 후 시험자 IP·종료 시각·계정·이미지 상태를 다시 확인하고 새 계획을 만든다. `expires_at`은 자동 삭제나 비용 상한을 보장하지 않는다. 이 계획 검토 시점에는 실제 서버 생성과 장애 시험을 실행하지 않았다. 이후 배포·정상 검증과 삭제 중단 결과는 아래 실제 AWS 검증 기록에 구분해 남긴다.
 
 ```sh
 cd ../experiment
@@ -124,12 +124,7 @@ terraform show /private/tmp/slash-experiment.tfplan
 
 `enable_workloads=false`여도 apply하면 ALB/RDS/Valkey 등이 생성되어 과금된다. 설정 확인만 할 때는 validate/plan에서 멈춘다. workload 실행에는 `cloud_contract_verified=true`, 실제 Cognito·이미지 계약 확인이 필요하다. `enable_cloudwatch_metrics`는 지표 발행과 task IAM을 함께 켠다. `enable_db_test_task=true`는 시험 task **정의**만 생성하며 작업을 자동 실행하지 않는다.
 
-정상 동작용 계획 검토를 마쳤으며 다음 순서로 진행한다.
-
-1. 생성 자원·실행 시간·비용·삭제 범위를 확인하고 실제 서버 생성 승인을 받는다.
-2. 승인 시점의 시험자 IP·종료 시각·계정·이미지 상태로 새 계획을 만들고 범위가 같은지 확인한 뒤 적용한다.
-3. 정상 로그인·`/me`·IP와 내부 경로 차단·Grafana·CloudWatch 수신을 확인하고 결과를 저장한다.
-4. 계획한 종료 시각 전에 정리를 시작해 experiment를 삭제하고 잔여 과금 자원을 확인한다. 이후 DB 장애 도구의 High 보완·별도 검토를 거쳐 장애 시험과 M2·M3 실환경 검증으로 진행한다.
+정상 배포·검증은 아래 기록까지 진행했다. 다음 실행에서는 남은 state와 실제 VPC·subnet·보안 그룹을 먼저 대조하고, 승인된 시험 범위·접속 IP·종료 시각으로 새 계획을 만든다. 현재 API·DB·관측 서버는 삭제되어 기존 주소로 시험을 이어갈 수 없다. 추가 제한적 부하와 실행 영상은 아직 수행하지 않았으며, 이번 0.5 rps 정상 요청 결과를 부하 한계 검증으로 해석하지 않는다. DB 장애 도구의 High 보완·별도 검토 후 세 Alarm과 M3 실환경 검증으로 진행한다.
 
 가짜 값이나 보완 전 이미지 digest가 들어간 plan을 배포 가능한 계획으로 취급하지 않는다.
 
@@ -173,12 +168,45 @@ state 목록과 실제 ECS·ALB·API Gateway·VPC Link·RDS·Valkey·ENI/IP·Clo
 
 ALB·Valkey는 부분 시간도 한 시간으로 계산한다. private DNS 영역은 생성 후 12시간 내 삭제하는 조건으로 무료를 가정했으며, 이 조건을 넘기면 월 $0.50이 발생한다. `desired_count=0`이나 종료 태그만으로 비용이 멈추지 않는다. [현재 계산 가정·단가·삭제 대상](../../docs/observability/results/2026-10-29-baseline-cost-estimate.json)을 기준으로 검토하고, [이전 부분 비용 예시](../../docs/observability/results/2026-10-28-domainless-cost-estimate.json)는 당시 기록으로 남긴다. 추정치는 실제 청구액이나 지출 상한이 아니다.
 
+## 실제 AWS 정상 검증 — 2026-10-29
+
+| 단계 | 실제 결과와 해석 |
+| --- | --- |
+| 최초 배포 | 94개 생성 후 ElastiCache 생성이 HTTP 408 `InvalidCredentialsException`으로 실패했다. 당시 캐시는 없었고 재계획·재시도 후 생성됐다. 서비스 연결 역할의 최초 생성 시점은 확인했지만 오류 원인은 확정하지 않았다. |
+| 접속 경로 보완 | 실제 `/me`·Grafana 요청이 ALB의 기본 404로 전달됐다. Gateway URI에 stage와 각 backend 경로를 명시하고 Grafana `{proxy}` 매핑을 추가한 뒤 실제 요청이 통과했다. 자동 stage 전달을 가정하지 않는다. |
+| 반복 계획 보완 | 실제 생성되지 않은 빈 Cloud Map health 설정을 제거해 DNS 검색 동작을 유지했다. Gateway 오류 템플릿과 전체 ARN의 별도 접근 정책을 명시해 AWS 정규화와의 차이를 없앴다. 최종 적용 후 재계획은 `No changes`였다. |
+| 실행 상태 | API·관측 ECS 서비스 각 1개가 RUNNING, ALB target group 2개가 healthy였다. ECS 컨테이너 health 값은 UNKNOWN이므로 HEALTHY로 기록하지 않는다. RDS PostgreSQL 18.3의 migration·앱 기동은 성공했으며 버전 호환 경고는 남았다. |
+| 실제 로그인·접근 제한 | Cognito 웹 client로 AWS `/me` 첫·반복 200, 잘못된 인증 401, 공개 관리 경로 403 등 17개 확인 항목이 통과했다. 다른 출발지 IP의 실제 거부 시험은 수행하지 않았다. |
+| 정상 요청 | 0.5 rps로 180초 동안 trial 90회와 사전 확인 1회, 총 91회가 모두 200이었다. 인증·경로 확인 요청은 이 91회와 별개다. 장애 주입과 성능 한계 시험은 아니다. |
+| 관측 | Grafana·Prometheus 연결과 CloudWatch 여섯 지표를 확인했다. namespace·차원·60초 집계는 기존 계약을 유지했다. |
+| 삭제 중단 후 상태 | 01:29 KST 읽기 조회에서 ECS 실행 task 0, RDS·Valkey·ALB·REST API·VPC Link 없음, ENI 0을 확인했다. Cloud Map·private DNS·시험 로그·secret도 제거됐다. 사용자 요청으로 추가 삭제를 중단했고 VPC·private subnet 2개·보안 그룹 2개는 남아 있다. |
+
+[실행 결과와 화면 근거](../../docs/observability/results/2026-10-29-baseline-runtime/index.json)를 함께 보관한다. 토큰·프로필·원문 IP·secret은 공개 근거에서 제외한다. 화면 캡처는 검증 결과를 보조하며 실제 AWS 콘솔 화면과 검증 결과를 표시한 화면을 구분한다.
+
+초기 CloudWatch 스냅샷은 01:14 KST 구간까지 `RequestCount` 합계 77을 담았다. 후속 읽기 조회에서는 01:15 구간의 23회가 추가로 보여 최종 합계 100, 5xx 합계 0을 확인했다. 초기 77은 유실 건수나 최종 집계가 아니다. 정상 관찰기 91회와 추가 인증·경로 검사의 집계 범위가 다르며 개별 요청과 지표를 완전히 대응시킨 것은 아니다. `/actuator` 요청은 발행 집계에서 제외하므로 health check를 차이의 원인으로 설명하지 않는다. `DBQueryCount`에는 주기 작업도 포함되고, `DBConnectionsActive=0`은 발행 순간의 표본이다. 개별 요청 대조·비허용 IP 시험·추가 제한적 부하·실행 영상은 후속 검증이다.
+
+위 삭제 상태는 experiment 전체 삭제 완료나 계정 비용 0원을 뜻하지 않는다. 기존 Cognito·ECR·LambdaOps는 유지하며 다음 작업 전에 잔존 네트워크와 Terraform state를 대조한다. 삭제 중단 요청 이후 추가 정리를 실행하지 않았다.
+
+## 추가 재배포·제한적 요청·영상 계획 — 실행 전 기록
+
+삭제 중단 뒤 남은 state를 기준으로 재배포 계획을 검토했다. **생성 92·유지 6, 기존 자원 변경·삭제 0**이며 VPC·private subnet·cache 보안 그룹과 subnet group·기존 비밀번호 생성 결과를 재사용한다. 같은 이미지 3개·시험자 IPv4 제한을 유지하고 실제 요청에서 보완한 stage/backend 경로와 Grafana proxy 매핑을 반영한다. Cognito·ECR·기존 LambdaOps와 DB 장애 도구는 이 계획에 포함하지 않는다.
+
+| 항목 | 실행 전 계획 |
+| --- | --- |
+| 정상 요청 단계 | 0.5·1·2·5 rps를 각 목표 120초 실행. 단계 요청 최대 1,020회와 사전·사후 확인 각 1회. 실제 간격을 유지하며 누적 일정 지연 3초 또는 신규 발송 시간 483초를 넘으면 중단. |
+| 실행 제한 | 동시 요청 최대 4개, 요청 timeout 3초. 오류 1건·응답 2초 초과·요청 실행 용량 부족이면 즉시 중단. |
+| 지표 확인 | 요청 종료 후 120초 동안 발행·수집을 기다리고 실제 요청 수와 지표 구간을 대조. |
+| 영상 | 검증 보고와 실제 그래프의 브라우저 화면을 1초 간격으로 캡처해 약 40초 영상으로 저장. 실제 화면을 사용하며 미검증 결과를 연출하지 않음. |
+| 종료 기준 | 기존 2026-10-29 04:45:03 KST 기준을 연장하지 않음. 종료 태그 자체는 자동 삭제 기능이 아님. |
+
+이 절은 시험 전 계획이다. 01:55 KST 재배포 92개 생성·변경/삭제 0개를 적용했고 서비스 2개와 ALB 대상 2개의 정상 실행을 확인했다. 후속 계획에서 발견한 배포 식별값의 정규화 차이는 명시적 설정값을 기준으로 보완했다. 제한적 요청·영상은 아직 완료 전이다. DB 장애 주입·세 Alarm 전이·M3 Incident 종단 검증은 포함하지 않는다. 실제 실행과 중단 여부, 최종 자원 상태는 후속 결과에 구분해 기록한다.
+
 ## 검증의 범위
 
 Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험, 임시 TLS PostgreSQL 동작 검사를 실행한다. Grafana의 `/m2/grafana/` 로그인·정적 파일·보안 쿠키는 로컬 이미지로 확인했다. GitHub CI도 AWS 자원 생성 없이 같은 종류의 검사를 수행한다.
 
 foundation 생성과 실제 Cognito code+PKCE 로그인을 확인했다. 활성화한 **LambdaOps HTTP API → 조회 Lambda → DSQL** 경로에서 빈 목록 200(`items` 0개), 무토큰·잘못된 토큰 401, 같은 client의 읽기 scope 없는 토큰 403, 미존재 상세 404를 확인했다. 실제 존재하는 Incident의 상세 200은 아직 검증하지 않았다. LambdaOps의 M2 Alarm·수집 연결도 아직 활성화하지 않았다.
 
-Slash의 REST API·ECS·RDS·ALB는 experiment에 속하며 아직 배포하지 않았다. Slash의 stage 경로 전달·IP 정책·ECR pull·AWS에서의 정상 `/me`·CloudWatch·Alarm·부하와 장애 시험은 후속 환경 검증이다. 실제 Cognito와 로컬 personal API의 `/me`·지표 격리는 별도 검증을 통과했다. LambdaOps 조회 API 인증 성공을 Slash 앱 로그인이나 장애 시험 성공으로 대신하지 않는다. M2·M3는 아직 In Progress다.
+Slash의 REST API→VPC Link V2→내부 ALB→ECS·RDS 경로에서 정상 로그인·요청과 지표 수신을 검증했다. 비허용 IP의 실제 차단, 세 Alarm의 ALARM/OK 전이, 장애 시험, M3 이벤트 처리와 실제 Incident 상세 200은 미검증이다. 로컬 21개와 AWS 17개 검증은 서로 다른 실행 근거이며 혼합해 집계하지 않는다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).

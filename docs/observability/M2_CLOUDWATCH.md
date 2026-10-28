@@ -60,9 +60,26 @@ DB 집계에는 앱의 주기 작업 쿼리도 들어간다. 따라서 13:55의 
 
 같은 구간에 CloudWatch `GetMetricData`의 Metric Math를 직접 조회해 5xx 비율 33.33%, 평균 API 지연 616.71 ms, 평균 DB 쿼리 지연 87.26 ms를 확인했다. 이 값은 수식 동작 검증이며 Alarm 임계값의 근거로 사용하지 않는다.
 
+## AWS 정상 요청·지표 수신 — 2026-10-29
+
+개인 experiment를 배포해 실제 Cognito 로그인·AWS HTTPS API 검증 17개가 통과했다. 0.5 rps로 180초 동안 trial 90회와 preflight 1회, 총 91회가 모두 200이었다. 인증·경로 프로브는 별도 요청이며, 이번 결과는 정상 동작 기준선이지 부하 한계나 장애 복구 검증이 아니다.
+
+CloudWatch `LambdaOps/Slash`, `Service=slash-api`, `Environment=dev`에서 기존 여섯 지표를 수신했다. 같은 60초 구간의 `Sum`으로 계산한 대표값은 다음과 같다.
+
+| KST 구간 | 요청 수 | 5xx 수 | 평균 API 지연 | DB 쿼리 수 | 평균 DB 지연 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 01:13 | 30 | 0 | 7.98 ms | 55 | 2.50 ms |
+| 01:14 | 30 | 0 | 7.59 ms | 55 | 2.69 ms |
+
+평균은 해당 구간의 소요 시간 합계/건수이며 p95가 아니다. 초기 스냅샷의 요청 합계 77은 후속 읽기 조회에서 01:15 구간 23회가 추가되며 최종 100으로 확인됐다. 5xx 합계는 0이었다. 정상 관찰기 91회 외에 추가 인증·경로 검사가 있고 집계 범위가 달라, 개별 요청과 지표의 완전한 대응을 증명한 것은 아니다. 초기 77을 유실 건수로 해석하지 않는다. API가 조용한 구간에도 DB 쿼리가 있어 배경 작업의 영향을 구분해야 한다. `/actuator` 요청은 발행 집계에서 제외되고 `DBConnectionsActive=0`은 발행 순간 표본이다.
+
+최초 ElastiCache 생성은 HTTP 408 `InvalidCredentialsException`으로 실패했으며 재계획·재시도로 생성했다. 오류 원인은 확정하지 않았다. 실제 ALB 404는 Gateway URI의 stage·경로와 Grafana proxy 매핑을 명시해 보완했다. 빈 Cloud Map health 설정·Gateway 기본 오류 템플릿·접근 정책 ARN 정규화 차이를 정리한 뒤 최종 재계획은 `No changes`였다. [실행·검증 근거](results/2026-10-29-baseline-runtime/index.json)와 [배포·정리 기록](../../infra/personal/README.md)을 연결한다.
+
+검증 후 사용자의 삭제 중단 요청이 있었고 01:29 KST 읽기 조회에서 서버·API·DB·캐시 제거와 VPC·private subnet 2개·보안 그룹 2개 잔존을 확인했다. 전체 정리 완료로 표시하지 않는다. DB 장애 도구는 제외했으며 High 4건은 미해결이다. 추가 제한적 부하·실행 영상·비허용 IP의 실제 거부·세 Alarm 전환·M3 종단 경로는 미검증이므로 M2·M3는 In Progress를 유지한다.
+
 ## AWS 시험 준비 — 2026-10-28
 
-이 절은 개인 ECS 시험 환경의 설정과 실행 방법을 정의한다. AWS 배포·실제 지표 수신·Alarm 전이는 별도 환경 검증이다. 기존 `local,m1` 장애 API와 `personal`의 인증·프로필 제한은 유지한다.
+이 절은 당시 개인 ECS 시험 환경의 설정과 실행 방법을 정의한 기록이다. 이후 AWS 배포·정상 지표 수신은 위 2026-10-29 실행에서 확인했으며 Alarm 전이는 아직 별도 환경 검증이다. 기존 `local,m1` 장애 API와 `personal`의 인증·프로필 제한은 유지한다.
 
 ### 발행 설정과 IAM을 함께 켜기
 
@@ -148,11 +165,11 @@ AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS t
 
 Java 검사는 `apps/api`에서 `./gradlew test --offline --tests 'com.likelion.slash.observability.*' --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'`로, 인프라 검사는 저장소 루트에서 `python3 -m unittest discover -s infra/personal/tests -v`로 실행할 수 있다. DB 검증은 별도 임시 DB에 합성 `users` 한 행을 만들고 같은 SQL 파일을 비대화형 `psql`로 실행한 결과다. 앱 HTTP·Cognito·RDS의 검증은 포함하지 않는다.
 
-위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 후속 작업에서 Cognito/ECR 생성, 이미지 게시, LambdaOps 운영자 로그인·HTTP 조회 인증을 확인했다. API·Grafana OS 패키지 보완으로 Critical 0건을 확인했다. 추가 이미지 보완·재검사로 High는 21건에서 DB 시험 이미지의 4건으로 줄었다. experiment 계획은 생성 후보 100개를 계산했지만 실제 Slash 토큰 검증이 없어 기존 인증 조건에서 차단됐다. 후속 실제 Cognito·로컬 personal API 검증 21개가 통과했고, 없는 경로의 500을 404로 보완한 이미지를 게시했다. [로그인 검증 근거](results/2026-10-28-slash-cognito-local-verification.json)에 결과를 기록했다. 2026-10-29에는 DB 장애 도구를 제외하고 실제 인증 근거·최신 이미지·시험 IP·종료 시각을 반영한 [정상 동작 계획](results/2026-10-29-baseline-deployment-plan.json)을 만들었다. 생성 97·변경 0·삭제 0으로 성공했으며 실제 서버는 생성하지 않았다. 다음 단계는 비용·삭제 범위를 포함한 별도 배포 승인과 정상 요청·지표 수신 확인이다. High 4건은 해결로 표시하지 않으며 DB 장애 도구를 사용하기 전에 별도 보완·검토한다. 정상 기준선을 확보한 뒤 별도 승인한 장애 시험으로 세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
+위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 후속 작업에서 Cognito/ECR 생성, 이미지 게시, LambdaOps 운영자 로그인·HTTP 조회 인증을 확인했다. API·Grafana OS 패키지 보완으로 Critical 0건을 확인했다. 추가 이미지 보완·재검사로 High는 21건에서 DB 시험 이미지의 4건으로 줄었다. experiment 계획은 생성 후보 100개를 계산했지만 실제 Slash 토큰 검증이 없어 기존 인증 조건에서 차단됐다. 후속 실제 Cognito·로컬 personal API 검증 21개가 통과했고, 없는 경로의 500을 404로 보완한 이미지를 게시했다. [로그인 검증 근거](results/2026-10-28-slash-cognito-local-verification.json)에 결과를 기록했다. 2026-10-29에는 DB 장애 도구를 제외하고 실제 인증 근거·최신 이미지·시험 IP·종료 시각을 반영한 [정상 동작 계획](results/2026-10-29-baseline-deployment-plan.json)을 만들었다. 이 계획 검토 단계는 생성 97·변경 0·삭제 0으로 성공했다. 후속 승인으로 실제 AWS 배포·정상 요청·여섯 지표 수신까지 검증했으며 실행 결과와 삭제 중단 상태는 위 2026-10-29 기록을 따른다. High 4건은 해결로 표시하지 않으며 DB 장애 도구를 사용하기 전에 별도 보완·검토한다. 정상 기준선을 확보한 뒤 별도 승인한 장애 시험으로 세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
 
 
 ### 후속 준비: 일회성 작업과 요청 실행기
 
 2026-10-28 `observability/personal/db-test`, `task`, `requests`에 실행기와 검증을 추가했다. DB 작업은 기본 3초 지연 한 번이며, 반복 설정도 전체 시간 제한을 적용한다. 실제 요청은 정상 Cognito 토큰으로 HTTPS `/me`를 호출하고 시각·상태·시간만 기록한다. 새 작업 정의와 전용 SG/IAM은 `infra/personal/experiment/db-test.tf.json`에 있다. 생성과 실행은 분리했다.
 
-로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 후속 작업에서 operator client와 scope를 포함한 foundation을 생성 17·변경 0·삭제 0으로 실제 적용했다. Cognito 설정·로그인 폼과 빈 ECR 저장소를 확인했고 재계획도 변경 0개였다. [검증 근거](results/2026-10-28-foundation-provision.json)를 참고한다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 후속 단계에서 이미지 4종을 ECR에 게시하고 실제 Cognito operator 로그인·LambdaOps 빈 목록 200·무토큰 401·읽기 권한 없음 403을 확인했다. [이미지 게시·보안 검사](results/2026-10-28-image-publication.json)의 보완 상태를 실제 배포 전에 확인한다. Slash 웹 client의 실제 Cognito 토큰과 로컬 /me 검증은 완료했다. Fargate/RDS의 실제 /me·CloudWatch·Alarm 전이와 실제 Incident 상세 200은 아직 미검증이다.
+로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 후속 작업에서 operator client와 scope를 포함한 foundation을 생성 17·변경 0·삭제 0으로 실제 적용했다. Cognito 설정·로그인 폼과 빈 ECR 저장소를 확인했고 재계획도 변경 0개였다. [검증 근거](results/2026-10-28-foundation-provision.json)를 참고한다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 후속 단계에서 이미지 4종을 ECR에 게시하고 실제 Cognito operator 로그인·LambdaOps 빈 목록 200·무토큰 401·읽기 권한 없음 403을 확인했다. [이미지 게시·보안 검사](results/2026-10-28-image-publication.json)의 보완 상태를 실제 배포 전에 확인한다. Slash 웹 client의 실제 Cognito 토큰과 로컬 /me 검증은 완료했다. 후속 Fargate/RDS의 실제 `/me`·CloudWatch 정상 수신은 검증했다. Alarm 전이와 실제 Incident 상세 200은 아직 미검증이다.

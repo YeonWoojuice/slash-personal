@@ -1,7 +1,8 @@
 """Offline checks for the domain-free HTTPS boundary (not an AWS E2E substitute).
 
-REST private integration includes /stage in the backend path. The ALB removes it
-only for the explicitly allowed API route; Grafana keeps it in its root URL.
+The integration URI explicitly includes /stage, as required by the observed
+VPC Link V2 request path. The ALB removes it only for the allowed API route;
+Grafana keeps it in its root URL.
 Sources: AWS API Gateway private-integration and ALB rule-transforms guides.
 """
 import fnmatch
@@ -113,9 +114,14 @@ class IngressBoundary(unittest.TestCase):
             operator = 'IpAddress' if s['Effect'] == 'Allow' else 'NotIpAddress'
             self.assertEqual(s['Condition'], {operator: {'aws:SourceIp': '${sort(tolist(var.allowed_cidrs))}'}})
             self.assertEqual(s['Action'], 'execute-api:Invoke')
-            self.assertEqual(s['Resource'], 'execute-api:/*')
+            self.assertEqual(s['Resource'], '${aws_api_gateway_rest_api.test.execution_arn}/*')
         api = self.g['aws_api_gateway_rest_api']['test']
-        self.assertEqual(api['policy'], '${jsonencode(local.ingress_policy)}')
+        self.assertNotIn('policy', api)
+        policy_resource = self.g['aws_api_gateway_rest_api_policy']['test']
+        self.assertEqual(policy_resource['rest_api_id'], '${aws_api_gateway_rest_api.test.id}')
+        self.assertEqual(policy_resource['policy'], '${jsonencode(local.ingress_policy)}')
+        self.assertIn('aws_api_gateway_rest_api_policy.test',
+                      self.g['aws_api_gateway_deployment']['test']['depends_on'])
         self.assertEqual(api['endpoint_configuration'], {'types': ['REGIONAL'], 'ip_address_type': 'ipv4'})
         # CIDRs are evaluated against the network source, never a client-provided header.
         allowed = [ipaddress.ip_network('203.0.113.10/32')]
@@ -143,7 +149,49 @@ class IngressBoundary(unittest.TestCase):
         integration = self.g['aws_api_gateway_integration']['baseline']
         self.assertEqual(integration['connection_id'], '${aws_apigatewayv2_vpc_link.test.id}')
         self.assertEqual(integration['integration_target'], '${aws_lb.test.arn}')
-        self.assertEqual(integration['uri'], 'http://${local.api_hostname}')
+        self.assertEqual(integration['uri'], 'http://${local.api_hostname}/${var.api_stage_name}${local.ingress_paths[each.key]}')
+
+    def test_gateway_backend_paths_reach_allowed_alb_routes(self):
+        # A host-only integration URI sent every request to the ALB fallback.
+        # Render the complete configured URI before evaluating the ALB boundary.
+        # This catches both a missing backend path and a missing explicit stage.
+        integration = self.g['aws_api_gateway_integration']['baseline']
+        paths = self.ingress['locals']['ingress_paths']
+        self.assertEqual(set(paths), {'me_get', 'me_options', 'grafana', 'grafana_proxy'})
+        cases = [
+            ('me_get', 'GET', None, '/api/v1/me', 'api'),
+            ('me_options', 'OPTIONS', None, '/api/v1/me', 'api'),
+            ('grafana', 'GET', None, '/m2/grafana', 'grafana'),
+            ('grafana_proxy', 'GET', 'public/build/app.js', '/m2/grafana/public/build/app.js', 'grafana'),
+            ('grafana_proxy', 'POST', 'login', '/m2/grafana/login', 'grafana'),
+            ('grafana_proxy', 'POST', 'api/ds/query', '/m2/grafana/api/ds/query', 'grafana'),
+        ]
+        for key, method, proxy, expected_path, service in cases:
+            with self.subTest(route=key, proxy=proxy):
+                uri = self.expand(integration['uri']).replace('${local.api_hostname}', 'example.invalid')
+                uri = uri.replace('${local.ingress_paths[each.key]}', paths[key])
+                path = uri.removeprefix('http://example.invalid')
+                if proxy is not None:
+                    self.assertIn('"integration.request.path.proxy"="method.request.path.proxy"',
+                                  integration['request_parameters'])
+                    self.assertIn('"method.request.path.proxy"=true',
+                                  self.g['aws_api_gateway_method']['baseline']['request_parameters'])
+                    path = path.replace('{proxy}', proxy)
+                self.assertNotIn('{proxy}', path)
+                target, forwarded = self.route(method, path + '?probe=a%20b')
+                self.assertEqual(target, '${aws_lb_target_group.' + service + '.arn}')
+                self.assertEqual(forwarded, expected_path + '?probe=a%20b')
+
+    def test_aws_normalized_defaults_are_explicit(self):
+        # Omitting these values produced repeated replacement/update plans
+        # after AWS returned normalized service-discovery and gateway values.
+        # Preserve DNS-only discovery actually created by the original empty
+        # block; ALB/ECS handle application health, not Cloud Map custom health.
+        for service in self.r['aws_service_discovery_service'].values():
+            self.assertNotIn('health_check_custom_config', service)
+            self.assertNotIn('health_check_config', service)
+        self.assertEqual(self.g['aws_api_gateway_gateway_response']['cors']['response_templates'],
+                         {'application/json': '{"message":$context.error.messageString}'})
 
     def test_cors_and_forwarded_headers_do_not_weaken_authentication(self):
         env = self.main['locals']['api_environment']
@@ -173,10 +221,20 @@ class IngressBoundary(unittest.TestCase):
     def test_deployment_tracks_config_and_caches_are_off(self):
         deployment = self.g['aws_api_gateway_deployment']['test']
         trigger = deployment['triggers']['configuration']
-        for reference in ['local.ingress_routes', 'aws_api_gateway_method.baseline',
-                          'aws_api_gateway_integration.baseline', 'local.ingress_policy',
-                          'local.ingress_gateway_cors', 'binary_media_types']:
+        # Hash the declared file and resolved inputs, never whole provider objects:
+        # AWS fills/normalizes defaults after create, which otherwise forces a
+        # redundant deployment on the very next plan.
+        for reference in ['filesha256("${path.module}/ingress.tf.json")',
+                          'var.name', 'local.ingress_routes', 'local.ingress_paths',
+                          'local.ingress_policy', 'local.ingress_gateway_cors',
+                          'var.api_stage_name', 'local.monitoring_enabled',
+                          'local.api_hostname', 'aws_apigatewayv2_vpc_link.test.id',
+                          'aws_lb.test.arn']:
             self.assertIn(reference, trigger)
+        self.assertNotIn('aws_api_gateway_method.baseline', trigger)
+        self.assertNotIn('aws_api_gateway_integration.baseline', trigger)
+        self.assertNotIn('aws_api_gateway_gateway_response.cors', trigger)
+        self.assertNotIn('aws_api_gateway_rest_api.test.binary_media_types', trigger)
         self.assertNotIn('timestamp(', trigger)
         self.assertFalse(self.g['aws_api_gateway_stage']['test']['cache_cluster_enabled'])
         self.assertFalse(self.g['aws_api_gateway_method_settings']['test']['settings']['caching_enabled'])

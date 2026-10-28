@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-29",
+  "timezone": "Asia/Seoul",
+  "scope": "First normal Slash AWS baseline and preserved evidence; not an Alarm, incident-processing or recovery-completion report.",
+  "artifact_status": {
+    "normal_runtime_checks": "PASS",
+    "normal_trials": 90,
+    "observer_preflight": 1,
+    "all_91_observer_requests_http_200": true,
+    "authentication_and_metric_checks_passed": 17,
+    "cleanup": "INTERRUPTED_WITH_RESIDUAL_NETWORK_RESOURCES",
+    "M2": "In Progress",
+    "M3": "In Progress"
+  },
+  "original_runtime_window": {
+    "started_at_utc": "2026-10-28T16:09:23.240181Z",
+    "finished_at_utc": "2026-10-28T16:15:06.691782Z"
+  },
+  "evidence": [
+    {
+      "path": "runtime-first/result.json",
+      "role": "Actual Cognito and AWS HTTP checks; original first metric snapshot",
+      "sha256": "bea86faeb7dc08d1ba80183dee9deb8a8973d38db4383141580e86a68ece5ec4",
+      "bytes": 10535,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "runtime-first/requests.jsonl",
+      "role": "One preflight plus 90 normal requests; status and time only",
+      "sha256": "b35477790ab007b6c56838b13ed21c096c978639fb0a73cac90c75a3a880d97c",
+      "bytes": 16201,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "runtime-review.json",
+      "role": "Independent interpretation of the initial runtime snapshot and source code",
+      "sha256": "b5113e61778f91481fab00821dddb224cc406a140a488892727ee4751ba33d0e",
+      "bytes": 8588,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "startup-verification.json",
+      "role": "Application/schema startup checks, including retained PostgreSQL version warning",
+      "sha256": "7e4c40ecccab2f2dca12f020ca6ad06985de4792edd83a6cc1e3bdedf1fa1af5",
+      "bytes": 266,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "status.json",
+      "role": "Runtime ECS/ALB/RDS/cache status before cleanup",
+      "sha256": "ac5d645ad465301319ec73441936380e9b13864045548179359b26d6044eb68a",
+      "bytes": 4649,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "destroy-interruption-observation.json",
+      "role": "Read-only inventory after user-requested cleanup interruption",
+      "sha256": "d1710b2fb2229df4343921980446e7776c81866489c4b77c1054755e8686eed1",
+      "bytes": 2218,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "cloudwatch-final-snapshot.json",
+      "role": "Read-only historical metric follow-up; final request publication tail visible",
+      "sha256": "0995f21e3af45f426bde8dc84e6cb3efa2a1cac0c8f22d3d8b94b827d3605033",
+      "bytes": 7416,
+      "source_bytes_preserved": true
+    },
+    {
+      "path": "screenshots/02-ecs-running.jpg",
+      "role": "AWS ECS console: two active services and two running tasks",
+      "sha256": "95a1afab8bf1dd36d75ac4b9ae1374190f8073f80f243595cfe1308890f9221f",
+      "bytes": 94804,
+      "source_bytes_preserved": true,
+      "image_edited": false,
+      "exif_header_present": false
+    },
+    {
+      "path": "screenshots/03-api-auth-verification.jpg",
+      "role": "Actual HTTP verification result report rendered from result.json; not the AWS console",
+      "sha256": "a177bbda769f541deefd7eb017657631b5fbcd941742e2edc2110a3211f03431",
+      "bytes": 84900,
+      "source_bytes_preserved": true,
+      "image_edited": false,
+      "exif_header_present": false
+    },
+    {
+      "path": "screenshots/04-grafana-baseline-original.jpg",
+      "role": "Original live Grafana capture with request rate, latency, error ratio and DB graphs",
+      "sha256": "9bb7cf732539ee52095bd07b9a62d075e828fad96d20d01599afc7527f9344e1",
+      "bytes": 74372,
+      "source_bytes_preserved": true,
+      "image_edited": false,
+      "exif_header_present": false
+    },
+    {
+      "path": "screenshots/05-cloudwatch-metrics.jpg",
+      "role": "AWS CloudWatch console: actual metric series and request/error count plot",
+      "sha256": "d5dba616492c3f10e21cf4088864eb40670e30d52424e26b207ff545c3c356fe",
+      "bytes": 94046,
+      "source_bytes_preserved": true,
+      "image_edited": false,
+      "exif_header_present": false
+    }
+  ],
+  "reading_order": [
+    "runtime-first/result.json",
+    "runtime-first/requests.jsonl",
+    "runtime-review.json",
+    "cloudwatch-final-snapshot.json",
+    "destroy-interruption-observation.json"
+  ],
+  "cloudwatch_followup": {
+    "original_snapshot_request_sum": 77,
+    "original_snapshot_series_count": 6,
+    "original_snapshot_points_each": 6,
+    "final_query_request_sum": 100.0,
+    "final_query_server_error_sum": 0.0,
+    "final_query_points_each": 8,
+    "newly_visible_0115_kst_request_count": 23.0,
+    "request_count_fully_reconciled_per_request": false,
+    "interpretation": [
+      "The original snapshot was captured shortly after the last normal request. A later read-only query includes the 01:15 KST publication bucket with 23 additional requests, bringing the observed sum from 77 to 100.",
+      "The original 77 is not a lost-request count; it is an earlier, incomplete publication snapshot.",
+      "The observer records 91 calls. The complete verifier adds 10 HTTP probes, including two gateway-blocked management paths. Other application checks may also be counted, so the CloudWatch total is not expected to equal the observer-only total.",
+      "Exact request-by-request attribution was not traced; do not claim complete 100-request reconciliation.",
+      "The exporter explicitly excludes URI labels beginning /actuator. Health checks and Prometheus scrapes are not the explanation for the difference."
+    ],
+    "original_narrative_correction": "The generic interpretation string in the byte-preserved original result.json mentions health paths. That statement is superseded by runtime-review.json and this index: exported /actuator timers are excluded.",
+    "matched_60_second_windows": [
+      {
+        "timestamp_kst": "2026-10-29T01:09:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": null,
+        "db_query_count": 31.0,
+        "db_mean_ms": 5.313004
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:10:00+09:00",
+        "request_count": 4.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 10.413324,
+        "db_query_count": 25.0,
+        "db_mean_ms": 3.554008
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:11:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": null,
+        "db_query_count": 25.0,
+        "db_mean_ms": 3.595169
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:12:00+09:00",
+        "request_count": 13.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 40.992052,
+        "db_query_count": 37.0,
+        "db_mean_ms": 4.635331
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:13:00+09:00",
+        "request_count": 30.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 7.981179,
+        "db_query_count": 55.0,
+        "db_mean_ms": 2.496263
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:14:00+09:00",
+        "request_count": 30.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 7.589637,
+        "db_query_count": 55.0,
+        "db_mean_ms": 2.689971
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:15:00+09:00",
+        "request_count": 23.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 6.314619,
+        "db_query_count": 48.0,
+        "db_mean_ms": 2.472318
+      },
+      {
+        "timestamp_kst": "2026-10-29T01:16:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": null,
+        "db_query_count": 25.0,
+        "db_mean_ms": 2.889893
+      }
+    ],
+    "mean_formula": "Same-60-second duration total Sum divided by same-window count Sum; null for a zero denominator. These are means, not p95.",
+    "db_note": "DB counts include instrumented scheduled queries. Active-connections zero is a sampled instant, not proof that the database was unused."
+  },
+  "cleanup_observation": {
+    "observed_at_utc": "2026-10-28T16:29:13.149542+00:00",
+    "cause": "Destroy was interrupted at the user request; this is a historical observation, not a new cleanup action.",
+    "major_execution_resources_removed_at_snapshot": [
+      "ECS services/tasks",
+      "RDS",
+      "Valkey",
+      "ALB",
+      "REST API",
+      "VPC link",
+      "private Cloud Map namespace/DNS",
+      "experiment logs and secrets"
+    ],
+    "residual_resources_observed": [
+      "VPC available",
+      "two private subnets",
+      "two security groups"
+    ],
+    "network_interfaces_observed": 0,
+    "retained_foundation": [
+      "Cognito pool",
+      "six ECR repositories",
+      "existing LambdaOps DSQL"
+    ],
+    "cleanup_complete": false,
+    "zero_total_aws_cost_claimed": false
+  },
+  "screenshots": {
+    "preservation": "Selected captures are copied byte-for-byte; no pixels edited.",
+    "grafana_selected": "screenshots/04-grafana-baseline-original.jpg",
+    "grafana_excluded": "The later 04-grafana-baseline.jpg shows no data after teardown and is not used as runtime evidence.",
+    "visible_operational_identifiers": "AWS console captures retain the already-authorized account number and IAM display name. They do not show access keys, passwords, login tokens, private tester IP or end-user response data.",
+    "auth_report_is_not_aws_console": true,
+    "cloudwatch_capture_limit": "The screenshot displays only selected request/error graph series; the JSON data provides all six metrics."
+  },
+  "privacy_review": {
+    "json_files_scanned": 7,
+    "forbidden_fields_or_secret_patterns_found": 0,
+    "images_visually_reviewed": 4,
+    "original_images_preserved": true,
+    "private_tfvars_state_plans_credentials_not_included": true
+  },
+  "remaining_limits": [
+    "Other-source-IP rejection was not tested from a separate source.",
+    "Repeated user identity does not independently count database rows.",
+    "PostgreSQL 18.3 migrations and startup succeeded, but the version compatibility warning remains.",
+    "ECS container health reports UNKNOWN; RUNNING tasks and healthy ALB targets are the separate observed facts.",
+    "No DB fault injection, M2 ALARM/OK transition, M3 Incident end-to-end validation or recovery test.",
+    "No final cleanup completion, billing-zero claim, or restoration of removed servers."
+  ]
+}

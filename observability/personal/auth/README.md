@@ -11,9 +11,29 @@ Cognito resource server `lambdaops`와 `incidents.read` scope를 추가한다. �
 
 현재 개인 pool은 초대된 사용자만 로그인할 수 있다. **별도 public client는 사용자별 관리자 권한 경계가 아니다.** 이 pool의 로그인 사용자는 operator client가 허용하는 읽기 scope를 요청할 수 있다. 현재 1인 프로젝트의 계정 전체 읽기 범위이며, 다중 사용자·조직별 소유권이나 그룹 승인은 이번 변경에서 도입하지 않는다.
 
+## 실제 Slash 로그인 — AWS 검증 결과
+
+2026-10-29 기존 웹 client의 code+PKCE 로그인을 사용해 **Cognito → AWS REST API → VPC Link V2 → 내부 ALB → ECS API → RDS** 경로를 검증했다. 아래 로컬 검증과 별개의 실행이며, 총 **17개 확인 항목이 통과**했다.
+
+| 확인 항목 | 실제 결과 |
+| --- | --- |
+| 실제 access token으로 첫·반복 `/api/v1/me` | 200, 응답 형태·실제 Cognito 프로필 일치·같은 사용자 반환 확인 |
+| 토큰 없음·가짜 토큰·서명 변조·ID token 대용 | 모두 401 |
+| 전달 헤더로 인증 우회 시도 | 401 |
+| 공개 `/actuator/prometheus` 경로 | 인증 유무와 관계없이 Gateway 403, 지표 미노출 |
+| 제한된 정상 요청 | 0.5 rps·180초 trial 90회와 preflight 1회가 모두 200 |
+| 시험 뒤 정상 토큰 재조회 | 200 |
+| CloudWatch 발행 | 기존 차원의 지표 6종 수신 |
+
+토큰과 사용자 프로필 원문을 공개 결과에 기록하지 않았다. [AWS 실행 근거](../../../docs/observability/results/2026-10-29-baseline-runtime/index.json)에서 개별 검사와 요청 기록을 확인할 수 있다. 91회 정상 요청은 별도의 인증·경로 프로브와 구분한다. CloudWatch 요청 합계는 초기 77에서 마지막 발행 구간 23회가 반영된 최종 100으로 확인됐고 5xx는 0이었다. 정상 요청과 추가 프로브의 집계 범위가 다르므로 개별 요청 완전 대응을 주장하지 않는다. 실제 DB 행 수를 직접 조회해 1건임을 확인한 것은 아니므로 반복 조회 결과만으로 DB 중복 행 방지까지 증명하지 않는다.
+
+다른 출발지 IP의 실제 차단·만료 토큰·다른 client 토큰 통합 시험은 이 실행에 포함하지 않았다. 실제 Incident 상세 200·세 Alarm 전환·M3 수집 종단 검증도 수행하지 않았다. 기존 API의 인증·권한 계약은 유지했다. Gateway가 등록하지 않은 관리 경로를 403으로 차단한 결과와 로컬 앱의 401/404 결과를 구분한다.
+
+검증 후 정리 과정에서 사용자가 삭제 중단을 요청했다. 01:29 KST 기준 Slash API·ECS 실행 task·RDS·캐시·ALB·VPC Link는 제거됐고 VPC·subnet·보안 그룹 일부가 남았다. 기존 Cognito·ECR과 LambdaOps는 유지했다. 현재 삭제된 Slash 주소로 재검증할 수 없으며, 다음 시험에서는 잔존 상태를 확인해 다시 배포해야 한다. 추가 제한적 부하·실행 영상은 아직 수행하지 않았다.
+
 ## 실제 Slash 로그인 — 로컬 검증 결과
 
-2026-10-28 기존 웹 client의 code+PKCE 로그인과 **실제 Cognito → 로컬 personal API → 임시 PostgreSQL** 경로를 확인했다. API의 서명·발급자·만료·client·토큰 종류 검증은 그대로 사용했다. 비밀번호는 Cognito 화면에서 입력했으며 토큰은 프로세스 메모리로만 다루고 파일·명령 인자·공개 결과에 남기지 않았다.
+2026-10-28 기존 웹 client의 code+PKCE 로그인과 **실제 Cognito → 로컬 personal API → 임시 PostgreSQL 16** 경로를 확인했다. API의 서명·발급자·만료·client·토큰 종류 검증은 그대로 사용했다. 비밀번호는 Cognito 화면에서 입력했으며 토큰은 프로세스 메모리로만 다루고 파일·명령 인자·공개 결과에 남기지 않았다.
 
 | 확인 항목 | 결과 |
 | --- | --- |
@@ -55,7 +75,7 @@ LambdaOps M3 조회 HTTP API를 활성화했고 실제 API Gateway → 조회 La
 | 같은 operator client의 읽기 scope 없는 토큰 | 403 | 읽기 권한 없는 요청 거부 |
 | 유효한 읽기 토큰으로 미존재 ID 상세 조회 | 404 | 없는 기록의 오류 응답 |
 
-**실제 존재하는 Incident 상세 200은 아직 검증하지 않았다.** M2 Alarm·수집 연결과 Slash experiment도 아직 실행하지 않았다. 아래 명령은 현재 출력을 다시 얻을 때 사용한다.
+**실제 존재하는 Incident 상세 200은 아직 검증하지 않았다.** M2 Alarm·수집 연결은 아직 실행하지 않았다. Slash experiment는 위 AWS 정상 검증 후 실행 자원을 삭제했으며 일부 네트워크는 남아 있다. 아래 명령은 현재 출력을 다시 얻을 때 사용한다.
 
 ```sh
 umask 077
