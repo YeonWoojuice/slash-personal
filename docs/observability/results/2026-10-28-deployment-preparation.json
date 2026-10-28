@@ -242,5 +242,91 @@
     "aws_execution": false,
     "temporary_test_resources": "local DB/HTTPS containers and test networks cleaned up",
     "review": "main plus independent agents; launch-interruption cleanup fixed and regression tested"
+  },
+  "experiment_review_after_high_remediation": {
+    "at": "2026-10-28T12:02:11.537930+00:00",
+    "account_id": "642935793048",
+    "region": "ap-northeast-2",
+    "name": "slash-lab",
+    "terraform_version": "1.5.7",
+    "plan_exit_code": 1,
+    "status": "BLOCKED_BY_AUTHENTICATION_PRECONDITION; not an apply-ready plan",
+    "partial_change_summary": {
+      "add": 100,
+      "change": 0,
+      "import": 0,
+      "remove": 0,
+      "operation": "plan"
+    },
+    "partial_resource_counts": {
+      "aws_api_gateway_deployment": 1,
+      "aws_api_gateway_gateway_response": 2,
+      "aws_api_gateway_integration": 4,
+      "aws_api_gateway_method": 4,
+      "aws_api_gateway_method_settings": 1,
+      "aws_api_gateway_resource": 5,
+      "aws_api_gateway_rest_api": 1,
+      "aws_api_gateway_stage": 1,
+      "aws_apigatewayv2_vpc_link": 1,
+      "aws_cloudwatch_log_group": 1,
+      "aws_db_instance": 1,
+      "aws_db_subnet_group": 1,
+      "aws_ecs_cluster": 1,
+      "aws_elasticache_replication_group": 1,
+      "aws_elasticache_subnet_group": 1,
+      "aws_iam_role": 8,
+      "aws_iam_role_policy": 4,
+      "aws_iam_role_policy_attachment": 3,
+      "aws_internet_gateway": 1,
+      "aws_lb": 1,
+      "aws_lb_listener": 1,
+      "aws_lb_listener_rule": 5,
+      "aws_lb_target_group": 2,
+      "aws_route": 1,
+      "aws_route_table": 1,
+      "aws_route_table_association": 2,
+      "aws_secretsmanager_secret": 2,
+      "aws_secretsmanager_secret_version": 2,
+      "aws_security_group": 8,
+      "aws_service_discovery_private_dns_namespace": 1,
+      "aws_service_discovery_service": 2,
+      "aws_subnet": 4,
+      "aws_vpc": 1,
+      "aws_vpc_security_group_egress_rule": 13,
+      "aws_vpc_security_group_ingress_rule": 9,
+      "random_password": 2,
+      "terraform_data": 1
+    },
+    "diagnostics": [
+      {
+        "severity": "error",
+        "summary": "Resource precondition failed",
+        "detail": "Verify the authentication/metrics contract before baseline, plus job/Bedrock safety before full mode."
+      }
+    ],
+    "inputs": {
+      "images": "API from original image-publication plus high_remediation_followup images",
+      "actual_cognito_foundation_outputs": true,
+      "tester_source": "current public IPv4 /32, retained privately",
+      "expires_at": "four-hour review assumption; refresh before apply; not an execution schedule",
+      "enable_workloads": true,
+      "cloud_contract_verified": false,
+      "enable_monitoring": true,
+      "enable_cloudwatch_metrics": true,
+      "enable_db_test_task": true,
+      "prometheus_config_contract_verified": true
+    },
+    "next_gate": "Use a real Slash web-client Cognito token with local personal API; verify /me 200, invalid token rejection and metrics isolation. LambdaOps operator API results do not satisfy this gate.",
+    "unresolved_security": "DB client High 4 remain open. Review before any future fault-task execution.",
+    "applied": false,
+    "fault_tasks_run": false,
+    "m2_connected": false,
+    "private_files_excluded": [
+      "tester IPv4",
+      "tfvars",
+      "raw plan output",
+      "credentials"
+    ],
+    "cost_reference": "2026-10-28-domainless-cost-estimate.json"
   }
 }

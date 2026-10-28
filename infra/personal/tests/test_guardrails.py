@@ -100,7 +100,8 @@ class MonitoringGuardrails(unittest.TestCase):
                 self.assertNotIn('cidr_ipv4', rule)
         prom = self.main['locals']['monitoring_containers'][0]
         self.assertNotIn('portMappings', prom)
-        self.assertIn('--web.listen-address=127.0.0.1:9090', prom['command'][0])
+        arguments = json.loads((ROOT.parents[1] / 'observability/personal/prometheus/arguments.json').read_text())
+        self.assertIn('--web.listen-address=127.0.0.1:9090', arguments)
 
     def test_grafana_secret_is_not_a_literal_environment_value(self):
         grafana = self.main['locals']['monitoring_containers'][1]

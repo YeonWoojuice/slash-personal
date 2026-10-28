@@ -7,7 +7,13 @@ RUN apk add --no-cache \
     curl=8.23.0-r0 \
     libcurl=8.23.0-r0 \
     libcrypto3=3.5.9-r0 \
-    libssl3=3.5.9-r0
+    libssl3=3.5.9-r0 \
+    zlib=1.3.2-r1 \
+    musl=1.2.5-r24 \
+    musl-utils=1.2.5-r24 \
+    libcap2=2.78-r0 \
+    nghttp2-libs=1.69.0-r0 \
+    c-ares=1.34.9-r0
 USER 472
 
 COPY --chown=grafana:root provisioning/ /etc/grafana/provisioning/

@@ -155,29 +155,7 @@
       }
     },
     "core_containers": "${concat([local.api_container], local.full_mode ? [local.nlu_container] : [])}",
-    "prometheus_config": {
-      "global": {
-        "scrape_interval": "15s",
-        "evaluation_interval": "15s"
-      },
-      "scrape_configs": [
-        {
-          "job_name": "slash-api-personal",
-          "metrics_path": "/actuator/prometheus",
-          "scrape_timeout": "5s",
-          "dns_sd_configs": [
-            {
-              "names": [
-                "core.${var.name}.internal"
-              ],
-              "type": "A",
-              "port": 9091,
-              "refresh_interval": "10s"
-            }
-          ]
-        }
-      ]
-    },
+    "prometheus_config": "${templatefile(\"${path.module}/../../../observability/personal/prometheus/config.json.tftpl\", { name = var.name })}",
     "monitoring_containers": [
       {
         "name": "prometheus",
@@ -186,18 +164,9 @@
         "cpu": 512,
         "memory": 1024,
         "entryPoint": [
-          "/bin/sh",
-          "-ec"
+          "/bin/prometheus"
         ],
-        "command": [
-          "printf %s \"$PROMETHEUS_CONFIG_B64\" | base64 -d > /tmp/prometheus.yml; exec /bin/prometheus --config.file=/tmp/prometheus.yml --web.listen-address=127.0.0.1:9090 --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=6h --storage.tsdb.retention.size=2GB"
-        ],
-        "environment": [
-          {
-            "name": "PROMETHEUS_CONFIG_B64",
-            "value": "${base64encode(yamlencode(local.prometheus_config))}"
-          }
-        ],
+        "command": "${jsondecode(file(\"${path.module}/../../../observability/personal/prometheus/arguments.json\"))}",
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
@@ -205,7 +174,8 @@
             "awslogs-region": "ap-northeast-2",
             "awslogs-stream-prefix": "ecs"
           }
-        }
+        },
+        "user": "65532:65532"
       },
       {
         "name": "grafana",
@@ -1094,6 +1064,10 @@
             {
               "condition": "${!local.full_mode}",
               "error_message": "Domain-free REST ingress supports api-baseline only. Full mode requires a separately reviewed WebSocket-capable ingress; no full API routes are exposed here."
+            },
+            {
+              "condition": "${!local.monitoring_enabled || try(var.prometheus_image_contract.image == var.images.prometheus && var.prometheus_image_contract.name == var.name && var.prometheus_image_contract.config_sha256 == sha256(local.prometheus_config), false)}",
+              "error_message": "Generate a verified Prometheus image contract for this name/config and the same immutable images.prometheus reference before enabling monitoring."
             }
           ]
         }
@@ -1131,6 +1105,13 @@
     "api_base_url": {
       "value": "${local.api_base_url}",
       "description": "AWS-managed HTTPS base URL including the stage; append /api/v1/me. Restricted to allowed_cidrs."
+    }
+  },
+  "variable": {
+    "prometheus_image_contract": {
+      "type": "object({ image = string, name = string, config_sha256 = string })",
+      "default": null,
+      "description": "Verified image.py contract output; binds the immutable Prometheus image to this name and rendered configuration."
     }
   }
 }

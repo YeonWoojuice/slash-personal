@@ -346,5 +346,265 @@
       "Corrected the temporary Valkey readiness probe to use REDISCLI_AUTH per valkey-cli help.",
       "Probed API from inside the internal Docker network instead of publishing host ports. No application or image change was needed."
     ]
+  },
+  "high_remediation_followup": {
+    "at": "2026-10-28T11:56:25.145166+00:00",
+    "scope": "Published candidates and local checks; no experiment apply, ECS/RDS creation, fault trial or M2 connection",
+    "previous_high_total": 21,
+    "remaining_high_total": 4,
+    "current_selection": "Use API reference in original images plus the three images below; original section is historical evidence.",
+    "images": [
+      {
+        "at": "2026-10-28T11:48:45.958545+00:00",
+        "name": "grafana",
+        "tag": "m2-20261028-highfix1",
+        "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana",
+        "manifest_digest": "sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+        "scan_digest": "sha256:c79a33f88bce2301b10f7c1ada3ab3534fada48d2e2e18cfe78b05fcd51c1ed5",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+        "local_image_id": "sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+        "platform": "linux/amd64",
+        "size_bytes": 218025640,
+        "scan_status": "COMPLETE",
+        "scan_counts": {},
+        "scan_type": "BASIC",
+        "remaining_high_findings": [],
+        "supersedes": "sha256:c8d2a8a6001f56d09ec0e52a63830614b5b18a9017edc3de8b7b978d12a4705e"
+      },
+      {
+        "at": "2026-10-28T11:58:37.552894+00:00",
+        "name": "prometheus",
+        "tag": "m2-20261028-highfix1",
+        "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus",
+        "manifest_digest": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "scan_digest": "sha256:d0013ae90fcc31a8a8380336342330295acb993f5c5ce7c3424db91ecf7fe05d",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "local_image_id": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "platform": "linux/amd64",
+        "size_bytes": 113790104,
+        "scan_status": "COMPLETE",
+        "scan_counts": {},
+        "scan_type": "BASIC",
+        "remaining_high_findings": [],
+        "supersedes": "sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa"
+      },
+      {
+        "at": "2026-10-28T11:56:25.145166+00:00",
+        "name": "db-test",
+        "tag": "m2-20261028-highfix1",
+        "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test",
+        "manifest_digest": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+        "scan_digest": "sha256:309eb70da7b0aa1231e2ddf57b3616c083a7eaa8c882287118194ef845337995",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+        "local_image_id": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+        "platform": "linux/amd64",
+        "size_bytes": 46717967,
+        "scan_status": "COMPLETE",
+        "scan_counts": {
+          "HIGH": 4,
+          "MEDIUM": 9,
+          "LOW": 3
+        },
+        "scan_type": "BASIC",
+        "remaining_high_findings": [
+          {
+            "id": "CVE-2026-85091",
+            "package": "zlib",
+            "version": "1.3.dfsg+really1.3.1-1",
+            "status": "open; not automatically accepted or suppressed"
+          },
+          {
+            "id": "CVE-2026-5435",
+            "package": "glibc",
+            "version": "2.41-12+deb13u4",
+            "status": "open; not automatically accepted or suppressed"
+          },
+          {
+            "id": "CVE-2026-107161",
+            "package": "cyrus-sasl2",
+            "version": "2.1.28+dfsg1-9",
+            "status": "open; not automatically accepted or suppressed"
+          },
+          {
+            "id": "CVE-2026-19499",
+            "package": "glibc",
+            "version": "2.41-12+deb13u4",
+            "status": "open; not automatically accepted or suppressed"
+          }
+        ],
+        "supersedes": "sha256:4829ca4c1ef6dd210ea5d7b25910151b2a781f26ed37177f310a526a7154a0ea"
+      }
+    ],
+    "local_verification": {
+      "grafana": {
+        "status": "PASS",
+        "package_changes": {
+          "libcap2": {
+            "before": "2.77-r0",
+            "after": "2.78-r0"
+          },
+          "zlib": {
+            "before": "1.3.1-r2",
+            "after": "1.3.2-r1"
+          },
+          "musl-utils": {
+            "before": "1.2.5-r21",
+            "after": "1.2.5-r24"
+          },
+          "musl": {
+            "before": "1.2.5-r21",
+            "after": "1.2.5-r24"
+          },
+          "c-ares": {
+            "before": "1.34.6-r0",
+            "after": "1.34.9-r0"
+          },
+          "nghttp2-libs": {
+            "before": "1.68.0-r0",
+            "after": "1.69.0-r0"
+          }
+        },
+        "smoke": {
+          "status": "PASS",
+          "network_internal": true,
+          "host_ports": false,
+          "runtime_uid": 472,
+          "health": 200,
+          "database": "ok",
+          "login_page": 200,
+          "static_asset": 200,
+          "login_post": 200,
+          "cookie_path": "/m2/grafana",
+          "cookie_secure": true,
+          "cookie_httponly": true,
+          "provisioned_dashboard": 200,
+          "prometheus_datasource_health": 200,
+          "prometheus_real_scrape_via_grafana_proxy": true,
+          "scraped_metric": "slash_os_patch_smoke",
+          "scraped_value": 1,
+          "dns_resolution_by_curl": true,
+          "gzip_response_decoded_by_curl": true,
+          "curl_version": "curl 8.23.0 (x86_64-alpine-linux-musl) libcurl/8.23.0 OpenSSL/3.5.9 zlib/1.3.2 brotli/1.2.1 zstd/1.5.7 c-ares/1.34.9 libidn2/2.3.8 libpsl/0.21.5 nghttp2/1.69.0",
+          "prometheus_fixture_image_id": "sha256:86b17a25c2db1d16a61b16b3c8f336679eb19e26333d03e808da387206e40faa"
+        }
+      },
+      "prometheus": {
+        "at": "2026-10-28T11:57:05.650036+00:00",
+        "image": "slash-personal-prometheus:m2-highfix-20261028",
+        "image_id": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "name": "slash-lab",
+        "platform": "linux/amd64",
+        "config_sha256": "fc50350d5921d380fd680cab79ed7100fe59c7aeabdd5a33a9b740de4fa39089",
+        "checks": {
+          "promtool_config": true,
+          "prometheus_version_unchanged": true,
+          "ready": true,
+          "dns_discovery_and_scrape": true,
+          "metric_value": true,
+          "retention_6h_2GB": true,
+          "loopback_only": true,
+          "nonroot_uid_gid_65532": true,
+          "no_shell_busybox_base64": true,
+          "tsdb_wal_written": true,
+          "tsdb_read_after_restart_without_target": true
+        },
+        "aws_calls": false,
+        "host_ports_published": false,
+        "prometheus_version": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)",
+        "status": "PASS",
+        "cleanup": "completed",
+        "limits": [
+          "Internal local fixture only; no ECS, Cloud Map or AWS validation.",
+          "Restart reuses the same container filesystem; ECS task replacement is not persistent storage.",
+          "No ECR security scan is performed by this test."
+        ]
+      },
+      "db_test": {
+        "status": "PASS",
+        "tests": {
+          "result": "passed",
+          "count": 15,
+          "duration_seconds": 53.669,
+          "cases": [
+            "test_cancel_mode_requires_explicit_single_private_target",
+            "test_client_image_is_nonroot_readonly_and_supports_forced_timeout",
+            "test_connection_override_environment_cannot_bypass_fixed_target",
+            "test_exact_blocked_me_query_cancelled_once_and_lock_released",
+            "test_invalid_limits_are_rejected",
+            "test_invalid_target_or_confirmation_never_starts_pulse",
+            "test_lock_conflict_fails_without_leaving_transaction",
+            "test_multiple_blocked_app_queries_are_not_cancelled",
+            "test_real_query_waits_then_rollback_preserves_data",
+            "test_stop_task_signal_releases_actual_db_lock",
+            "test_trusted_certificate_with_wrong_hostname_fails_closed",
+            "test_untrusted_server_certificate_fails_closed",
+            "test_wrong_ip_application_name_or_role_is_not_cancelled",
+            "test_wrong_query_shape_is_not_cancelled",
+            "test_zero_matching_queries_refuses_without_leaving_lock"
+          ],
+          "runtime_controls": [
+            "read-only root",
+            "nonroot UID 999",
+            "cap-drop ALL",
+            "no-new-privileges",
+            "internal Docker network",
+            "temporary TLS PostgreSQL server"
+          ],
+          "aws_e2e": false
+        },
+        "installed_packages_before": 142,
+        "installed_packages_after": 101,
+        "file_absence_checks": {
+          "result": "verified",
+          "absent": [
+            "postgres server",
+            "gpg",
+            "tpm2daemon",
+            "libxml2.so.2",
+            "SASL DIGEST-MD5 plugin",
+            "Python libxml2 binding"
+          ]
+        }
+      },
+      "infra_tests": {
+        "passed": 31,
+        "terraform_format": "PASS",
+        "terraform_validate": "PASS",
+        "actionlint": "PASS"
+      }
+    },
+    "remaining_high_review": [
+      {
+        "id": "CVE-2026-5435",
+        "source_package": "glibc",
+        "status": "No Debian 13 stable fixed package at review. DNS debug TSIG path; psql/libpq direct symbol use absent, indirect reachability not proven. Open.",
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+      },
+      {
+        "id": "CVE-2026-19499",
+        "source_package": "glibc",
+        "status": "No Debian 13 stable fixed package at review. strfmon path; psql/libpq direct symbol use absent, indirect reachability not proven. Open.",
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+      },
+      {
+        "id": "CVE-2026-85091",
+        "source_package": "zlib",
+        "status": "No Debian 13 stable fixed package at review. Conflicting affected-version statements; not assumed false positive. Open.",
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-85091"
+      },
+      {
+        "id": "CVE-2026-107161",
+        "source_package": "cyrus-sasl2",
+        "status": "Affected DIGEST-MD5 plugin verified absent, required SASL packages remain; finding retained as open. No stable fix at review.",
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-107161"
+      }
+    ],
+    "limitations": [
+      "ECR Basic covers supported OS packages, not all application dependencies.",
+      "Local fixtures do not verify real Slash Cognito /me, ECS, RDS, Cloud Map, CloudWatch or alarms.",
+      "No unstable/sid packages mixed into the stable DB client image.",
+      "Dependency repositories can change; ECR manifest pins this tested build.",
+      "Remaining DB High findings require review or stable patches before any requested fault-task execution."
+    ]
   }
 }

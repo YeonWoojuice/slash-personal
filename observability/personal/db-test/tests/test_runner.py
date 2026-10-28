@@ -13,6 +13,7 @@ import unittest
 
 IMAGE = os.environ.get('DB_TEST_IMAGE', 'slash-personal-db-test:preparation')
 HOST = 'synthetic.test.ap-northeast-2.rds.amazonaws.com'
+WRONG_HOST = 'wrong.test.ap-northeast-2.rds.amazonaws.com'
 
 
 def command(*args, check=True, **kw):
@@ -41,7 +42,7 @@ class RunnerTests(unittest.TestCase):
         command('docker', 'network', 'create', '--internal', cls.network)
         cls.resources.append(('network', cls.network))
         command('docker', 'run', '-d', '--name', cls.name, '--network', cls.network,
-                '--network-alias', HOST, '--env-file', str(cls.server_env),
+                '--network-alias', HOST, '--network-alias', WRONG_HOST, '--env-file', str(cls.server_env),
                 '-v', str(cls.path)+':/certs:ro', '--entrypoint', '/bin/sh', 'postgres:16', '-c',
                 'cp /certs/server.key /tmp/server.key && cp /certs/server.crt /tmp/server.crt && chown postgres:postgres /tmp/server.key && chmod 0600 /tmp/server.key && exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key')
         cls.resources.append(('container', cls.name))
@@ -83,7 +84,8 @@ class RunnerTests(unittest.TestCase):
         return command('docker', 'exec', cls.name, 'psql', '-X', '-U', 'slashadmin', '-d', 'slash', '-Atc', sql, check=check)
 
     def run_command(self, overrides=None, name=None):
-        args = ['docker', 'run', '--rm', '--network', self.network, '--env-file', str(self.client_env),
+        args = ['docker', 'run', '--rm', '--read-only', '--cap-drop=ALL',
+                '--security-opt=no-new-privileges', '--network', self.network, '--env-file', str(self.client_env),
                 '-v', str(self.path/'server.crt')+':/opt/db-test/rds-ap-northeast-2-bundle.crt:ro']
         if name:
             args += ['--name', name]
@@ -255,6 +257,41 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn('pulse_failed', result.stdout)
         self.assertNotIn(self.password, result.stdout+result.stderr)
+
+    def test_trusted_certificate_with_wrong_hostname_fails_closed(self):
+        # Both aliases resolve to this same server; only HOST is in its certificate.
+        result = command(*self.run_command({'PGHOST': WRONG_HOST}), check=False)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('pulse_failed', result.stdout)
+        self.assertNotIn(self.password, result.stdout+result.stderr)
+
+    def test_connection_override_environment_cannot_bypass_fixed_target(self):
+        result = command(*self.run_command({
+            'PGSERVICE': 'missing-service', 'PGSERVICEFILE': '/does-not-exist',
+            'PGHOSTADDR': '127.0.0.1', 'PGPASSFILE': '/does-not-exist',
+            'PGOPTIONS': '-c statement_timeout=1',
+        }), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('pulse_completed', result.stdout)
+
+    def test_client_image_is_nonroot_readonly_and_supports_forced_timeout(self):
+        result = command('docker', 'run', '--rm', '--read-only', '--network', 'none',
+                         '--cap-drop=ALL', '--security-opt=no-new-privileges',
+                         '--entrypoint', '/bin/sh', IMAGE, '-ec',
+                         'test "$(id -u)" = 999; '
+                         'test ! -e /usr/lib/postgresql/16/bin/postgres; '
+                         'psql --version; timeout --version; '
+                         '! touch /opt/db-test/should-not-be-writable', check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('psql (PostgreSQL) 16.', result.stdout)
+        self.assertIn('GNU coreutils', result.stdout)
+        started = time.monotonic()
+        result = command('docker', 'run', '--rm', '--read-only', '--network', 'none',
+                         '--cap-drop=ALL', '--security-opt=no-new-privileges',
+                         '--entrypoint', 'timeout', IMAGE, '--signal=TERM', '--kill-after=1s',
+                         '1s', '/bin/sh', '-c', "trap '' TERM; while :; do sleep 1; done", check=False)
+        self.assertEqual(result.returncode, 137, result.stdout + result.stderr)
+        self.assertLess(time.monotonic() - started, 8)
 
     def test_lock_conflict_fails_without_leaving_transaction(self):
         proc = subprocess.Popen(['docker','exec','-e','PGAPPNAME=slash-test-blocker', self.name,
