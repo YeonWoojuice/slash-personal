@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-29",
+  "timezone": "Asia/Seoul",
+  "source_commit": "4997d0ca68226a3826e93a9820f2eccf3b627775",
+  "terraform_root": "infra/personal/experiment",
+  "terraform_version": "1.5.7",
+  "status": "PLAN_SAVED_SUCCESSFULLY_APPLY_NOT_RUN",
+  "plan": {
+    "timestamp_utc": "2026-10-28T15:20:24Z",
+    "managed_creates": 97,
+    "aws_resource_declarations": 94,
+    "local_support_resources": 3,
+    "updates": 0,
+    "deletes": 0,
+    "counts_by_type": {
+      "aws_api_gateway_deployment": 1,
+      "aws_api_gateway_gateway_response": 2,
+      "aws_api_gateway_integration": 4,
+      "aws_api_gateway_method": 4,
+      "aws_api_gateway_method_settings": 1,
+      "aws_api_gateway_resource": 5,
+      "aws_api_gateway_rest_api": 1,
+      "aws_api_gateway_stage": 1,
+      "aws_apigatewayv2_vpc_link": 1,
+      "aws_cloudwatch_log_group": 1,
+      "aws_db_instance": 1,
+      "aws_db_subnet_group": 1,
+      "aws_ecs_cluster": 1,
+      "aws_ecs_service": 2,
+      "aws_ecs_task_definition": 2,
+      "aws_elasticache_replication_group": 1,
+      "aws_elasticache_subnet_group": 1,
+      "aws_iam_role": 6,
+      "aws_iam_role_policy": 3,
+      "aws_iam_role_policy_attachment": 3,
+      "aws_internet_gateway": 1,
+      "aws_lb": 1,
+      "aws_lb_listener": 1,
+      "aws_lb_listener_rule": 5,
+      "aws_lb_target_group": 2,
+      "aws_route": 1,
+      "aws_route_table": 1,
+      "aws_route_table_association": 2,
+      "aws_secretsmanager_secret": 2,
+      "aws_secretsmanager_secret_version": 2,
+      "aws_security_group": 7,
+      "aws_service_discovery_private_dns_namespace": 1,
+      "aws_service_discovery_service": 2,
+      "aws_subnet": 4,
+      "aws_vpc": 1,
+      "aws_vpc_security_group_egress_rule": 11,
+      "aws_vpc_security_group_ingress_rule": 8,
+      "random_password": 2,
+      "terraform_data": 1
+    },
+    "all_preconditions_passed": true,
+    "saved_plan_sha256": "c166b757f5cb580b44fe53f6a430c57d3d5c877d803d6c311d121e3caa911ee2",
+    "saved_plan_json_sha256": "3ab89e85a29ba2e9422bb7524a4dc30554e3c4c501ec4b374779265c56cb82ac",
+    "raw_plan_private": true
+  },
+  "input_verification": {
+    "at": "2026-10-28T15:19:20.011325+00:00",
+    "account_id": "642935793048",
+    "region": "ap-northeast-2",
+    "principal_kind": "IAM user",
+    "images": [
+      {
+        "name": "api",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+        "scan_digest": "sha256:6650541066c85bb74663249f02e5ecd5fedfacd9bd6c3e65efb30c3763ddf72b",
+        "scan_status": "COMPLETE",
+        "finding_counts": {},
+        "scan_completed_at": "2026-10-28 23:58:04+09:00",
+        "scan_evidence": "Existing completed ECR Basic scan; no new scan requested"
+      },
+      {
+        "name": "prometheus",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "scan_digest": "sha256:d0013ae90fcc31a8a8380336342330295acb993f5c5ce7c3424db91ecf7fe05d",
+        "scan_status": "COMPLETE",
+        "finding_counts": {},
+        "scan_completed_at": "2026-10-28 20:58:47+09:00",
+        "scan_evidence": "Existing completed ECR Basic scan; no new scan requested"
+      },
+      {
+        "name": "grafana",
+        "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+        "scan_digest": "sha256:c79a33f88bce2301b10f7c1ada3ab3534fada48d2e2e18cfe78b05fcd51c1ed5",
+        "scan_status": "COMPLETE",
+        "finding_counts": {},
+        "scan_completed_at": "2026-10-28 20:48:59+09:00",
+        "scan_evidence": "Existing completed ECR Basic scan; no new scan requested"
+      }
+    ],
+    "cognito_web_client_contract": "confirmed via read-only Describe calls",
+    "local_real_cognito_evidence": "2026-10-28-slash-cognito-local-verification.json",
+    "tester_access": "current public IPv4 /32; value private",
+    "review_window_hours": 4,
+    "expires_at_is_schedule": false,
+    "deadline_is_auto_delete": false,
+    "enable_db_test_task": false,
+    "db_test_image_supplied": false,
+    "cloud_contract_verified": true,
+    "server_creation_authorized": false,
+    "fault_trial_authorized": false
+  },
+  "local_checks": {
+    "terraform_fmt": "PASS",
+    "terraform_validate": "PASS",
+    "prometheus_image_contract": "PASS",
+    "prior_real_cognito_local_api_checks": 21,
+    "real_cognito_check_evidence": "2026-10-28-slash-cognito-local-verification.json"
+  },
+  "independent_review": {
+    "schema_version": 1,
+    "review_type": "independent_read_only_saved_terraform_plan_review",
+    "source_plan_sha256": "3ab89e85a29ba2e9422bb7524a4dc30554e3c4c501ec4b374779265c56cb82ac",
+    "plan_timestamp_utc": "2026-10-28T15:20:24Z",
+    "result": "PASS_WITH_RUNTIME_VALIDATION_PENDING",
+    "deployment_blocking_findings": [],
+    "changes": {
+      "create": 97,
+      "update": 0,
+      "delete": 0
+    },
+    "mode": "api-baseline",
+    "db_test": {
+      "enabled": false,
+      "resources_planned": 0,
+      "image_supplied": false,
+      "output": null,
+      "remaining_image_high_findings_not_remediated_by_exclusion": true
+    },
+    "images": {
+      "api": {
+        "digest": "sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+        "matches_expected": true,
+        "same_account_seoul_ecr": true
+      },
+      "grafana": {
+        "digest": "sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+        "matches_expected": true,
+        "same_account_seoul_ecr": true
+      },
+      "prometheus": {
+        "digest": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+        "matches_expected": true,
+        "same_account_seoul_ecr": true
+      }
+    },
+    "ingress": {
+      "tester_cidr_count": 1,
+      "tester_prefix_length": 32,
+      "raw_tester_ip_omitted": true,
+      "other_addresses_explicitly_denied": true,
+      "alb_internal": true,
+      "sg_ingress_uses_only_sg_sources": true,
+      "ecs_public_ips_for_outbound_https": true,
+      "api_gateway_authentication": "API application validates Cognito JWT; API Gateway methods use NONE and the resource policy restricts source addresses"
+    },
+    "iam": {
+      "core_task": "CloudWatch PutMetricData only in LambdaOps/Slash and ap-northeast-2",
+      "core_execution_secrets": "New experiment DB and cache secrets only",
+      "monitoring_execution_secrets": "New experiment Grafana secret only",
+      "ecs_execution_managed_policy": "AmazonECSTaskExecutionRolePolicy remains attached; not repository-specific ECR least privilege",
+      "db_test_roles_absent": true,
+      "bedrock_invoke_policy_absent": true
+    },
+    "checks": [
+      {
+        "check": "97_create_only_no_update_or_delete",
+        "passed": true
+      },
+      {
+        "check": "baseline_flags_match",
+        "passed": true
+      },
+      {
+        "check": "db_test_resources_absent",
+        "passed": true
+      },
+      {
+        "check": "db_test_output_null",
+        "passed": true
+      },
+      {
+        "check": "exact_three_same_account_seoul_images",
+        "passed": true
+      },
+      {
+        "check": "prometheus_contract_matches",
+        "passed": true
+      },
+      {
+        "check": "provider_account_and_region_boundary",
+        "passed": true
+      },
+      {
+        "check": "one_host_only_allowed_cidr",
+        "passed": true
+      },
+      {
+        "check": "rest_policy_allows_only_tester_and_explicitly_denies_others",
+        "passed": true
+      },
+      {
+        "check": "only_core_and_monitoring_workloads",
+        "passed": true
+      },
+      {
+        "check": "linux_amd64_task_platforms",
+        "passed": true
+      },
+      {
+        "check": "no_public_sg_ingress",
+        "passed": true
+      },
+      {
+        "check": "alb_internal_database_private_encrypted",
+        "passed": true
+      },
+      {
+        "check": "cache_transport_and_storage_encryption",
+        "passed": true
+      },
+      {
+        "check": "metric_permission_namespace_and_region_limited",
+        "passed": true
+      },
+      {
+        "check": "no_bedrock_invoke_policy",
+        "passed": true
+      },
+      {
+        "check": "secret_access_uses_only_dedicated_resources",
+        "passed": true
+      },
+      {
+        "check": "no_extra_api_environment_overrides",
+        "passed": true
+      },
+      {
+        "check": "gateway_request_payload_logging_disabled",
+        "passed": true
+      }
+    ],
+    "non_blocking_observations": [
+      "Existing unused inference IAM roles, SG rules and service-discovery record remain in the baseline plan; inference task/service and Bedrock invocation policy are absent.",
+      "Task container_definitions, secret ARNs, SG IDs and ingress integration endpoints are unknown until apply. Image input values and source references were reviewed; a fully resolved deployed task definition was not observed.",
+      "RDS engine_version is not pinned and remains unknown in this plan. Runtime database/migration compatibility still requires verification.",
+      "The cleanup deadline is only an ExpiresAt tag; it does not automatically delete resources."
+    ],
+    "approval_boundary": {
+      "plan_review_only": true,
+      "aws_changes_performed_by_reviewer": false,
+      "apply_approval_received": false,
+      "fault_test_approval_received": false,
+      "runtime_aws_verified": false
+    },
+    "required_after_approved_deployment": [
+      "Verify both ECS services stabilize and load balancer health checks succeed.",
+      "Verify real Cognito /api/v1/me through the AWS HTTPS path and deny unauthenticated/outside-CIDR access.",
+      "Verify DB migration and encrypted DB/cache connectivity; confirm management endpoints remain inaccessible from the public path.",
+      "Verify Grafana/Prometheus visibility and actual CloudWatch metric labels/values under normal requests.",
+      "Do not enable or execute DB fault tests until the separate vulnerability and fault-test approval decision."
+    ],
+    "privacy": {
+      "contains_tester_ip": false,
+      "contains_credentials_tokens_or_profile_data": false,
+      "source_plan_not_copied": true
+    }
+  },
+  "cost_evidence": "2026-10-29-baseline-cost-estimate.json",
+  "limitations": [
+    "Plan success does not verify actual ECS, network, database, authentication or metric ingestion behavior.",
+    "Image scans are the existing completed ECR Basic OS package scans, not a fresh full application security scan.",
+    "DB test High findings remain unresolved; excluding the image is not remediation or risk acceptance.",
+    "RDS version is chosen by AWS default because current configuration does not pin it. Verify runtime migration compatibility after approved deployment.",
+    "No Slash servers were created, no AWS fault trials run, and no M2 Alarm or M3 collection was enabled.",
+    "Refresh tester IP, cleanup time, identity, image and plan before separately authorized deployment. ExpiresAt is not automatic cleanup."
+  ],
+  "privacy": {
+    "tester_ip_omitted": true,
+    "secrets_tokens_user_data_omitted": true,
+    "raw_tfvars_state_and_plan_not_committed": true
+  },
+  "regional_service_availability": {
+    "rds": [
+      {
+        "default_engine_version": "18.3",
+        "status": "available",
+        "db_t4g_small_gp3_orderable": true
+      }
+    ],
+    "valkey_8_available": true,
+    "read_only": true,
+    "engine_version_not_pinned_in_plan": true
+  }
+}

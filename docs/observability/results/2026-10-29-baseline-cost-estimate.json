@@ -1,0 +1,256 @@
+{
+  "checked_at": "2026-10-29",
+  "region": "ap-northeast-2",
+  "currency": "USD",
+  "scope": "Incremental Slash normal-baseline experiment; estimate, not bill or budget cap; no resources created by this review.",
+  "plan": {
+    "add": 97,
+    "change": 0,
+    "destroy": 0,
+    "mode": "api-baseline",
+    "db_test": false,
+    "monitoring": true,
+    "cloudwatch_metrics": true,
+    "fargate_tasks": 2,
+    "images_used": 3,
+    "vcpu": 2,
+    "gib": 5,
+    "task_public_ipv4": 2,
+    "secrets": 3,
+    "custom_metrics_max": 6,
+    "new_alarm_resources": 0,
+    "rds": "single-AZ db.t4g.small + 20GB gp3",
+    "cache": "1 Valkey cache.t4g.micro",
+    "ingress": "Regional REST API -> VPC link V2 -> internal ALB",
+    "nat_or_interface_endpoint_or_api_cache": false
+  },
+  "scenarios": [
+    {
+      "creation_through_completed_deletion_hours": 2,
+      "low_usd": 0.7206,
+      "high_usd": 1.4207,
+      "low_rounded_usd": 0.72,
+      "high_rounded_usd": 1.42,
+      "main_resources_usd": 0.44274,
+      "storage_secrets_metrics_discovery_api_usd": 0.020837,
+      "requests_egress_crossaz_usd": 0.181,
+      "logs_and_lcu_usd_range": [
+        0.076009,
+        0.776086
+      ]
+    },
+    {
+      "creation_through_completed_deletion_hours": 4,
+      "low_usd": 1.1802,
+      "high_usd": 1.8964,
+      "low_rounded_usd": 1.18,
+      "high_rounded_usd": 1.9,
+      "main_resources_usd": 0.88548,
+      "storage_secrets_metrics_discovery_api_usd": 0.037708,
+      "requests_egress_crossaz_usd": 0.181,
+      "logs_and_lcu_usd_range": [
+        0.076017,
+        0.792172
+      ]
+    }
+  ],
+  "test_time_plus_one_hour_setup_cleanup": [
+    {
+      "creation_through_completed_deletion_hours": 3,
+      "low_usd": 0.9504,
+      "high_usd": 1.6585,
+      "low_rounded_usd": 0.95,
+      "high_rounded_usd": 1.66,
+      "main_resources_usd": 0.66411,
+      "storage_secrets_metrics_discovery_api_usd": 0.029273,
+      "requests_egress_crossaz_usd": 0.181,
+      "logs_and_lcu_usd_range": [
+        0.076013,
+        0.784129
+      ]
+    },
+    {
+      "creation_through_completed_deletion_hours": 5,
+      "low_usd": 1.41,
+      "high_usd": 2.1342,
+      "low_rounded_usd": 1.41,
+      "high_rounded_usd": 2.13,
+      "main_resources_usd": 1.10685,
+      "storage_secrets_metrics_discovery_api_usd": 0.046144,
+      "requests_egress_crossaz_usd": 0.181,
+      "logs_and_lcu_usd_range": [
+        0.076022,
+        0.800215
+      ]
+    }
+  ],
+  "range_assumptions": {
+    "time": "All resources conservatively charged from creation until deletion is confirmed complete. 2/4h is total lifecycle time, not just test duration.",
+    "per_run_REST_requests_including_Grafana_and_OPTIONS": 10000,
+    "per_run_log_GB_low_high": [
+      0.1,
+      1
+    ],
+    "average_ALB_LCU_low_high": [
+      0,
+      1
+    ],
+    "per_run_paid_internet_egress_GB": 1,
+    "per_run_cross_AZ_allowance_usd": 0.02,
+    "monthly_proration_hours": 730,
+    "CloudWatch_metric_hours": "elapsed hours + 1, allowing for partial clock-hour boundaries",
+    "CloudWatch_API_calls": "60/hour publishing + 100 reads/run",
+    "Secrets_API_calls": 100,
+    "private_DNS": "Deleted within 12h: hosted-zone test exemption; private-zone queries free.",
+    "RDS_surplus_CPU_credits": 0,
+    "task_replacement_or_parallel_redeployment": false,
+    "discounts_credits_free_tier_and_tax": "Not applied; actual charges can be lower with account allowances."
+  },
+  "main_hourly_usd": {
+    "fargate": 0.11867,
+    "rds_instance": 0.051,
+    "valkey_node": 0.0192,
+    "internal_alb": 0.0225,
+    "task_public_ipv4": 0.01,
+    "total": 0.22137
+  },
+  "verified_price_api_rates": {
+    "rds_db_t4g_small_hour": {
+      "usd": 0.051,
+      "unit": "Hrs",
+      "sku": "UMH398UHTY46K8BK"
+    },
+    "rds_gp3_gb_month": {
+      "usd": 0.131,
+      "unit": "GB-Mo",
+      "sku": "8TFTRRBWJSP95DQP"
+    },
+    "rds_surplus_vcpu_hour": {
+      "usd": 0.075,
+      "unit": "vCPU-Hours",
+      "sku": "GYPHBB4HSCMUCDNK"
+    },
+    "valkey_cache_t4g_micro_hour": {
+      "usd": 0.0192,
+      "unit": "Hrs",
+      "sku": "JWGV22RACS6825AS"
+    },
+    "alb_hour": {
+      "usd": 0.0225,
+      "unit": "Hrs",
+      "sku": "VUV9M7PZ543S2SC9"
+    },
+    "alb_lcu_hour": {
+      "usd": 0.008,
+      "unit": "LCU-Hrs",
+      "sku": "CX4ZBV2SE6F5HJV3"
+    },
+    "public_ipv4_hour": {
+      "usd": 0.005,
+      "unit": "Hrs",
+      "sku": "ZKBHEVDXYBRCKFQ8"
+    },
+    "rest_request": {
+      "usd": 3.5e-06,
+      "unit": "Requests",
+      "sku": "3U6J7Z7NQKKPWAZ9"
+    },
+    "cw_metric_month": {
+      "usd": 0.3,
+      "unit": "Metrics",
+      "sku": "92QAN7T7PQUAG6NQ"
+    },
+    "cw_logs_ingest_gb": {
+      "usd": 0.76,
+      "unit": "GB",
+      "sku": "5P9Q77R2ADUJCNJ2"
+    },
+    "cw_logs_store_gb_month": {
+      "usd": 0.0314,
+      "unit": "GB-Mo",
+      "sku": "E7V5NF3GN7MQKCB6"
+    },
+    "cw_api_request": {
+      "usd": 1e-05,
+      "unit": "Requests",
+      "sku": "CY5JMB5JBHJAY5XB"
+    },
+    "secret_month": {
+      "usd": 0.4,
+      "unit": "Secrets",
+      "sku": "8TY6BPQ52JVYCRQD"
+    },
+    "secrets_api_request": {
+      "usd": 5e-06,
+      "unit": "API Requests",
+      "sku": "9779GVGYGTKZ2UJA"
+    },
+    "cloudmap_resource_month": {
+      "usd": 0.1,
+      "unit": "CloudMapResource",
+      "sku": "JAF56EEF95B2NSXP"
+    },
+    "internet_egress_gb": {
+      "usd": 0.126,
+      "unit": "GB",
+      "sku": "9AS8NERTGECRPGT7"
+    },
+    "existing_ecr_gb_month": {
+      "usd": 0.1,
+      "unit": "GB-Mo",
+      "sku": "FP58BXCX2RHZR3B2"
+    },
+    "fargate_x86_vcpu_hour": {
+      "usd": 0.04656,
+      "unit": "hours",
+      "sku": "DS579H2QDYXPJDKE"
+    },
+    "fargate_x86_gib_hour": {
+      "usd": 0.00511,
+      "unit": "hours",
+      "sku": "KJE68NNYFF2BQG98"
+    }
+  },
+  "billing_rules": {
+    "fargate_linux": "Per second from image download to task termination, minimum 60 seconds; default 20 GiB ephemeral disk included.",
+    "public_ipv4": "Per second, minimum 60 seconds per address.",
+    "rds_compute": "Per second, minimum 10 minutes after a billable status change; stopping does not stop storage charges.",
+    "valkey_node": "Every partial node-hour billed as a full hour.",
+    "alb": "Every partial ALB-hour billed as a full hour; LCU charged separately by usage.",
+    "private_hosted_zone": "No charge if deleted within 12h of creation; otherwise $0.50 for the first 25 zones, not prorated.",
+    "secrets": "Hourly prorated storage; API calls charged separately.",
+    "metrics": "Charged for hours in which custom metric data is published; old metric history alone does not keep producing ingestion charges."
+  },
+  "additional_or_retained_costs": [
+    "Surplus RDS T4g CPU credits $0.075/vCPU-hour. For this 2-vCPU instance, a conservative extra bound before baseline/credit offsets is $0.15 per elapsed hour; not included in the normal-baseline totals.",
+    "Private hosted zone retained past 12h: $0.50/month, not prorated. Additional elapsed time and partial ALB/Valkey hours add charges.",
+    "Request/log/LCU/network volume above assumptions and duplicate/retried tasks can exceed this range. The range is not a spending cap.",
+    "Existing ECR storage $0.10/GB-month, Cognito MAU/SMS/M2M, and existing LambdaOps/alarms/state are outside this experiment-only total. No new image upload or messaging is assumed.",
+    "Manual snapshots/backups, extra KMS API calls, Logs Insights queries, tax and exchange conversion are not included."
+  ],
+  "cleanup_required": [
+    "Delete both ECS services and residual tasks; confirm task public IPv4 addresses/ENIs released.",
+    "Delete internal ALB, API Gateway stage/API and VPC link.",
+    "Delete RDS including any retained/manual snapshots; stopping alone leaves storage charges. Plan has backups=0, delete automated backups=true, skip final snapshot=true.",
+    "Delete Valkey and any manual snapshots; snapshot retention=0.",
+    "Deregister Cloud Map task; delete services/private namespace/private hosted zone within 12h.",
+    "Delete experiment log group and cache/Grafana secrets; confirm RDS-managed secret lifecycle cleanup. Stop custom metric publication.",
+    "Remove experiment network/IAM dependencies. expires_at is only a tag and does not automatically delete resources.",
+    "Keep existing foundation ECR/Cognito and LambdaOps separate; no deletion of those is authorized by experiment cleanup."
+  ],
+  "source_method": "AWS Price List Query API GetProducts, read-only, queried 2026-10-29, with pricing/billing documentation below. SKU retained for reproducibility.",
+  "official_sources": [
+    "https://aws.amazon.com/fargate/pricing/",
+    "https://aws.amazon.com/rds/postgresql/pricing/",
+    "https://aws.amazon.com/elasticache/pricing/",
+    "https://aws.amazon.com/elasticloadbalancing/pricing/",
+    "https://aws.amazon.com/vpc/pricing/",
+    "https://aws.amazon.com/api-gateway/pricing/",
+    "https://aws.amazon.com/cloudwatch/pricing/",
+    "https://aws.amazon.com/secrets-manager/pricing/",
+    "https://aws.amazon.com/cloud-map/pricing/",
+    "https://aws.amazon.com/route53/pricing/",
+    "https://aws.amazon.com/ko/blogs/tech/aws-networking-dto-dp-01/",
+    "https://docs.aws.amazon.com/whitepapers/latest/best-practices-api-gateway-private-apis-integration/cost-optimization.html"
+  ]
+}
