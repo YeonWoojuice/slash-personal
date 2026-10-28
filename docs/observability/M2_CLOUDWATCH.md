@@ -91,7 +91,7 @@ VPC 안의 일회성 DB 작업 → users 잠금 → 3초 후 ROLLBACK
 
 SQL은 [db-query-delay.sql](../../observability/personal/sql/db-query-delay.sql)에 있다. 데이터나 스키마는 수정하지 않는다. 한 번 실행할 때 잠금 획득 대기는 최대 1초, 정상 보유 시간은 3초다. 문장 제한 5초와 트랜잭션 유휴 제한 5초를 둔다. SQL 파일은 `psql -X --file=db-query-delay.sql`로 비대화형 실행한다. 정상 종료는 `ROLLBACK`, 오류 시 `ON_ERROR_STOP`에 따라 `psql`이 종료되어 연결을 반납한다. 대화형으로 붙여넣어 실행하는 방식은 사용하지 않는다. 실행 클라이언트가 멈춘 경우에도 유휴 제한으로 잠금이 해제되지만, 모든 실패 상황이 정확히 3초 이내에 끝난다는 뜻은 아니다.
 
-AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS task**로 준비한다. 기존 VPC에서 private RDS로 TLS 접속하며, 전용 실행 역할에 그 실험 DB secret 읽기만 허용하고 비밀번호는 ECS가 주입한다. DB 접속용 보안 그룹도 별도로 제한한다. 실행 이미지는 digest로 고정한다. 후속 준비에서 이 작업의 Terraform·이미지·실행 도구를 작성했다. [배포 준비 현황](../../infra/personal/README.md#2026-10-28-배포-준비와-실제-계획-범위)을 따른다. 실제 AWS 실행은 아직 검증하지 않았다. 현재 API task에 ECS Exec가 설정됐다고 가정하지 않는다.
+AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS task**로 준비한다. 기존 VPC에서 private RDS로 TLS 접속하며, 전용 실행 역할에 그 실험 DB secret 읽기만 허용하고 비밀번호는 ECS가 주입한다. DB 접속용 보안 그룹도 별도로 제한한다. 실행 이미지는 digest로 고정한다. 후속 준비에서 이 작업의 Terraform·이미지·실행 도구를 작성했다. [배포 준비 현황](../../infra/personal/README.md#배포-전-준비와-계획)을 따른다. 실제 AWS 실행은 아직 검증하지 않았다. 현재 API task에 ECS Exec가 설정됐다고 가정하지 않는다.
 
 | 순서 | 작업 | 남길 근거 |
 | --- | --- | --- |
