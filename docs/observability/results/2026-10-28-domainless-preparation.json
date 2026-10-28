@@ -64,7 +64,8 @@
   "review_fixes": [
     "Detail probe accepts consistent canonical redirection without changing the Incident ID contract",
     "Gradle --tests options belong to test before bootJar",
-    "Cancellation rechecks the exact blocked query before signalling"
+    "Cancellation rechecks the exact blocked query before signalling",
+    "First GitHub run exposed missing linux_amd64 provider h1 hashes; official signed Mac and Linux checksums were added for both Terraform roots without changing versions."
   ],
   "not_verified": [
     "Actual AWS ingress and IP restriction",
