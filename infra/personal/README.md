@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. Terraform 코드와 로컬 시험 도구를 준비했으며 **Slash AWS 배포·이미지 게시·장애 실행은 아직 하지 않았다.** 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-28 기준. LambdaOps M2·M3의 실제 이벤트 경로를 검증하기 위한 Slash 시험 환경이다. **foundation의 Cognito·ECR 자원 17개를 생성하고 실제 설정을 검증했다.** Slash 실행 환경인 experiment·이미지 게시·장애 실행은 아직 하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -66,9 +66,9 @@ terraform show /private/tmp/slash-foundation.tfplan
 # 생성 목록 검토가 끝난 뒤에만 apply
 ```
 
-foundation 최신 계획은 **생성 17·변경 0·삭제 0**이다. 기존 15개 계획에 Cognito resource server와 operator client 2개를 추가했다. ECR 6개 중 이번에 게시할 이미지는 API·Prometheus·Grafana·DB 시험 이미지 네 개다. NLU/inference 이미지는 게시하거나 실행하지 않는다. 이전 계획과 이미지 준비 결과는 [당시 근거](../../docs/observability/results/2026-10-28-deployment-preparation.json)에 남겨 두며, 코드가 바뀐 이전 계획을 적용하지 않는다.
+foundation은 **생성 17·변경 0·삭제 0으로 적용 완료**했으며, 재계획 결과 추가 변경은 0개다. 기존 15개 계획에 Cognito resource server와 operator client 2개를 추가한 구성이다. ECR 6개 중 이번에 게시할 이미지는 API·Prometheus·Grafana·DB 시험 이미지 네 개다. NLU/inference 이미지는 게시하거나 실행하지 않는다. 이전 계획과 이미지 준비 결과는 [당시 근거](../../docs/observability/results/2026-10-28-deployment-preparation.json)에 남겨 두며, 코드가 바뀐 이전 계획을 적용하지 않는다.
 
-foundation 적용 이후에만 실제 Cognito 출력과 ECR manifest digest를 얻을 수 있다. Cognito 로그인 domain prefix의 사용 가능 여부도 생성 시 확인한다. 로컬 Docker image ID는 ECR digest의 대체 입력이 아니다.
+실제 Cognito 출력과 ECR 저장소 주소를 확보했다. Cognito domain은 ACTIVE이고 로그인 폼·issuer 정보·공개 서명 키 조회가 성공했다. 사용자 0명·각 저장소 이미지 0개이며, 실제 로그인과 이미지 게시 후 manifest digest 확보는 다음 단계다. [생성·검증 근거](../../docs/observability/results/2026-10-28-foundation-provision.json)를 따른다. 로컬 Docker image ID는 ECR digest의 대체 입력이 아니다.
 
 ```sh
 cd ../experiment
@@ -122,6 +122,6 @@ state 목록과 실제 ECS·ALB·API Gateway·VPC Link·RDS·Valkey·ENI/IP·Clo
 
 Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험, 임시 TLS PostgreSQL 동작 검사를 실행한다. Grafana의 `/m2/grafana/` 로그인·정적 파일·보안 쿠키는 로컬 이미지로 확인했다. GitHub CI도 AWS 자원 생성 없이 같은 종류의 검사를 수행한다.
 
-실제 AWS stage 경로 전달·IP 정책·ECR pull·Cognito 로그인·ECS health·RDS·CloudWatch·Alarm·실제 JWT 조회는 배포 후 환경 검증이다. M2·M3는 아직 In Progress다.
+foundation의 자원 생성·설정·로그인 페이지까지 실제 확인했다. 로그인 페이지 HTTP 200은 사용자 로그인 성공 증거가 아니다. 실제 AWS stage 경로 전달·IP 정책·ECR pull·Cognito 사용자 로그인·ECS health·RDS·CloudWatch·Alarm·실제 JWT 조회는 후속 환경 검증이다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).

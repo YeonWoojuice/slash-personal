@@ -1,7 +1,7 @@
 # Slash Personal
 
 Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독립 모노레포입니다.
-개인용 로컬 관측 환경과 일회성 AWS 테스트용 Terraform 설계를 추가했습니다. 실제 AWS 배포는 수행하지 않았습니다.
+개인용 로컬 관측 환경과 일회성 AWS 테스트용 Terraform을 추가했습니다. Cognito·ECR 기반 자원 17개는 생성·검증했으며, Slash API·DB 실행 환경과 이미지 게시는 아직 준비 단계입니다.
 
 ## 구성
 
@@ -25,7 +25,7 @@ Slash 팀 프로젝트를 바탕으로 개인적으로 개선하기 위한 독�
 - 원본 주소·기준 커밋·로컬 변경은 `docs/migration/sources.json`에 기록했습니다.
 - 팀 코드의 저작·기여 출처를 유지하며 새 라이선스를 임의로 부여하지 않았습니다.
 - 실제 `.env`, 비밀 키, Terraform state, 설치 의존성, 빌드 결과는 가져오지 않았습니다.
-- GitHub는 `YeonWoojuice/slash-personal`을 사용합니다. 개인 AWS 배포 대상은 확인했으며 Slash 자원은 아직 생성하지 않았습니다.
+- GitHub는 `YeonWoojuice/slash-personal`을 사용합니다. 개인 AWS 계정의 서울 리전에 foundation을 생성했습니다. [배포 검증 결과](docs/observability/results/2026-10-28-foundation-provision.json)를 참고하세요.
 
 ## 개발 시작 전
 

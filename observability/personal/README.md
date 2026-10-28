@@ -1,6 +1,6 @@
 # 개인 AWS API 관측 실험
 
-2026-10-28 기준. 첫 시험 대상은 Cognito 인증을 거친 Slash의 `GET /api/v1/me`다. 실제 AWS 배포·이미지 게시·장애 실행은 아직 하지 않았다. 전체 리소스·계획·비용·삭제 절차는 [개인 Terraform](../../infra/personal/README.md)을 기준으로 한다.
+2026-10-28 기준. 첫 시험 대상은 Cognito 인증을 거친 Slash의 `GET /api/v1/me`다. Cognito·ECR foundation은 실제 생성했으며, Slash 실행 환경 배포·이미지 게시·장애 실행은 아직 하지 않았다. 전체 리소스·계획·비용·삭제 절차는 [개인 Terraform](../../infra/personal/README.md)을 기준으로 한다.
 
 ## 연결
 
@@ -30,7 +30,7 @@ Prometheus 웹 서버는 loopback에만 연결한다. Grafana는 로그인·Secu
 
 ## 실제 배포·시험 순서
 
-1. 계정 `642935793048`·서울 리전·실행 주체를 재확인한다. foundation 계획을 검토해 Cognito/ECR를 생성한다.
+1. 계정 `642935793048`·서울 리전에 foundation 17개 자원을 생성했고 재계획 변경 0개를 확인했다. 다음 실행에서도 같은 계정·상태 파일을 사용한다.
 2. API·Grafana·Prometheus·DB 시험 이미지를 ECR에 게시하고 manifest digest를 확보한다. 로컬 이미지 ID를 대신 쓰지 않는다.
 3. 실제 Cognito 출력, 시험자 IPv4/32, 종료시각, 이미지 digest를 experiment 입력에 넣고 새 계획을 검토한다.
 4. 배포 후 `api_base_url`을 사용한다. 기본 stage는 `m2`다. 웹은 localhost:5173의 code+PKCE callback을 사용하며 토큰은 저장소·로그·채팅에 남기지 않는다.

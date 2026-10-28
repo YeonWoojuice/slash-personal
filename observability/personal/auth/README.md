@@ -22,7 +22,7 @@ foundation의 두 출력에는 비밀값이 없다.
 
 `jwt_audience`에는 operator client ID를 넣는다. Cognito access token에 `aud`가 없으면 API Gateway JWT authorizer는 `client_id`를 검사한다. `read_authorization_scope`는 API Gateway 경로와 조회 Lambda의 `REQUIRED_READ_SCOPE`에 같은 값으로 전달된다. 백엔드의 일반 기본값 `incidents:read`는 바꾸지 않았으며 이 Cognito 배포에서만 명시적으로 설정한다.
 
-아래 명령은 foundation을 실제로 생성한 뒤 사용한다. 지금은 Cognito·조회 HTTP API가 없어 실제 로그인·프로브를 실행하지 않았다.
+foundation 생성과 Cognito 설정·로그인 폼 확인을 완료했다. 사용자는 아직 등록하지 않았고 M3 조회 HTTP API도 활성화하지 않았다. 아래 명령으로 실제 출력을 다시 얻을 수 있으며, 사용자 로그인·토큰 발급·프로브는 다음 단계에서 검증한다.
 
 ```sh
 umask 077

@@ -139,4 +139,4 @@ Java 검사는 `apps/api`에서 `./gradlew test --offline --tests 'com.likelion.
 
 2026-10-28 `observability/personal/db-test`, `task`, `requests`에 실행기와 검증을 추가했다. DB 작업은 기본 3초 지연 한 번이며, 반복 설정도 전체 시간 제한을 적용한다. 실제 요청은 정상 Cognito 토큰으로 HTTPS `/me`를 호출하고 시각·상태·시간만 기록한다. 새 작업 정의와 전용 SG/IAM은 `infra/personal/experiment/db-test.tf.json`에 있다. 생성과 실행은 분리했다.
 
-로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 최신 foundation 계획은 operator client와 scope를 포함해 생성 17·변경 0·삭제 0이며 적용하지 않았다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 실제 ECR 게시·로그인·Fargate/RDS·CloudWatch·Alarm 전이는 아직 미검증이다.
+로컬 API/Grafana/Prometheus/DB 시험 이미지는 모두 `linux/amd64`로 준비했다. 후속 작업에서 operator client와 scope를 포함한 foundation을 생성 17·변경 0·삭제 0으로 실제 적용했다. Cognito 설정·로그인 폼과 빈 ECR 저장소를 확인했고 재계획도 변경 0개였다. [검증 근거](results/2026-10-28-foundation-provision.json)를 참고한다. 개인 도메인 없이 접속하는 REST API→VPC Link V2→내부 ALB를 코드로 구성했다. 이전 15개 계획은 이 변경 전의 준비 기록이다. 실제 ECR 게시·로그인·Fargate/RDS·CloudWatch·Alarm 전이는 아직 미검증이다.

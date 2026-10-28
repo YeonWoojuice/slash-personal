@@ -1,0 +1,121 @@
+{
+  "checked_at": "2026-10-28T09:48:54.548352+00:00",
+  "code_commit": "14dde5ebabcb3c8c51e2910b4663bbe7f4d0889b",
+  "account_id": "642935793048",
+  "identity_arn": "arn:aws:iam::642935793048:user/Yeonu",
+  "region": "ap-northeast-2",
+  "scope": "Foundation only: no images published, no users created, no email, no Slash workloads or M3 HTTP API activated.",
+  "terraform_state_resource_count": 17,
+  "cognito": {
+    "pool_id": "ap-northeast-2_36ba530CM",
+    "name": "slash-lab",
+    "issuer": "https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_36ba530CM",
+    "domain": "https://slash-lab-642935793048.auth.ap-northeast-2.amazoncognito.com",
+    "domain_status": "ACTIVE",
+    "user_count": 0,
+    "admin_create_only": true,
+    "clients": [
+      {
+        "purpose": "web",
+        "client_id": "11n6l74efvmil96ecq00tio6t7",
+        "callback": "http://localhost:5173/callback",
+        "scopes": [
+          "email",
+          "openid",
+          "profile"
+        ],
+        "has_client_secret": false,
+        "code_flow": true
+      },
+      {
+        "purpose": "lambdaops_operator",
+        "client_id": "3oq69gv0kg2mcom5hnu378k224",
+        "callback": "http://localhost:8765/callback",
+        "scopes": [
+          "lambdaops/incidents.read",
+          "openid"
+        ],
+        "has_client_secret": false,
+        "code_flow": true
+      }
+    ],
+    "read_scope": "lambdaops/incidents.read",
+    "discovery_http": 200,
+    "public_signing_key_count": 2,
+    "login_page_http": 200,
+    "login_form_found": true,
+    "actual_user_login_verified": false
+  },
+  "ecr": [
+    {
+      "name": "slash-lab/api",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    },
+    {
+      "name": "slash-lab/db-test",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    },
+    {
+      "name": "slash-lab/grafana",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    },
+    {
+      "name": "slash-lab/inference",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/inference",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    },
+    {
+      "name": "slash-lab/nlu",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/nlu",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    },
+    {
+      "name": "slash-lab/prometheus",
+      "uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus",
+      "immutable_tags": true,
+      "scan_on_push": true,
+      "untagged_retention_days": 7,
+      "image_count": 0
+    }
+  ],
+  "all_checks_passed": true,
+  "terraform_apply": {
+    "created": 17,
+    "changed": 0,
+    "destroyed": 0
+  },
+  "post_apply_plan": {
+    "exit_code": 0,
+    "changes": 0
+  },
+  "state_protection": {
+    "directory_mode": "0700",
+    "state_and_tfvars_mode": "0600",
+    "git_ignored": true
+  },
+  "limitations": [
+    "No Cognito users or actual sign-in/token issuance",
+    "No ECR images published",
+    "No Slash experiment deployment",
+    "No M3 HTTP API activation or JWT Detail verification",
+    "No M2 Alarm or fault execution"
+  ]
+}
