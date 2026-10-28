@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-28T17:14:36.998526+00:00",
+  "review_scope": "Read-only local completed demo evidence; no AWS calls or load added.",
+  "status": "STOPPED_INCOMPLETE",
+  "checks": [
+    {
+      "check": "runtime_17_checks_pass",
+      "passed": false
+    },
+    {
+      "check": "1020_steps_plus_two_checks",
+      "passed": false
+    },
+    {
+      "check": "http_200_no_error_within_2000_ms",
+      "passed": false
+    },
+    {
+      "check": "no_scheduler_stop",
+      "passed": false
+    },
+    {
+      "check": "actual_step_sequences_unique_contiguous",
+      "passed": true
+    },
+    {
+      "check": "planned_1020_steps_all_successful_no_skips",
+      "passed": false
+    },
+    {
+      "check": "submission_schedule_under_483_seconds",
+      "passed": true
+    },
+    {
+      "check": "passive_120_second_cooldown",
+      "passed": true
+    },
+    {
+      "check": "fresh_gate_consumed",
+      "passed": true
+    },
+    {
+      "check": "stage_1_planned_count_completed",
+      "passed": true
+    },
+    {
+      "check": "stage_2_planned_count_completed",
+      "passed": true
+    },
+    {
+      "check": "stage_3_planned_count_completed",
+      "passed": true
+    },
+    {
+      "check": "stage_4_planned_count_completed",
+      "passed": false
+    },
+    {
+      "check": "observed_overlapping_client_calls_at_most_four",
+      "passed": true
+    },
+    {
+      "check": "six_expected_metric_series_nonempty",
+      "passed": true
+    },
+    {
+      "check": "metric_values_finite_nonnegative",
+      "passed": true
+    },
+    {
+      "check": "observed_server_errors_zero",
+      "passed": true
+    },
+    {
+      "check": "no_secret_or_profile_fields_in_reviewed_records",
+      "passed": true
+    },
+    {
+      "check": "login_url_removed",
+      "passed": true
+    }
+  ],
+  "http": {
+    "total_probe_requests": 709,
+    "step_requests": 708,
+    "preflight": 1,
+    "postflight": 0,
+    "all_http_200": true,
+    "over_2000ms_requests": [
+      {
+        "sequence": 699,
+        "stage": 4,
+        "started_at": "2026-10-28T17:11:48.006540+00:00",
+        "finished_at": "2026-10-28T17:11:50.061213+00:00",
+        "status": 200,
+        "elapsed_ms": 2054.693,
+        "error": null
+      }
+    ],
+    "control_events": [
+      {
+        "phase": "control",
+        "observed_at": "2026-10-28T17:11:50.020275Z",
+        "error": "inflight_latency_limit"
+      }
+    ],
+    "max_overlapping_client_call_intervals": 2,
+    "stage_stats": [
+      {
+        "stage": 1,
+        "target_rps": 0.5,
+        "requests": 60,
+        "first_client_start_offset_seconds": 0.0,
+        "last_client_start_offset_seconds": 118.105251,
+        "client_start_gap_seconds": {
+          "nominal": 2.0,
+          "min": 1.999953,
+          "mean": 2.001784,
+          "max": 2.004681,
+          "below_nominal_count": 1,
+          "largest_shortfall_seconds": 4.7e-05
+        },
+        "latency_ms": {
+          "mean": 70.205,
+          "p95": 122.852,
+          "max": 133.504
+        },
+        "summary_dispatch_window_seconds": 120.108094
+      },
+      {
+        "stage": 2,
+        "target_rps": 1,
+        "requests": 120,
+        "first_client_start_offset_seconds": 119.999434,
+        "last_client_start_offset_seconds": 239.252958,
+        "client_start_gap_seconds": {
+          "nominal": 1.0,
+          "min": 0.99998,
+          "mean": 1.00213,
+          "max": 1.004942,
+          "below_nominal_count": 4,
+          "largest_shortfall_seconds": 2e-05
+        },
+        "latency_ms": {
+          "mean": 97.0,
+          "p95": 144.203,
+          "max": 1115.11
+        },
+        "summary_dispatch_window_seconds": 120.256539
+      },
+      {
+        "stage": 3,
+        "target_rps": 2,
+        "requests": 240,
+        "first_client_start_offset_seconds": 239.994572,
+        "last_client_start_offset_seconds": 360.062314,
+        "client_start_gap_seconds": {
+          "nominal": 0.5,
+          "min": 0.498874,
+          "mean": 0.502375,
+          "max": 0.507236,
+          "below_nominal_count": 2,
+          "largest_shortfall_seconds": 0.001126
+        },
+        "latency_ms": {
+          "mean": 75.01,
+          "p95": 127.018,
+          "max": 1048.362
+        },
+        "summary_dispatch_window_seconds": 120.570594
+      },
+      {
+        "stage": 4,
+        "target_rps": 5,
+        "requests": 288,
+        "first_client_start_offset_seconds": 360.264512,
+        "last_client_start_offset_seconds": 418.109392,
+        "client_start_gap_seconds": {
+          "nominal": 0.2,
+          "min": 0.200007,
+          "mean": 0.20155,
+          "max": 0.204858,
+          "below_nominal_count": 0,
+          "largest_shortfall_seconds": 0
+        },
+        "latency_ms": {
+          "mean": 81.43,
+          "p95": 121.752,
+          "max": 2054.693
+        },
+        "summary_dispatch_window_seconds": 58.046256
+      }
+    ],
+    "clock_note": "Client started_at records request_once entry before TLS/socket work, not exact wire transmission. Scheduler dispatch intervals and client start gaps are different measurements."
+  },
+  "runtime_reported_status": "FAIL",
+  "runtime_passed_check_count": 15,
+  "runtime_failed_checks": [
+    "bounded_normal_requests",
+    "final_authenticated_me"
+  ],
+  "schedule": {
+    "schedule_elapsed_seconds": 418.310845,
+    "active_elapsed_seconds": 418.351841,
+    "postflight_dispatch_offset_seconds": null,
+    "schedule_limit_seconds": 483,
+    "max_schedule_drift_seconds": 3,
+    "cooldown_seconds": 120,
+    "cooldown_completed": true,
+    "stop_reason": "inflight_latency_limit"
+  },
+  "cloudwatch": {
+    "namespace": "LambdaOps/Slash",
+    "dimensions": [
+      {
+        "Name": "Service",
+        "Value": "slash-api"
+      },
+      {
+        "Name": "Environment",
+        "Value": "dev"
+      }
+    ],
+    "period_seconds": 60,
+    "points_by_metric": {
+      "RequestCount": 10,
+      "ServerErrorCount": 10,
+      "RequestDurationMsTotal": 10,
+      "DBQueryCount": 10,
+      "DBQueryDurationMsTotal": 10,
+      "DBConnectionsActive": 10
+    },
+    "request_count_sum": 716.0,
+    "server_error_count_sum": 0.0,
+    "matched_windows": [
+      {
+        "timestamp": "2026-10-29T02:03:00+09:00",
+        "request_count": 0.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": null,
+        "db_query_count": 25.0,
+        "db_mean_ms": 2.204147,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:04:00+09:00",
+        "request_count": 3.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 9.89245,
+        "db_query_count": 25.0,
+        "db_mean_ms": 1.928333,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:05:00+09:00",
+        "request_count": 17.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 25.420375,
+        "db_query_count": 41.0,
+        "db_mean_ms": 3.054966,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:06:00+09:00",
+        "request_count": 30.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 6.823988,
+        "db_query_count": 55.0,
+        "db_mean_ms": 2.280666,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:07:00+09:00",
+        "request_count": 42.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 5.727124,
+        "db_query_count": 67.0,
+        "db_mean_ms": 2.047842,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:08:00+09:00",
+        "request_count": 60.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 6.744759,
+        "db_query_count": 85.0,
+        "db_mean_ms": 3.008859,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:09:00+09:00",
+        "request_count": 82.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 4.675769,
+        "db_query_count": 107.0,
+        "db_mean_ms": 1.723564,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:10:00+09:00",
+        "request_count": 120.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 5.925736,
+        "db_query_count": 145.0,
+        "db_mean_ms": 1.617981,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:11:00+09:00",
+        "request_count": 189.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 3.552738,
+        "db_query_count": 214.0,
+        "db_mean_ms": 1.307504,
+        "sampled_active_db_connections": 0.0
+      },
+      {
+        "timestamp": "2026-10-29T02:12:00+09:00",
+        "request_count": 173.0,
+        "server_error_count": 0.0,
+        "api_mean_ms": 3.068825,
+        "db_query_count": 198.0,
+        "db_mean_ms": 1.153725,
+        "sampled_active_db_connections": 0.0
+      }
+    ],
+    "all_http_requests_individually_reconciled": false,
+    "interpretation": "RequestCount includes non-actuator application auth/probe calls. /actuator health and scrape paths are excluded. DB queries also include scheduled tasks. Samples are publish-time deltas and cannot individually attribute every HTTP request; same-bucket ratios are means, not p95."
+  },
+  "privacy_findings": 0,
+  "limitations": [
+    "Normal bounded step demonstration only; no production capacity/SLO assertion.",
+    "No other-source-IP verification, fault injection, M2 Alarm transition, M3 incident or recovery completion.",
+    "Runtime completion is not cleanup completion; preserve the environment until the parent finishes video verification."
+  ],
+  "source_sha256": {
+    "result.json": "771270caafc17fc809c2e61b5bb72701b51168c95eab693ad2f95b0b5fb3c3a6",
+    "requests.jsonl": "c148c2f571f8ffea85d2766c894a05b41ae54a774ba3a3274d0c962f51bda593",
+    "step-summary.json": "bea75c402ff5cf61b0110e9f13618c78441293563872ffdfaf93b8533c0aa339",
+    "cloudwatch-snapshot.json": "bcddf6743b23ac943f092c1b9ae04746b7f892520fae5250b1cb64ea0aba0864"
+  },
+  "stopped_run_interpretation": {
+    "normal_step_target": 1020,
+    "normal_step_observed": 708,
+    "preflight_observed": 1,
+    "postflight_observed": 0,
+    "all_observed_probe_http_statuses": 200,
+    "threshold_failure_count": 1,
+    "threshold_failure_ms": 2054.693,
+    "stop_reason": "inflight_latency_limit",
+    "completion": false,
+    "runtime_check_failures_mean": [
+      "bounded_normal_requests fails because only 708 of 1020 steps completed and one exceeded 2000 ms.",
+      "final_authenticated_me was not sent because the stop policy suppresses postflight; it is not an observed non-200 response."
+    ],
+    "cause_not_established": "Client elapsed time includes DNS/TLS/network/API Gateway/application time. A single 2054.693 ms response does not identify CPU, database or application as the cause, nor establish a 5 RPS capacity limit.",
+    "cloudwatch_aggregate_reconciliation": {
+      "probe_http_calls": 709,
+      "additional_application_auth_calls": 7,
+      "gateway_blocked_management_calls_excluded": 2,
+      "sum_expected_application_calls": 716,
+      "cloudwatch_request_sum": 716.0,
+      "aggregate_counts_match": true,
+      "individual_requests_traced": false
+    },
+    "new_request_starts_after_stop_event": 0
+  },
+  "review_verdict": {
+    "evidence_consistent_with_configured_safety_stop": true,
+    "planned_trial_complete": false,
+    "http_non_200_count": 0,
+    "latency_threshold_exceeded_requests": 1,
+    "postflight_not_sent_by_stop_policy": true,
+    "runtime_false_checks_are_completion_criteria_not_unobserved_http_errors": true,
+    "review_made_no_aws_or_load_calls": true,
+    "video_verification_and_cleanup_decision_remain_with_parent": true
+  }
+}

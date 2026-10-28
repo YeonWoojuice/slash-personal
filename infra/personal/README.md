@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-29 기준. Slash 정상 동작용 experiment를 AWS에 배포해 **실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신**을 확인했다. DB 장애 도구는 제외했고 남은 High 4건은 미해결로 유지한다. 검증 후 삭제를 시작했으며, 사용자의 삭제 중단 요청 뒤 01:29 KST에 실행 서버·API·DB·캐시가 제거된 상태를 확인했다. VPC·private subnet 2개·보안 그룹 2개는 남아 있어 전체 정리 완료가 아니다. Cognito·ECR foundation과 기존 LambdaOps는 유지했다. 장애 시험·세 Alarm 전이·M3 종단 검증은 아직 수행하지 않았다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 High 4건, 장애 시험·세 Alarm 전이·M3 종단 검증은 미해결·미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -183,23 +183,36 @@ ALB·Valkey는 부분 시간도 한 시간으로 계산한다. private DNS 영�
 
 [실행 결과와 화면 근거](../../docs/observability/results/2026-10-29-baseline-runtime/index.json)를 함께 보관한다. 토큰·프로필·원문 IP·secret은 공개 근거에서 제외한다. 화면 캡처는 검증 결과를 보조하며 실제 AWS 콘솔 화면과 검증 결과를 표시한 화면을 구분한다.
 
-초기 CloudWatch 스냅샷은 01:14 KST 구간까지 `RequestCount` 합계 77을 담았다. 후속 읽기 조회에서는 01:15 구간의 23회가 추가로 보여 최종 합계 100, 5xx 합계 0을 확인했다. 초기 77은 유실 건수나 최종 집계가 아니다. 정상 관찰기 91회와 추가 인증·경로 검사의 집계 범위가 다르며 개별 요청과 지표를 완전히 대응시킨 것은 아니다. `/actuator` 요청은 발행 집계에서 제외하므로 health check를 차이의 원인으로 설명하지 않는다. `DBQueryCount`에는 주기 작업도 포함되고, `DBConnectionsActive=0`은 발행 순간의 표본이다. 개별 요청 대조·비허용 IP 시험·추가 제한적 부하·실행 영상은 후속 검증이다.
+초기 CloudWatch 스냅샷은 01:14 KST 구간까지 `RequestCount` 합계 77을 담았다. 후속 읽기 조회에서는 01:15 구간의 23회가 추가로 보여 최종 합계 100, 5xx 합계 0을 확인했다. 초기 77은 유실 건수나 최종 집계가 아니다. 정상 관찰기 91회와 추가 인증·경로 검사의 집계 범위가 다르며 개별 요청과 지표를 완전히 대응시킨 것은 아니다. `/actuator` 요청은 발행 집계에서 제외하므로 health check를 차이의 원인으로 설명하지 않는다. `DBQueryCount`에는 주기 작업도 포함되고, `DBConnectionsActive=0`은 발행 순간의 표본이다. 개별 요청 대조·비허용 IP 시험은 후속 검증이다. 추가 단계별 요청과 실행 영상은 아래의 별도 실행에 기록한다.
 
-위 삭제 상태는 experiment 전체 삭제 완료나 계정 비용 0원을 뜻하지 않는다. 기존 Cognito·ECR·LambdaOps는 유지하며 다음 작업 전에 잔존 네트워크와 Terraform state를 대조한다. 삭제 중단 요청 이후 추가 정리를 실행하지 않았다.
+위 상태는 첫 시험 직후의 기록이며 experiment 전체 삭제 완료나 계정 비용 0원을 뜻하지 않는다. 이후 별도 승인을 받아 잔존 네트워크와 Terraform state를 대조하고 아래 재배포를 진행했다. 기존 Cognito·ECR·LambdaOps는 유지했다.
 
-## 추가 재배포·제한적 요청·영상 계획 — 실행 전 기록
+## 추가 재배포·단계별 요청·영상 — 실행 결과
 
-삭제 중단 뒤 남은 state를 기준으로 재배포 계획을 검토했다. **생성 92·유지 6, 기존 자원 변경·삭제 0**이며 VPC·private subnet·cache 보안 그룹과 subnet group·기존 비밀번호 생성 결과를 재사용한다. 같은 이미지 3개·시험자 IPv4 제한을 유지하고 실제 요청에서 보완한 stage/backend 경로와 Grafana proxy 매핑을 반영한다. Cognito·ECR·기존 LambdaOps와 DB 장애 도구는 이 계획에 포함하지 않는다.
+잔존 state를 재사용해 01:55 KST에 **생성 92·유지 6, 기존 자원 변경·삭제 0**으로 재배포했다. 같은 이미지 3개·시험자 IPv4 제한을 유지했다. 이후 배포 여부를 판정하는 해시를 AWS 응답 객체 대신 설정 파일과 입력값으로 계산하도록 보완했고, 최종 재계획은 `No changes`였다. Cognito·ECR·기존 LambdaOps와 DB 장애 도구는 이 배포 범위에 포함하지 않았다.
 
-| 항목 | 실행 전 계획 |
-| --- | --- |
-| 정상 요청 단계 | 0.5·1·2·5 rps를 각 목표 120초 실행. 단계 요청 최대 1,020회와 사전·사후 확인 각 1회. 실제 간격을 유지하며 누적 일정 지연 3초 또는 신규 발송 시간 483초를 넘으면 중단. |
-| 실행 제한 | 동시 요청 최대 4개, 요청 timeout 3초. 오류 1건·응답 2초 초과·요청 실행 용량 부족이면 즉시 중단. |
-| 지표 확인 | 요청 종료 후 120초 동안 발행·수집을 기다리고 실제 요청 수와 지표 구간을 대조. |
-| 영상 | 검증 보고와 실제 그래프의 브라우저 화면을 1초 간격으로 캡처해 약 40초 영상으로 저장. 실제 화면을 사용하며 미검증 결과를 연출하지 않음. |
-| 종료 기준 | 기존 2026-10-29 04:45:03 KST 기준을 연장하지 않음. 종료 태그 자체는 자동 삭제 기능이 아님. |
+각 단계의 목표는 120초이며, 단계 요청 최대 1,020회와 사전·사후 확인 각 1회로 제한했다. 동시 요청 최대 4개·요청 timeout 3초를 유지하고 오류·응답 2초 초과·실행 용량 부족이면 중단하도록 실행했다. 밀린 요청을 몰아 보내지 않았으며 누적 일정 지연 3초·신규 발송 483초 제한도 유지했다.
 
-이 절은 시험 전 계획이다. 01:55 KST 재배포 92개 생성·변경/삭제 0개를 적용했고 서비스 2개와 ALB 대상 2개의 정상 실행을 확인했다. 후속 계획에서 발견한 배포 식별값의 정규화 차이는 명시적 설정값을 기준으로 보완했다. 제한적 요청·영상은 아직 완료 전이다. DB 장애 주입·세 Alarm 전이·M3 Incident 종단 검증은 포함하지 않는다. 실제 실행과 중단 여부, 최종 자원 상태는 후속 결과에 구분해 기록한다.
+| 목표 요청 속도 | 완료 / 계획 | 평균 응답 | p95 응답 | 최대 응답 | 결과 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 0.5 rps | 60 / 60 | 70.205 ms | 122.852 ms | 133.504 ms | 완료 |
+| 1 rps | 120 / 120 | 97.000 ms | 144.203 ms | 1,115.110 ms | 완료 |
+| 2 rps | 240 / 240 | 75.010 ms | 127.018 ms | 1,048.362 ms | 완료 |
+| 5 rps | 288 / 600 | 81.430 ms | 121.752 ms | 2,054.693 ms | 기준 초과로 중단·미완료 |
+
+p95는 관측 응답의 95%가 이 값 이하였다는 뜻이다. 표의 시간은 클라이언트에서 측정해 TLS 연결·네트워크 시간을 포함하며, 서버 내부 처리 시간과 다르다. 마지막 단계는 일부 구간만 관측했으므로 이 표만으로 서버 병목이나 5 rps 처리 한계를 단정하지 않는다.
+
+추가 읽기 조회에서 지연이 발생한 02:11 KST(17:11 UTC) 60초 구간의 API 대상 ALB 응답 시간은 평균 4.070 ms·최대 31.310 ms·249표본이었다. ECS API CPU 최대는 4.390%, 메모리 최대는 12.337%였고 RDS CPU는 4.883%, 연결 수는 2개였다. [추가 지연 검토 근거](../../docs/observability/results/2026-10-29-step-demo/client-latency-review.json)에서 서버 포화를 뒷받침하는 근거는 확인하지 못했다. 다만 집계 지표와 개별 클라이언트의 2.05초는 측정 범위가 다르므로 두 값을 빼서 네트워크 지연으로 판단할 수 없으며 원인은 미확정이다.
+
+후속 계획은 클라이언트 연결·DNS·TLS·API Gateway의 소요 시간과 요청별 추적을 보강하는 것이다. 추가 시험은 실행하지 않았다.
+
+`sequence=699` 요청이 HTTP 200으로 끝났지만 2,054.693 ms가 걸려 새 요청을 중단했다. 진행 중이던 요청까지 수집한 **단계 요청 708회와 사전 확인 1회, 총 709회가 모두 HTTP 200**이었다. HTTP 오류는 없었지만 시간 기준 실패가 1건이고 사후 조회는 발송하지 않았다. 결과는 **15/17 확인 항목 통과·전체 FAIL**이다. 안전 중단 동작 확인과 전체 시나리오 통과를 구분하며, 한도를 높이거나 재실행하지 않았다.
+
+요청 종료 후 120초 수집 대기를 마쳤고 CloudWatch 여섯 지표를 수신했다. 스냅샷 `RequestCount` 합계는 716, 5xx는 0이다. 정상 관찰 709회와 앱까지 도달한 별도 인증 요청 7회를 합한 수와 일치한다. 별도 관리 경로 요청 2회는 Gateway 403으로 앱에 도달하지 않았다. 집계 숫자의 일치를 확인한 것이며 개별 요청별 추적을 통한 완전 대응은 아직 검증하지 않았다.
+
+실제 브라우저 화면을 1초 간격으로 캡처해 **40초 영상**으로 저장했다. 요청 시작·Grafana 그래프·지표 수신 화면을 연결했고 구간 사이 시간 생략과 조기 중단을 표시했다. 로그인 화면이나 비밀값을 넣지 않았으며 대표 장면 3개를 검토했다. [요청·지표·영상 근거](../../docs/observability/results/2026-10-29-step-demo/index.json)에 첫 정상 시험과 구분해 보관한다.
+
+종료 기준은 기존 2026-10-29 04:45:03 KST에서 연장하지 않았다. 02:30 KST에 저장된 삭제 계획 98개 항목 적용과 [후속 실제 조회 59/59](../../docs/observability/results/2026-10-29-step-demo/cleanup-verification.json)를 확인했다. 시험용 실행 자원·DB/백업·캐시·API·네트워크·로그·Secrets를 정리했고 Terraform 관리 자원은 0개다. Cognito·ECR과 기존 LambdaOps는 유지하며 수집 연결은 Disabled다. 중지된 작업 이력과 과거 CloudWatch 지표는 남을 수 있으며 계정 전체 비용 0을 뜻하지 않는다. DB 장애 주입·세 Alarm 전이·M3 Incident 종단 검증은 수행하지 않았다.
 
 ## 검증의 범위
 
@@ -207,6 +220,6 @@ Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험,
 
 foundation 생성과 실제 Cognito code+PKCE 로그인을 확인했다. 활성화한 **LambdaOps HTTP API → 조회 Lambda → DSQL** 경로에서 빈 목록 200(`items` 0개), 무토큰·잘못된 토큰 401, 같은 client의 읽기 scope 없는 토큰 403, 미존재 상세 404를 확인했다. 실제 존재하는 Incident의 상세 200은 아직 검증하지 않았다. LambdaOps의 M2 Alarm·수집 연결도 아직 활성화하지 않았다.
 
-Slash의 REST API→VPC Link V2→내부 ALB→ECS·RDS 경로에서 정상 로그인·요청과 지표 수신을 검증했다. 비허용 IP의 실제 차단, 세 Alarm의 ALARM/OK 전이, 장애 시험, M3 이벤트 처리와 실제 Incident 상세 200은 미검증이다. 로컬 21개와 AWS 17개 검증은 서로 다른 실행 근거이며 혼합해 집계하지 않는다. M2·M3는 아직 In Progress다.
+Slash의 REST API→VPC Link V2→내부 ALB→ECS·RDS 경로에서 정상 로그인·요청과 지표 수신을 검증했다. 비허용 IP의 실제 차단, 세 Alarm의 ALARM/OK 전이, 장애 시험, M3 이벤트 처리와 실제 Incident 상세 200은 미검증이다. 로컬 21개·첫 AWS 17개·후속 단계별 시험 15/17 결과는 서로 다른 실행 근거이며 혼합해 집계하지 않는다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).

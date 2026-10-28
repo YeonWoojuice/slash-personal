@@ -1,0 +1,84 @@
+{
+  "reviewed_at_utc": "2026-10-28T16:45:52.093900+00:00",
+  "status": "PASS",
+  "counts": {
+    "create": 92,
+    "no-op": 6
+  },
+  "checks": [
+    {
+      "check": "92 creates 6 retained only",
+      "passed": true
+    },
+    {
+      "check": "retained addresses match",
+      "passed": true
+    },
+    {
+      "check": "same account",
+      "passed": true
+    },
+    {
+      "check": "same images",
+      "passed": true
+    },
+    {
+      "check": "same one source IPv4",
+      "passed": true
+    },
+    {
+      "check": "deadline not extended",
+      "passed": true
+    },
+    {
+      "check": "baseline and DB test excluded",
+      "passed": true
+    },
+    {
+      "check": "shared resources excluded",
+      "passed": true
+    },
+    {
+      "check": "fixed URI in saved plan",
+      "passed": true
+    },
+    {
+      "check": "proxy mapping planned",
+      "passed": true
+    },
+    {
+      "check": "separate policy and deployment dependency",
+      "passed": true
+    },
+    {
+      "check": "same source IP policy bounds",
+      "passed": true
+    },
+    {
+      "check": "no empty health blocks",
+      "passed": true
+    },
+    {
+      "check": "all plan contracts pass",
+      "passed": true
+    }
+  ],
+  "retained_addresses": [
+    "aws_elasticache_subnet_group.test",
+    "aws_security_group.cache",
+    "aws_subnet.data[0]",
+    "aws_subnet.data[1]",
+    "aws_vpc.test",
+    "random_password.cache"
+  ],
+  "deadline_kst": "2026-10-29T04:45:03+09:00",
+  "plan_json_sha256": "3127388b5e8eac2119a597aa7d7bd58542085d5f576e2cd25e3746e99b1316be",
+  "fixed_ingress_source_sha256": "ee6e9134214da8123cb986028f73fa1851aa5f47a47c7925f41272dea3a52c1c",
+  "limitations": [
+    "New API hostname and fully resolved URI are unknown until apply; the saved plan has the corrected stage/path template and proxy mapping.",
+    "Same network source restriction; real other-IP denial remains separately unverified.",
+    "This is a plan review, not runtime/load/video completion."
+  ],
+  "aws_mutations": false,
+  "private_ip_and_secret_values_omitted": true
+}

@@ -1,0 +1,61 @@
+{
+  "reviewed_at_utc": "2026-10-28T17:01:30.687092+00:00",
+  "review": "Independent post-fix scheduler boundary and harness compatibility review",
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "normal",
+      "passed": true,
+      "outcome": "observed",
+      "step_sent": 1020,
+      "total_calls": 1022,
+      "postflight_dispatches": [
+        480.0
+      ],
+      "stop_reason": null,
+      "schedule_elapsed_seconds": 480.0,
+      "active_elapsed_seconds": 480.0
+    },
+    {
+      "case": "final_wait_oversleep",
+      "passed": true,
+      "outcome": "stopped",
+      "step_sent": 1020,
+      "total_calls": 1021,
+      "postflight_dispatches": [],
+      "stop_reason": "schedule_time_limit",
+      "schedule_elapsed_seconds": 489.92,
+      "active_elapsed_seconds": 489.92
+    },
+    {
+      "case": "pending_drain_oversleep",
+      "passed": true,
+      "outcome": "stopped",
+      "step_sent": 1020,
+      "total_calls": 1021,
+      "postflight_dispatches": [],
+      "stop_reason": "schedule_time_limit",
+      "schedule_elapsed_seconds": 480.0,
+      "active_elapsed_seconds": 490.3
+    }
+  ],
+  "fixed_step_requests": 1020,
+  "preflight_and_postflight": 2,
+  "max_concurrency": 4,
+  "scheduler_target_seconds": 480,
+  "schedule_drift_allowance_seconds": 3,
+  "required_token_seconds": 642,
+  "harness_initial_required_token_seconds": 792,
+  "harness_after_gate_required_token_seconds": 642,
+  "harness_compile": "PASS",
+  "real_http_or_aws_calls_made": false,
+  "repository_source_changed": false,
+  "source_sha256": {
+    "step_probe.py": "6bcf6dceee54f7c2891cc7bcfe1025bb9482f6d55857e4dae71c111696a3ddea",
+    "runtime_verify.py": "482965fc0cd5d931a8d0502a5368d904e447eb79da216b623fbdd7a6777510c4"
+  },
+  "limits": [
+    "Timing checks govern scheduler submission decisions; actual worker/socket dispatch timing should be inspected from real request records.",
+    "OS scheduling and already-running requests may outlast the deadline; the fixed code stops new postflight requests after the deadline and reports stopped."
+  ]
+}

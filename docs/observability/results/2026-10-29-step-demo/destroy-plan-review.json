@@ -1,0 +1,137 @@
+{
+  "at": "2026-10-28T17:11:03.410843+00:00",
+  "status": "PASS",
+  "scope": "Saved destroy plan review only; no apply or AWS mutations",
+  "changes": {
+    "create": 0,
+    "update": 0,
+    "delete": 98,
+    "aws_declarations": 95,
+    "local_support_resources": 3
+  },
+  "counts_by_type": {
+    "aws_api_gateway_deployment": 1,
+    "aws_api_gateway_gateway_response": 2,
+    "aws_api_gateway_integration": 4,
+    "aws_api_gateway_method": 4,
+    "aws_api_gateway_method_settings": 1,
+    "aws_api_gateway_resource": 5,
+    "aws_api_gateway_rest_api": 1,
+    "aws_api_gateway_rest_api_policy": 1,
+    "aws_api_gateway_stage": 1,
+    "aws_apigatewayv2_vpc_link": 1,
+    "aws_cloudwatch_log_group": 1,
+    "aws_db_instance": 1,
+    "aws_db_subnet_group": 1,
+    "aws_ecs_cluster": 1,
+    "aws_ecs_service": 2,
+    "aws_ecs_task_definition": 2,
+    "aws_elasticache_replication_group": 1,
+    "aws_elasticache_subnet_group": 1,
+    "aws_iam_role": 6,
+    "aws_iam_role_policy": 3,
+    "aws_iam_role_policy_attachment": 3,
+    "aws_internet_gateway": 1,
+    "aws_lb": 1,
+    "aws_lb_listener": 1,
+    "aws_lb_listener_rule": 5,
+    "aws_lb_target_group": 2,
+    "aws_route": 1,
+    "aws_route_table": 1,
+    "aws_route_table_association": 2,
+    "aws_secretsmanager_secret": 2,
+    "aws_secretsmanager_secret_version": 2,
+    "aws_security_group": 7,
+    "aws_service_discovery_private_dns_namespace": 1,
+    "aws_service_discovery_service": 2,
+    "aws_subnet": 4,
+    "aws_vpc": 1,
+    "aws_vpc_security_group_egress_rule": 11,
+    "aws_vpc_security_group_ingress_rule": 8,
+    "random_password": 2,
+    "terraform_data": 1
+  },
+  "checks": [
+    {
+      "check": "exactly_98_delete_only_managed_resources",
+      "passed": true
+    },
+    {
+      "check": "same_approved_account",
+      "passed": true
+    },
+    {
+      "check": "db_fault_tools_disabled",
+      "passed": true
+    },
+    {
+      "check": "foundation_types_absent",
+      "passed": true
+    },
+    {
+      "check": "lambdaops_types_absent",
+      "passed": true
+    },
+    {
+      "check": "lambdaops_named_resources_absent",
+      "passed": true
+    },
+    {
+      "check": "demo_inventory_matches_delete_targets",
+      "passed": true,
+      "matched_count": 37,
+      "unmatched": []
+    },
+    {
+      "check": "expected_experiment_resource_counts",
+      "passed": true,
+      "expected_counts": {
+        "aws_vpc": 1,
+        "aws_ecs_service": 2,
+        "aws_ecs_task_definition": 2,
+        "aws_db_instance": 1,
+        "aws_elasticache_replication_group": 1,
+        "aws_lb": 1,
+        "aws_api_gateway_rest_api": 1,
+        "aws_apigatewayv2_vpc_link": 1,
+        "aws_secretsmanager_secret": 2,
+        "aws_cloudwatch_log_group": 1,
+        "aws_service_discovery_private_dns_namespace": 1
+      }
+    },
+    {
+      "check": "disposable_rds_delete_contract",
+      "passed": true
+    },
+    {
+      "check": "disposable_cache_delete_contract",
+      "passed": true
+    },
+    {
+      "check": "first_inventory_preserved",
+      "passed": true
+    },
+    {
+      "check": "demo_inventory_preserved",
+      "passed": true
+    }
+  ],
+  "plan_sha256": "2ae4961161ff255a176f71652c76a8f04c45d57b898fbb4a203d8ef4a9478052",
+  "inventory_sha256": "ceb85a27963dfd24e860b07e427252e6643786dd750b1fda3ca95113e469e788",
+  "first_inventory_sha256": "e3e69c4e0fb71c97f7bcac4de15c884c570daa8dbd79def4c2f3f72d0aebc62a",
+  "apply_executed": false,
+  "gate": "Root must finish video playback and result verification before applying; this review does not itself authorize execution.",
+  "privacy": {
+    "raw_plan_private": true,
+    "tester_ip_and_secret_values_omitted": true
+  },
+  "retained_scope": [
+    "Foundation Cognito/ECR",
+    "LambdaOps DSQL/Lambda/SQS/HTTP API",
+    "Account-wide service-linked roles outside experiment state"
+  ],
+  "limitations": [
+    "A successful plan is not a completed deletion. Recheck actual resources after any authorized apply.",
+    "RDS/cache data and experiment logs will be deleted by the planned operation; no final snapshots are configured."
+  ]
+}

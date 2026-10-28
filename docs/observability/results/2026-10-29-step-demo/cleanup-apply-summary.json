@@ -1,0 +1,16 @@
+{
+  "status": "APPLY_SUCCEEDED",
+  "scope": "Slash personal experiment saved delete-only plan",
+  "result_line": "Apply complete! Resources: 0 added, 0 changed, 98 destroyed.",
+  "finished_at_utc": "2026-10-28T17:29:46.212169+00:00",
+  "exit_code": 0,
+  "added": 0,
+  "changed": 0,
+  "destroyed": 98,
+  "retained_scope": [
+    "Cognito/ECR foundation",
+    "Existing LambdaOps resources"
+  ],
+  "actual_absence_verification": "PASS_59_OF_59",
+  "verification_file": "cleanup-verification.json"
+}

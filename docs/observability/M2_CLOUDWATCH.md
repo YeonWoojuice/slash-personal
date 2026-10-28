@@ -75,7 +75,15 @@ CloudWatch `LambdaOps/Slash`, `Service=slash-api`, `Environment=dev`에서 기�
 
 최초 ElastiCache 생성은 HTTP 408 `InvalidCredentialsException`으로 실패했으며 재계획·재시도로 생성했다. 오류 원인은 확정하지 않았다. 실제 ALB 404는 Gateway URI의 stage·경로와 Grafana proxy 매핑을 명시해 보완했다. 빈 Cloud Map health 설정·Gateway 기본 오류 템플릿·접근 정책 ARN 정규화 차이를 정리한 뒤 최종 재계획은 `No changes`였다. [실행·검증 근거](results/2026-10-29-baseline-runtime/index.json)와 [배포·정리 기록](../../infra/personal/README.md)을 연결한다.
 
-검증 후 사용자의 삭제 중단 요청이 있었고 01:29 KST 읽기 조회에서 서버·API·DB·캐시 제거와 VPC·private subnet 2개·보안 그룹 2개 잔존을 확인했다. 전체 정리 완료로 표시하지 않는다. DB 장애 도구는 제외했으며 High 4건은 미해결이다. 추가 제한적 부하·실행 영상·비허용 IP의 실제 거부·세 Alarm 전환·M3 종단 경로는 미검증이므로 M2·M3는 In Progress를 유지한다.
+첫 시험 후 사용자의 삭제 중단 요청이 있었고 01:29 KST 읽기 조회에서 서버·API·DB·캐시 제거와 VPC·private subnet 2개·보안 그룹 2개 잔존을 확인했다. 이 상태는 당시 기록이며 이후 승인받은 재배포로 단계별 요청 시험을 진행했다.
+
+### 후속 단계별 요청의 안전 중단
+
+0.5·1·2 rps 단계는 각각 60·120·240회를 완료했다. 5 rps 단계는 600회 중 288회에서 멈췄다. 클라이언트가 측정한 `sequence=699` 응답이 2,054.693 ms로 2초 기준을 넘었기 때문이다. 단계 요청 708회와 사전 확인 1회는 모두 HTTP 200이지만 시간 기준 실패 1건이 있어 **전체 FAIL, 확인 항목 15/17 통과**로 기록한다. 사후 조회는 발송하지 않았고 마지막 단계는 미완료다. 단계별 평균·p95는 [실행 결과 표](../../infra/personal/README.md#추가-재배포단계별-요청영상--실행-결과)에 정리했다. 이 시간은 TLS·네트워크를 포함하므로 서버 병목이나 5 rps 처리 한계로 단정하지 않는다.
+
+요청 종료 후 120초 수집 대기를 거쳐 기존 여섯 지표를 수신했다. 원본 스냅샷의 `RequestCount` 합계 716은 정상 관찰 709회와 앱에 도달한 별도 인증 요청 7회의 합과 같고, `ServerErrorCount`는 0이다. 별도 관리 경로 2회는 Gateway 403으로 앱까지 도달하지 않았다. 집계 숫자는 맞지만 개별 요청 추적에 의한 완전 대응을 검증한 것은 아니다. 기존 `/actuator` 제외·DB 배경 쿼리·발행 시점 표본의 해석은 유지한다.
+
+실제 브라우저 화면의 1초 간격 캡처를 40초 영상으로 묶고 시간 생략과 조기 중단을 표시했다. [후속 요청·지표·영상 근거](results/2026-10-29-step-demo/index.json)를 첫 시험과 구분한다. 배포 해시를 설정 파일과 입력값 기준으로 보완한 뒤 최종 Terraform 재계획은 `No changes`였다. 02:30 KST [정리 후 실제 조회 59/59](results/2026-10-29-step-demo/cleanup-verification.json)를 통과했다. 시험용 자원과 Terraform 관리 항목은 모두 정리됐으며 Cognito·ECR·기존 LambdaOps와 비활성 수집 상태는 유지했다. 보존 자원이 있으므로 계정 전체 비용 0을 뜻하지 않는다. DB 장애 도구의 High 4건, 비허용 IP의 실제 거부·세 Alarm 전환·M3 종단 경로는 미해결·미검증이다. M2·M3는 In Progress를 유지한다.
 
 ## AWS 시험 준비 — 2026-10-28
 
@@ -165,7 +173,7 @@ AWS 실행 경로는 **입력 포트가 없는 일회성 PostgreSQL client ECS t
 
 Java 검사는 `apps/api`에서 `./gradlew test --offline --tests 'com.likelion.slash.observability.*' --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'`로, 인프라 검사는 저장소 루트에서 `python3 -m unittest discover -s infra/personal/tests -v`로 실행할 수 있다. DB 검증은 별도 임시 DB에 합성 `users` 한 행을 만들고 같은 SQL 파일을 비대화형 `psql`로 실행한 결과다. 앱 HTTP·Cognito·RDS의 검증은 포함하지 않는다.
 
-위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 후속 작업에서 Cognito/ECR 생성, 이미지 게시, LambdaOps 운영자 로그인·HTTP 조회 인증을 확인했다. API·Grafana OS 패키지 보완으로 Critical 0건을 확인했다. 추가 이미지 보완·재검사로 High는 21건에서 DB 시험 이미지의 4건으로 줄었다. experiment 계획은 생성 후보 100개를 계산했지만 실제 Slash 토큰 검증이 없어 기존 인증 조건에서 차단됐다. 후속 실제 Cognito·로컬 personal API 검증 21개가 통과했고, 없는 경로의 500을 404로 보완한 이미지를 게시했다. [로그인 검증 근거](results/2026-10-28-slash-cognito-local-verification.json)에 결과를 기록했다. 2026-10-29에는 DB 장애 도구를 제외하고 실제 인증 근거·최신 이미지·시험 IP·종료 시각을 반영한 [정상 동작 계획](results/2026-10-29-baseline-deployment-plan.json)을 만들었다. 이 계획 검토 단계는 생성 97·변경 0·삭제 0으로 성공했다. 후속 승인으로 실제 AWS 배포·정상 요청·여섯 지표 수신까지 검증했으며 실행 결과와 삭제 중단 상태는 위 2026-10-29 기록을 따른다. High 4건은 해결로 표시하지 않으며 DB 장애 도구를 사용하기 전에 별도 보완·검토한다. 정상 기준선을 확보한 뒤 별도 승인한 장애 시험으로 세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
+위 표는 초기 지표 설정 검증 기록이다. 이후 일회성 DB 작업·요청·로그인 도구와 도메인 없는 HTTPS 코드를 준비했다. 후속 작업에서 Cognito/ECR 생성, 이미지 게시, LambdaOps 운영자 로그인·HTTP 조회 인증을 확인했다. API·Grafana OS 패키지 보완으로 Critical 0건을 확인했다. 추가 이미지 보완·재검사로 High는 21건에서 DB 시험 이미지의 4건으로 줄었다. experiment 계획은 생성 후보 100개를 계산했지만 실제 Slash 토큰 검증이 없어 기존 인증 조건에서 차단됐다. 후속 실제 Cognito·로컬 personal API 검증 21개가 통과했고, 없는 경로의 500을 404로 보완한 이미지를 게시했다. [로그인 검증 근거](results/2026-10-28-slash-cognito-local-verification.json)에 결과를 기록했다. 2026-10-29에는 DB 장애 도구를 제외하고 실제 인증 근거·최신 이미지·시험 IP·종료 시각을 반영한 [정상 동작 계획](results/2026-10-29-baseline-deployment-plan.json)을 만들었다. 이 계획 검토 단계는 생성 97·변경 0·삭제 0으로 성공했다. 후속 승인으로 실제 AWS 배포·정상 요청·여섯 지표 수신까지 검증했으며 첫 정상 시험·후속 단계별 요청의 중단 결과와 자원 정리 상태는 위 2026-10-29 기록을 따른다. High 4건은 해결로 표시하지 않으며 DB 장애 도구를 사용하기 전에 별도 보완·검토한다. 정상 기준선을 확보한 뒤 별도 승인한 장애 시험으로 세 Alarm 전이와 M3 저장·조회 경로를 검증한다. M2/M3의 완료 기준은 유지한다.
 
 
 ### 후속 준비: 일회성 작업과 요청 실행기

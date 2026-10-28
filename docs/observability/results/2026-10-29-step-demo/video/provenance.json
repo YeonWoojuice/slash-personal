@@ -1,0 +1,190 @@
+{
+  "scope": "Actual browser screenshots sampled at one-second intervals, encoded as video. The measurement viewer renders actual request-runner records and is not the AWS console. Grafana and CloudWatch are actual service screens; no fabricated measurement values.",
+  "editing": "Three actual capture windows concatenated. Time between windows omitted and disclosed in the on-screen caption. No audio or login screen captured.",
+  "intended_fps": 1,
+  "playback_fps": 30,
+  "size": [
+    1280,
+    720
+  ],
+  "scenes": [
+    {
+      "name": "capture-start",
+      "frames": [
+        {
+          "file": "frame-000.jpg",
+          "captured_at": "2026-10-28T17:05:04.056Z"
+        },
+        {
+          "file": "frame-001.jpg",
+          "captured_at": "2026-10-28T17:05:05.057Z"
+        },
+        {
+          "file": "frame-002.jpg",
+          "captured_at": "2026-10-28T17:05:06.059Z"
+        },
+        {
+          "file": "frame-003.jpg",
+          "captured_at": "2026-10-28T17:05:07.060Z"
+        },
+        {
+          "file": "frame-004.jpg",
+          "captured_at": "2026-10-28T17:05:08.061Z"
+        },
+        {
+          "file": "frame-005.jpg",
+          "captured_at": "2026-10-28T17:05:09.061Z"
+        },
+        {
+          "file": "frame-006.jpg",
+          "captured_at": "2026-10-28T17:05:10.063Z"
+        },
+        {
+          "file": "frame-007.jpg",
+          "captured_at": "2026-10-28T17:05:11.063Z"
+        },
+        {
+          "file": "frame-008.jpg",
+          "captured_at": "2026-10-28T17:05:12.064Z"
+        },
+        {
+          "file": "frame-009.jpg",
+          "captured_at": "2026-10-28T17:05:13.064Z"
+        }
+      ],
+      "encoded_duration_seconds": 10
+    },
+    {
+      "name": "capture-grafana",
+      "frames": [
+        {
+          "file": "frame-000.jpg",
+          "captured_at": "2026-10-28T17:11:19.500Z"
+        },
+        {
+          "file": "frame-001.jpg",
+          "captured_at": "2026-10-28T17:11:20.501Z"
+        },
+        {
+          "file": "frame-002.jpg",
+          "captured_at": "2026-10-28T17:11:21.502Z"
+        },
+        {
+          "file": "frame-003.jpg",
+          "captured_at": "2026-10-28T17:11:22.503Z"
+        },
+        {
+          "file": "frame-004.jpg",
+          "captured_at": "2026-10-28T17:11:23.504Z"
+        },
+        {
+          "file": "frame-005.jpg",
+          "captured_at": "2026-10-28T17:11:24.505Z"
+        },
+        {
+          "file": "frame-006.jpg",
+          "captured_at": "2026-10-28T17:11:25.506Z"
+        },
+        {
+          "file": "frame-007.jpg",
+          "captured_at": "2026-10-28T17:11:26.507Z"
+        },
+        {
+          "file": "frame-008.jpg",
+          "captured_at": "2026-10-28T17:11:27.508Z"
+        },
+        {
+          "file": "frame-009.jpg",
+          "captured_at": "2026-10-28T17:11:28.509Z"
+        },
+        {
+          "file": "frame-010.jpg",
+          "captured_at": "2026-10-28T17:11:29.510Z"
+        },
+        {
+          "file": "frame-011.jpg",
+          "captured_at": "2026-10-28T17:11:30.510Z"
+        },
+        {
+          "file": "frame-012.jpg",
+          "captured_at": "2026-10-28T17:11:31.511Z"
+        },
+        {
+          "file": "frame-013.jpg",
+          "captured_at": "2026-10-28T17:11:32.512Z"
+        },
+        {
+          "file": "frame-014.jpg",
+          "captured_at": "2026-10-28T17:11:33.513Z"
+        },
+        {
+          "file": "frame-015.jpg",
+          "captured_at": "2026-10-28T17:11:34.515Z"
+        },
+        {
+          "file": "frame-016.jpg",
+          "captured_at": "2026-10-28T17:11:35.516Z"
+        },
+        {
+          "file": "frame-017.jpg",
+          "captured_at": "2026-10-28T17:11:36.517Z"
+        },
+        {
+          "file": "frame-018.jpg",
+          "captured_at": "2026-10-28T17:11:37.518Z"
+        },
+        {
+          "file": "frame-019.jpg",
+          "captured_at": "2026-10-28T17:11:38.519Z"
+        }
+      ],
+      "encoded_duration_seconds": 20
+    },
+    {
+      "name": "capture-cloudwatch",
+      "frames": [
+        {
+          "file": "frame-000.jpg",
+          "captured_at": "2026-10-28T17:14:31.601Z"
+        },
+        {
+          "file": "frame-001.jpg",
+          "captured_at": "2026-10-28T17:14:32.603Z"
+        },
+        {
+          "file": "frame-002.jpg",
+          "captured_at": "2026-10-28T17:14:33.605Z"
+        },
+        {
+          "file": "frame-003.jpg",
+          "captured_at": "2026-10-28T17:14:34.606Z"
+        },
+        {
+          "file": "frame-004.jpg",
+          "captured_at": "2026-10-28T17:14:35.607Z"
+        },
+        {
+          "file": "frame-005.jpg",
+          "captured_at": "2026-10-28T17:14:36.607Z"
+        },
+        {
+          "file": "frame-006.jpg",
+          "captured_at": "2026-10-28T17:14:37.608Z"
+        },
+        {
+          "file": "frame-007.jpg",
+          "captured_at": "2026-10-28T17:14:38.609Z"
+        },
+        {
+          "file": "frame-008.jpg",
+          "captured_at": "2026-10-28T17:14:39.611Z"
+        },
+        {
+          "file": "frame-009.jpg",
+          "captured_at": "2026-10-28T17:14:40.612Z"
+        }
+      ],
+      "encoded_duration_seconds": 10
+    }
+  ]
+}

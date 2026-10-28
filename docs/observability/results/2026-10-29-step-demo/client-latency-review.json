@@ -1,0 +1,271 @@
+{
+  "collected_at_utc": "2026-10-28T17:17:18.087995+00:00",
+  "scope": "Read-only AWS CloudWatch aggregate metrics; no HTTP load, resource changes, or log inspection.",
+  "region": "ap-northeast-2",
+  "window_start_utc_inclusive": "2026-10-28T17:10:00+00:00",
+  "window_end_utc_exclusive": "2026-10-28T17:13:00+00:00",
+  "observed_client_event": {
+    "source": "parent runtime report",
+    "step": 699,
+    "http_status": 200,
+    "elapsed_milliseconds": 2054.693,
+    "started_at_utc": "2026-10-28T17:11:48.006Z",
+    "finished_at_utc": "2026-10-28T17:11:50.061Z",
+    "action": "Stopped new requests under the existing 2000 ms safety threshold."
+  },
+  "metrics": [
+    {
+      "namespace": "AWS/ApplicationELB",
+      "metric": "TargetResponseTime",
+      "dimensions": [
+        {
+          "Name": "LoadBalancer",
+          "Value": "app/slash-lab/a428b39b35f5a583"
+        },
+        {
+          "Name": "TargetGroup",
+          "Value": "targetgroup/slash-lab/fa3f8e526fb15c15"
+        }
+      ],
+      "statistics": [
+        "Average",
+        "Maximum",
+        "Minimum",
+        "SampleCount"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "SampleCount": 143.0,
+          "Average": 0.004441391608391608,
+          "Minimum": 0.003553,
+          "Maximum": 0.011255,
+          "Unit": "Seconds",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "SampleCount": 249.0,
+          "Average": 0.004070008032128513,
+          "Minimum": 0.003189,
+          "Maximum": 0.03131,
+          "Unit": "Seconds",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [
+        "2026-10-28T17:12:00+00:00"
+      ],
+      "status": "partial_or_missing"
+    },
+    {
+      "namespace": "AWS/ApplicationELB",
+      "metric": "RequestCount",
+      "dimensions": [
+        {
+          "Name": "LoadBalancer",
+          "Value": "app/slash-lab/a428b39b35f5a583"
+        },
+        {
+          "Name": "TargetGroup",
+          "Value": "targetgroup/slash-lab/fa3f8e526fb15c15"
+        }
+      ],
+      "statistics": [
+        "Sum"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "Sum": 143.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "Sum": 249.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        },
+        {
+          "Sum": 0.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:12:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [],
+      "status": "received"
+    },
+    {
+      "namespace": "AWS/ECS",
+      "metric": "CPUUtilization",
+      "dimensions": [
+        {
+          "Name": "ClusterName",
+          "Value": "slash-lab"
+        },
+        {
+          "Name": "ServiceName",
+          "Value": "core"
+        }
+      ],
+      "statistics": [
+        "Average",
+        "Maximum"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "Average": 2.3209009170532227,
+          "Maximum": 3.495757818222046,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "Average": 3.7077563603719077,
+          "Maximum": 4.390440940856934,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        },
+        {
+          "Average": 0.7106271386146545,
+          "Maximum": 1.5225845575332642,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:12:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [],
+      "status": "received"
+    },
+    {
+      "namespace": "AWS/ECS",
+      "metric": "MemoryUtilization",
+      "dimensions": [
+        {
+          "Name": "ClusterName",
+          "Value": "slash-lab"
+        },
+        {
+          "Name": "ServiceName",
+          "Value": "core"
+        }
+      ],
+      "statistics": [
+        "Average",
+        "Maximum"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "Average": 12.288411458333334,
+          "Maximum": 12.3046875,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "Average": 12.331814236111112,
+          "Maximum": 12.337239583333334,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        },
+        {
+          "Average": 12.337239583333334,
+          "Maximum": 12.337239583333334,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:12:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [],
+      "status": "received"
+    },
+    {
+      "namespace": "AWS/RDS",
+      "metric": "CPUUtilization",
+      "dimensions": [
+        {
+          "Name": "DBInstanceIdentifier",
+          "Value": "slash-lab"
+        }
+      ],
+      "statistics": [
+        "Average",
+        "Maximum"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "Average": 4.233325540229117,
+          "Maximum": 4.233325540229117,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "Average": 4.883333333333334,
+          "Maximum": 4.883333333333334,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        },
+        {
+          "Average": 4.174775044492125,
+          "Maximum": 4.174775044492125,
+          "Unit": "Percent",
+          "timestamp_utc": "2026-10-28T17:12:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [],
+      "status": "received"
+    },
+    {
+      "namespace": "AWS/RDS",
+      "metric": "DatabaseConnections",
+      "dimensions": [
+        {
+          "Name": "DBInstanceIdentifier",
+          "Value": "slash-lab"
+        }
+      ],
+      "statistics": [
+        "Average",
+        "Maximum"
+      ],
+      "period_seconds": 60,
+      "datapoints": [
+        {
+          "Average": 2.0,
+          "Maximum": 2.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:10:00+00:00"
+        },
+        {
+          "Average": 2.0,
+          "Maximum": 2.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:11:00+00:00"
+        },
+        {
+          "Average": 2.0,
+          "Maximum": 2.0,
+          "Unit": "Count",
+          "timestamp_utc": "2026-10-28T17:12:00+00:00"
+        }
+      ],
+      "missing_minute_buckets": [],
+      "status": "received"
+    }
+  ],
+  "limitations": [
+    "Missing datapoints are missing evidence, not zero values. Recent data may arrive after collection.",
+    "Each datapoint aggregates a 60-second bucket. An Average or Maximum cannot identify the individual client request.",
+    "ALB TargetResponseTime is reported in seconds. Client elapsed time is milliseconds and includes client/network/connection/TLS and response handling overhead.",
+    "ALB target response timing and client wall duration cover different intervals; their numeric difference is not an attributed network delay.",
+    "ECS CPU/memory and RDS CPU/connections are service/instance aggregate measurements; they do not prove or disprove a transient request bottleneck.",
+    "No request trace, per-request server timing, or causal correlation was collected. No root cause or capacity conclusion is established.",
+    "No threshold increase, retry, additional load, alarm activation, or deletion was performed."
+  ],
+  "conclusion": "Aggregate observations only; client-side 2054.693 ms response caused the intended safety stop. Root cause remains undetermined.",
+  "observations": [
+    "For 17:11 UTC, the API target-group ALB response-time average is 4.070008 ms, maximum 31.310 ms, sample count 249; the client stop observation is 2054.693 ms. These are different measurement boundaries and cannot be correlated to one request.",
+    "For 17:11 UTC, ECS API service CPU average is 3.707756%, maximum 4.390441%; memory average 12.331814%, maximum 12.337240%.",
+    "For 17:11 UTC, RDS CPU average/maximum is 4.883333%; database connections average/maximum is 2.",
+    "At 17:12 UTC, the API target-group RequestCount datapoint is zero, while TargetResponseTime has no datapoint. This missing response-time datapoint is not treated as zero latency.",
+    "The collected aggregate measurements do not establish server saturation or the cause of the client-side delay."
+  ]
+}

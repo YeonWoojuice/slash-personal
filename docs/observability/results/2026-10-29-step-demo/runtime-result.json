@@ -1,0 +1,650 @@
+{
+  "started_at": "2026-10-28T17:03:57.022867Z",
+  "scope": "Actual AWS normal fixed-step demo, without fault injection",
+  "api_base_url": "https://l5nq38kvua.execute-api.ap-northeast-2.amazonaws.com/m2",
+  "checks": [
+    {
+      "case": "missing_access_token",
+      "passed": true,
+      "observed_at": "2026-10-28T17:03:57.121165Z",
+      "actual_status": 401,
+      "expected_status": 401,
+      "elapsed_ms": 97.892
+    },
+    {
+      "case": "fake_access_token",
+      "passed": true,
+      "observed_at": "2026-10-28T17:03:57.184247Z",
+      "actual_status": 401,
+      "expected_status": 401,
+      "elapsed_ms": 62.579
+    },
+    {
+      "case": "public_management_route_not_exposed",
+      "passed": true,
+      "observed_at": "2026-10-28T17:03:57.234541Z",
+      "actual_status": 403,
+      "expected_status": 403,
+      "elapsed_ms": 49.694
+    },
+    {
+      "case": "public_management_response_has_no_metrics",
+      "passed": true,
+      "observed_at": "2026-10-28T17:03:57.234813Z"
+    },
+    {
+      "case": "forwarded_headers_do_not_bypass_auth",
+      "passed": true,
+      "observed_at": "2026-10-28T17:03:57.290803Z",
+      "actual_status": 401,
+      "expected_status": 401,
+      "elapsed_ms": 55.721
+    },
+    {
+      "case": "expected_web_access_token_received",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.066604Z"
+    },
+    {
+      "case": "real_cognito_me_first",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.437749Z",
+      "actual_status": 200,
+      "expected_status": 200,
+      "elapsed_ms": 368.977
+    },
+    {
+      "case": "me_response_shape",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.438936Z"
+    },
+    {
+      "case": "profile_matches_real_cognito_identity",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.439676Z"
+    },
+    {
+      "case": "real_cognito_me_repeat",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.502857Z",
+      "actual_status": 200,
+      "expected_status": 200,
+      "elapsed_ms": 62.194
+    },
+    {
+      "case": "repeat_returns_same_user",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.504253Z"
+    },
+    {
+      "case": "tampered_signature",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.560846Z",
+      "actual_status": 401,
+      "expected_status": 401,
+      "elapsed_ms": 55.274
+    },
+    {
+      "case": "id_token_cannot_replace_access_token",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.614693Z",
+      "actual_status": 401,
+      "expected_status": 401,
+      "elapsed_ms": 52.662
+    },
+    {
+      "case": "authenticated_public_management_route_not_exposed",
+      "passed": true,
+      "observed_at": "2026-10-28T17:04:15.657129Z",
+      "actual_status": 403,
+      "expected_status": 403,
+      "elapsed_ms": 41.755
+    },
+    {
+      "case": "bounded_normal_requests",
+      "passed": false,
+      "observed_at": "2026-10-28T17:13:50.069567Z",
+      "sent": 708,
+      "expected_sent": 1020,
+      "observed_request_records": 709,
+      "expected_request_records": 1022,
+      "failed": 1,
+      "skipped": 0,
+      "stop_reason": "inflight_latency_limit"
+    },
+    {
+      "case": "final_authenticated_me",
+      "passed": false,
+      "observed_at": "2026-10-28T17:13:50.069810Z",
+      "actual_status": null,
+      "expected_status": 200,
+      "reused_step_postflight": true
+    },
+    {
+      "case": "six_cloudwatch_series_received",
+      "passed": true,
+      "observed_at": "2026-10-28T17:13:50.513866Z"
+    }
+  ],
+  "tokens_written_to_disk": false,
+  "raw_response_or_user_data_written": false,
+  "faults_injected": false,
+  "schedule": {
+    "stages": [
+      {
+        "stage": 1,
+        "rps": 0.5,
+        "seconds": 120
+      },
+      {
+        "stage": 2,
+        "rps": 1,
+        "seconds": 120
+      },
+      {
+        "stage": 3,
+        "rps": 2,
+        "seconds": 120
+      },
+      {
+        "stage": 4,
+        "rps": 5,
+        "seconds": 120
+      }
+    ],
+    "step_requests": 1020,
+    "preflight_and_postflight_requests": 2,
+    "separate_auth_http_checks": 9,
+    "max_concurrency": 4,
+    "request_timeout_seconds": 3,
+    "latency_stop_ms": 2000,
+    "passive_cooldown_seconds": 120
+  },
+  "gate": {
+    "required": true,
+    "timeout_seconds": 120,
+    "consumed": true,
+    "ready_at": "2026-10-28T17:04:15.657762Z",
+    "consumed_at": "2026-10-28T17:04:51.669578Z"
+  },
+  "limitations": [
+    "This is a bounded normal demonstration, not a capacity limit or stress test.",
+    "API results do not prove M2 Alarm transitions or M3 incident processing.",
+    "Other-source-IP rejection needs separate actual source evidence.",
+    "Repeated same user ID does not independently count database rows.",
+    "The fixed-step postflight is reused for final_authenticated_me; no extra final HTTP request is sent.",
+    "CloudWatch collection follows the passive 120-second window but is still subject to publication timing and service visibility; complete per-request reconciliation is not assumed.",
+    "Capture login only after navigating away from the callback URL, which may briefly contain an OAuth authorization code."
+  ],
+  "step_window": {
+    "started_at": "2026-10-28T17:04:51.669952Z",
+    "requests_finished_at": "2026-10-28T17:11:50.061702Z",
+    "metric_wait_started_at": "2026-10-28T17:11:50.061703Z",
+    "metric_wait_finished_at": "2026-10-28T17:13:50.069360Z"
+  },
+  "credential_references_released_at": "2026-10-28T17:11:50.061700Z",
+  "normal_requests": {
+    "scope": "Bounded normal observation only; not a capacity, Alarm or M3 completion test",
+    "started_at": "2026-10-28T17:04:51.670029Z",
+    "planned_step_requests": 1020,
+    "max_concurrency": 4,
+    "timeout_seconds": 3,
+    "latency_stop_ms": 2000,
+    "stages": [
+      {
+        "stage": 1,
+        "rps": 0.5,
+        "seconds": 120,
+        "planned": 60,
+        "sent": 60,
+        "completed": 60,
+        "failed": 0,
+        "skipped": 0,
+        "first_dispatch_offset_seconds": 2.4e-05,
+        "last_dispatch_offset_seconds": 118.108118,
+        "dispatch_window_seconds": 120.108094,
+        "latency_ms": {
+          "count": 60,
+          "avg": 70.205,
+          "p95": 122.852,
+          "max": 133.504
+        }
+      },
+      {
+        "stage": 2,
+        "rps": 1,
+        "seconds": 120,
+        "planned": 120,
+        "sent": 120,
+        "completed": 120,
+        "failed": 0,
+        "skipped": 0,
+        "first_dispatch_offset_seconds": 120.002349,
+        "last_dispatch_offset_seconds": 239.258888,
+        "dispatch_window_seconds": 120.256539,
+        "latency_ms": {
+          "count": 120,
+          "avg": 97.0,
+          "p95": 144.203,
+          "max": 1115.11
+        }
+      },
+      {
+        "stage": 3,
+        "rps": 2,
+        "seconds": 120,
+        "planned": 240,
+        "sent": 240,
+        "completed": 240,
+        "failed": 0,
+        "skipped": 0,
+        "first_dispatch_offset_seconds": 240.000524,
+        "last_dispatch_offset_seconds": 360.071118,
+        "dispatch_window_seconds": 120.570594,
+        "latency_ms": {
+          "count": 240,
+          "avg": 75.01,
+          "p95": 127.018,
+          "max": 1048.362
+        }
+      },
+      {
+        "stage": 4,
+        "rps": 5,
+        "seconds": 120,
+        "planned": 600,
+        "sent": 288,
+        "completed": 288,
+        "failed": 1,
+        "skipped": 0,
+        "first_dispatch_offset_seconds": 360.273413,
+        "last_dispatch_offset_seconds": 418.119669,
+        "dispatch_window_seconds": 58.046256,
+        "latency_ms": {
+          "count": 288,
+          "avg": 81.43,
+          "p95": 121.752,
+          "max": 2054.693
+        }
+      }
+    ],
+    "schedule_limit_seconds": 483,
+    "max_schedule_drift_seconds": 3,
+    "schedule_elapsed_seconds": 418.310845,
+    "active_elapsed_seconds": 418.351841,
+    "postflight_dispatch_offset_seconds": null,
+    "stop_reason": "inflight_latency_limit",
+    "preflight_passed": true,
+    "postflight_passed": false,
+    "cooldown_seconds": 120,
+    "cooldown_completed": true,
+    "sent_step_requests": 708,
+    "failed_step_requests": 1,
+    "skipped_step_requests": 0,
+    "outcome": "stopped",
+    "finished_at": "2026-10-28T17:13:50.069328Z"
+  },
+  "http_status": "FAIL",
+  "failure_stage": "fixed normal request steps",
+  "failure_kind": "step_probe_stopped",
+  "step_stop_reason": "inflight_latency_limit",
+  "cloudwatch": {
+    "namespace": "LambdaOps/Slash",
+    "dimensions": [
+      {
+        "Name": "Service",
+        "Value": "slash-api"
+      },
+      {
+        "Name": "Environment",
+        "Value": "dev"
+      }
+    ],
+    "period_seconds": 60,
+    "start_utc": "2026-10-28T17:03:57.022803+00:00",
+    "end_utc": "2026-10-28T17:13:50.070326+00:00",
+    "metrics": [
+      {
+        "metric": "RequestCount",
+        "statistic": "Sum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 3.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 17.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 30.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 42.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 60.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 82.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 120.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 189.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 173.0,
+            "unit": "Count"
+          }
+        ]
+      },
+      {
+        "metric": "ServerErrorCount",
+        "statistic": "Sum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          }
+        ]
+      },
+      {
+        "metric": "RequestDurationMsTotal",
+        "statistic": "Sum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 0.0,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 29.677351,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 432.146368,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 204.71963300000004,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 240.539223,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 404.6855179999999,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 383.41302900000005,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 711.0883319999998,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 671.4674610000002,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 530.9067129999999,
+            "unit": "Milliseconds"
+          }
+        ]
+      },
+      {
+        "metric": "DBQueryCount",
+        "statistic": "Sum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 25.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 25.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 41.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 55.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 67.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 85.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 107.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 145.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 214.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 198.0,
+            "unit": "Count"
+          }
+        ]
+      },
+      {
+        "metric": "DBQueryDurationMsTotal",
+        "statistic": "Sum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 55.103683000000046,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 48.20832299999995,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 125.25362199999995,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 125.43662500000005,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 137.2053860000001,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 255.75303400000007,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 184.42130799999995,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 234.60726899999986,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 279.8058350000001,
+            "unit": "Milliseconds"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 228.43754799999988,
+            "unit": "Milliseconds"
+          }
+        ]
+      },
+      {
+        "metric": "DBConnectionsActive",
+        "statistic": "Maximum",
+        "points": [
+          {
+            "timestamp": "2026-10-29T02:03:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:04:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:05:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:06:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:07:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:08:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:09:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:10:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:11:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          },
+          {
+            "timestamp": "2026-10-29T02:12:00+09:00",
+            "value": 0.0,
+            "unit": "Count"
+          }
+        ]
+      }
+    ],
+    "all_six_series_received": true,
+    "interpretation": "Actual AWS metric receipt only. RequestCount includes non-actuator application HTTP timers, including authentication checks. URI labels beginning /actuator are explicitly excluded. DB counts include scheduled queries. Publish-time counter deltas can cross observation boundaries; no per-request reconciliation or Alarm transition is claimed."
+  },
+  "status": "FAIL",
+  "finished_at": "2026-10-28T17:13:50.514094Z",
+  "observed_request_records": 709
+}

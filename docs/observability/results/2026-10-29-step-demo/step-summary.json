@@ -1,0 +1,101 @@
+{
+  "scope": "Bounded normal observation only; not a capacity, Alarm or M3 completion test",
+  "started_at": "2026-10-28T17:04:51.670029Z",
+  "planned_step_requests": 1020,
+  "max_concurrency": 4,
+  "timeout_seconds": 3,
+  "latency_stop_ms": 2000,
+  "stages": [
+    {
+      "stage": 1,
+      "rps": 0.5,
+      "seconds": 120,
+      "planned": 60,
+      "sent": 60,
+      "completed": 60,
+      "failed": 0,
+      "skipped": 0,
+      "first_dispatch_offset_seconds": 2.4e-05,
+      "last_dispatch_offset_seconds": 118.108118,
+      "dispatch_window_seconds": 120.108094,
+      "latency_ms": {
+        "count": 60,
+        "avg": 70.205,
+        "p95": 122.852,
+        "max": 133.504
+      }
+    },
+    {
+      "stage": 2,
+      "rps": 1,
+      "seconds": 120,
+      "planned": 120,
+      "sent": 120,
+      "completed": 120,
+      "failed": 0,
+      "skipped": 0,
+      "first_dispatch_offset_seconds": 120.002349,
+      "last_dispatch_offset_seconds": 239.258888,
+      "dispatch_window_seconds": 120.256539,
+      "latency_ms": {
+        "count": 120,
+        "avg": 97.0,
+        "p95": 144.203,
+        "max": 1115.11
+      }
+    },
+    {
+      "stage": 3,
+      "rps": 2,
+      "seconds": 120,
+      "planned": 240,
+      "sent": 240,
+      "completed": 240,
+      "failed": 0,
+      "skipped": 0,
+      "first_dispatch_offset_seconds": 240.000524,
+      "last_dispatch_offset_seconds": 360.071118,
+      "dispatch_window_seconds": 120.570594,
+      "latency_ms": {
+        "count": 240,
+        "avg": 75.01,
+        "p95": 127.018,
+        "max": 1048.362
+      }
+    },
+    {
+      "stage": 4,
+      "rps": 5,
+      "seconds": 120,
+      "planned": 600,
+      "sent": 288,
+      "completed": 288,
+      "failed": 1,
+      "skipped": 0,
+      "first_dispatch_offset_seconds": 360.273413,
+      "last_dispatch_offset_seconds": 418.119669,
+      "dispatch_window_seconds": 58.046256,
+      "latency_ms": {
+        "count": 288,
+        "avg": 81.43,
+        "p95": 121.752,
+        "max": 2054.693
+      }
+    }
+  ],
+  "schedule_limit_seconds": 483,
+  "max_schedule_drift_seconds": 3,
+  "schedule_elapsed_seconds": 418.310845,
+  "active_elapsed_seconds": 418.351841,
+  "postflight_dispatch_offset_seconds": null,
+  "stop_reason": "inflight_latency_limit",
+  "preflight_passed": true,
+  "postflight_passed": false,
+  "cooldown_seconds": 120,
+  "cooldown_completed": true,
+  "sent_step_requests": 708,
+  "failed_step_requests": 1,
+  "skipped_step_requests": 0,
+  "outcome": "stopped",
+  "finished_at": "2026-10-28T17:13:50.069328Z"
+}

@@ -1,0 +1,429 @@
+{
+  "at": "2026-10-28T17:30:31.776506+00:00",
+  "scope": "Read-only deletion checks for captured Slash experiment identities; existence checks for retained resources",
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "experiment_ecs_cluster",
+      "expected": "inactive or missing",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:25.912272+00:00"
+    },
+    {
+      "check": "experiment_running_or_pending_tasks",
+      "expected": "none; stopped task history may remain",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:25.938731+00:00"
+    },
+    {
+      "check": "experiment_rds",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.031423+00:00"
+    },
+    {
+      "check": "experiment_rds_snapshots",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.102204+00:00"
+    },
+    {
+      "check": "experiment_cache_group",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.172060+00:00"
+    },
+    {
+      "check": "experiment_cache_nodes",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.186948+00:00"
+    },
+    {
+      "check": "experiment_api_gateway_rest_api_test_0",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.245388+00:00"
+    },
+    {
+      "check": "experiment_apigatewayv2_vpc_link_test_1",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.359229+00:00"
+    },
+    {
+      "check": "experiment_cloudwatch_log_group_test_2",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.412491+00:00"
+    },
+    {
+      "check": "experiment_db_instance_test_3_automated_backups",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.451441+00:00"
+    },
+    {
+      "check": "experiment_secretsmanager_secret_rds_managed_4",
+      "expected": "absent; scheduled deletion remains separately visible",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:26.502594+00:00"
+    },
+    {
+      "check": "experiment_ecs_service_core_6",
+      "expected": "inactive or missing",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.596360+00:00"
+    },
+    {
+      "check": "experiment_ecs_service_monitoring_7",
+      "expected": "inactive or missing",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.699194+00:00"
+    },
+    {
+      "check": "experiment_ecs_task_definition_core_8",
+      "expected": "inactive/delete-in-progress; definition history is not a running task",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.732802+00:00"
+    },
+    {
+      "check": "experiment_ecs_task_definition_monitoring_9",
+      "expected": "inactive/delete-in-progress; definition history is not a running task",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:26.764705+00:00"
+    },
+    {
+      "check": "experiment_iam_role_core_execution_11",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:27.400157+00:00"
+    },
+    {
+      "check": "experiment_iam_role_core_task_12",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:27.616764+00:00"
+    },
+    {
+      "check": "experiment_iam_role_inference_execution_13",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:27.826044+00:00"
+    },
+    {
+      "check": "experiment_iam_role_inference_task_14",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.034342+00:00"
+    },
+    {
+      "check": "experiment_iam_role_monitoring_execution_15",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.263622+00:00"
+    },
+    {
+      "check": "experiment_iam_role_monitoring_task_16",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.467152+00:00"
+    },
+    {
+      "check": "experiment_lb_test_17",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.531796+00:00"
+    },
+    {
+      "check": "experiment_lb_target_group_api_18",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.592377+00:00"
+    },
+    {
+      "check": "experiment_lb_target_group_grafana_19",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.644259+00:00"
+    },
+    {
+      "check": "experiment_secretsmanager_secret_cache_20",
+      "expected": "absent; scheduled deletion remains separately visible",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.693223+00:00"
+    },
+    {
+      "check": "experiment_secretsmanager_secret_grafana_21",
+      "expected": "absent; scheduled deletion remains separately visible",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.745253+00:00"
+    },
+    {
+      "check": "experiment_service_discovery_private_dns_namespace_test_29",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:28.804809+00:00"
+    },
+    {
+      "check": "experiment_service_discovery_private_dns_namespace_test_29_hosted_zone",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:29.447316+00:00"
+    },
+    {
+      "check": "experiment_service_discovery_service_core_30",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:29.478008+00:00"
+    },
+    {
+      "check": "experiment_service_discovery_service_inference_31",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:29.513385+00:00"
+    },
+    {
+      "check": "experiment_vpc_test_36",
+      "expected": "absent",
+      "passed": true,
+      "result": "not_found",
+      "checked_at": "2026-10-28T17:30:29.616968+00:00"
+    },
+    {
+      "check": "experiment_vpc_test_36_network_interfaces",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:29.709516+00:00"
+    },
+    {
+      "check": "experiment_vpc_test_36_subnets",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:29.777231+00:00"
+    },
+    {
+      "check": "experiment_vpc_test_36_security_groups",
+      "expected": "absent",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:29.881555+00:00"
+    },
+    {
+      "check": "retained_cognito_resource_server_lambdaops_0",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.173812+00:00"
+    },
+    {
+      "check": "retained_cognito_user_pool_test_1",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.377711+00:00"
+    },
+    {
+      "check": "retained_cognito_user_pool_client_lambdaops_operator_2",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.452204+00:00"
+    },
+    {
+      "check": "retained_cognito_user_pool_client_web_3",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.519060+00:00"
+    },
+    {
+      "check": "retained_cognito_user_pool_domain_test_4",
+      "expected": "active",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.565338+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_5",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.660003+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_6",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.707053+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_7",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.750961+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_8",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.795284+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_9",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.843037+00:00"
+    },
+    {
+      "check": "retained_ecr_lifecycle_policy_images_10",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.887530+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_11",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.917306+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_12",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.947658+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_13",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:30.976255+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_14",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.006584+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_15",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.037810+00:00"
+    },
+    {
+      "check": "retained_ecr_repository_images_16",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.067556+00:00"
+    },
+    {
+      "check": "retained_lambdaops_dsql",
+      "expected": "active",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.363087+00:00"
+    },
+    {
+      "check": "retained_lambdaops-dev-slash-api-de2b25b5-read",
+      "expected": "active",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.511157+00:00"
+    },
+    {
+      "check": "retained_lambdaops-dev-slash-api-de2b25b5-ingest",
+      "expected": "active",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.607039+00:00"
+    },
+    {
+      "check": "retained_lambdaops-dev-slash-api-de2b25b5-ingest",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.672995+00:00"
+    },
+    {
+      "check": "retained_lambdaops-dev-slash-api-de2b25b5-consumer-dlq",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.687859+00:00"
+    },
+    {
+      "check": "retained_lambdaops-dev-slash-api-de2b25b5-eventbridge-dlq",
+      "expected": "present",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.702161+00:00"
+    },
+    {
+      "check": "retained_lambdaops_ingest_remains_disabled",
+      "expected": "all mappings disabled",
+      "passed": true,
+      "result": "expected_state_confirmed",
+      "checked_at": "2026-10-28T17:30:31.776161+00:00"
+    },
+    {
+      "check": "experiment_terraform_managed_state_empty",
+      "expected": "zero",
+      "passed": true,
+      "remaining_count": 0,
+      "checked_at": "2026-10-28T17:30:31.776500+00:00"
+    }
+  ],
+  "aws_mutations_performed": false,
+  "credentials_secret_values_or_tester_ip_recorded": false,
+  "limitations": [
+    "Stopped ECS tasks and inactive task-definition history may remain and are not running compute.",
+    "CloudWatch historical metric data may remain; this check verifies tasks/logs removed, not metric-history erasure.",
+    "Retained foundation and LambdaOps checks verify presence/state, not a complete configuration or billing audit.",
+    "AWS-created account-wide service-linked roles are outside Terraform experiment deletion and have no standalone hourly charge.",
+    "No Billing/Cost Explorer total-zero-cost claim is made."
+  ]
+}
