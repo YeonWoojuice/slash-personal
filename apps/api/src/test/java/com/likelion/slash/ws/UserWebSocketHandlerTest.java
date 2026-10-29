@@ -7,11 +7,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.SlashTime;
 import java.net.URI;
 import java.util.HashMap;
@@ -38,8 +37,8 @@ class UserWebSocketHandlerTest {
     private static final long 사용자_PK = 77L;
 
     private final ObjectMapper objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .configureForJackson2()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .defaultTimeZone(TimeZone.getTimeZone(SlashTime.ZONE))
             .build();
 

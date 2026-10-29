@@ -8,6 +8,7 @@ import com.likelion.slash.jooq.Indexes;
 import com.likelion.slash.jooq.Keys;
 import com.likelion.slash.jooq.Public;
 import com.likelion.slash.jooq.tables.AgentDispatches.AgentDispatchesPath;
+import com.likelion.slash.jooq.tables.AsyncJobs.AsyncJobsPath;
 import com.likelion.slash.jooq.tables.DeviceCapabilities.DeviceCapabilitiesPath;
 import com.likelion.slash.jooq.tables.DevicePairingRequests.DevicePairingRequestsPath;
 import com.likelion.slash.jooq.tables.DeviceSearchFolders.DeviceSearchFoldersPath;
@@ -35,10 +36,10 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -71,7 +72,7 @@ public class Devices extends TableImpl<DevicesRecord> {
     /**
      * The column <code>public.devices.id</code>.
      */
-    public final TableField<DevicesRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<DevicesRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
     /**
      * The column <code>public.devices.public_id</code>.
@@ -331,6 +332,14 @@ public class Devices extends TableImpl<DevicesRecord> {
         return _tasks;
     }
 
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.async_jobs</code> table
+     */
+    public AsyncJobsPath asyncJobs() {
+        return tasks().asyncJobs();
+    }
+
     @Override
     public List<Check<DevicesRecord>> getChecks() {
         return Arrays.asList(
@@ -386,7 +395,7 @@ public class Devices extends TableImpl<DevicesRecord> {
      */
     @Override
     public Devices where(Condition condition) {
-        return new Devices(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Devices(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -453,7 +462,7 @@ public class Devices extends TableImpl<DevicesRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Devices whereExists(Select<?> select) {
+    public Devices whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -461,7 +470,7 @@ public class Devices extends TableImpl<DevicesRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Devices whereNotExists(Select<?> select) {
+    public Devices whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

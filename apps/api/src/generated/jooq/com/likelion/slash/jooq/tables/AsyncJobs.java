@@ -7,6 +7,7 @@ package com.likelion.slash.jooq.tables;
 import com.likelion.slash.jooq.Indexes;
 import com.likelion.slash.jooq.Keys;
 import com.likelion.slash.jooq.Public;
+import com.likelion.slash.jooq.tables.Devices.DevicesPath;
 import com.likelion.slash.jooq.tables.Tasks.TasksPath;
 import com.likelion.slash.jooq.tables.records.AsyncJobsRecord;
 
@@ -31,10 +32,10 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -67,7 +68,7 @@ public class AsyncJobs extends TableImpl<AsyncJobsRecord> {
     /**
      * The column <code>public.async_jobs.id</code>.
      */
-    public final TableField<AsyncJobsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AsyncJobsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
     /**
      * The column <code>public.async_jobs.public_id</code>.
@@ -260,6 +261,14 @@ public class AsyncJobs extends TableImpl<AsyncJobsRecord> {
         return _tasks;
     }
 
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.devices</code> table
+     */
+    public DevicesPath devices() {
+        return tasks().devices();
+    }
+
     @Override
     public List<Check<AsyncJobsRecord>> getChecks() {
         return Arrays.asList(
@@ -318,7 +327,7 @@ public class AsyncJobs extends TableImpl<AsyncJobsRecord> {
      */
     @Override
     public AsyncJobs where(Condition condition) {
-        return new AsyncJobs(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new AsyncJobs(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -385,7 +394,7 @@ public class AsyncJobs extends TableImpl<AsyncJobsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsyncJobs whereExists(Select<?> select) {
+    public AsyncJobs whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -393,7 +402,7 @@ public class AsyncJobs extends TableImpl<AsyncJobsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsyncJobs whereNotExists(Select<?> select) {
+    public AsyncJobs whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

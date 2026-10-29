@@ -1,0 +1,3048 @@
+{
+  "recorded_at_utc": "2026-10-29T01:24:30.086381+00:00",
+  "scope": "Approved isolated Slash Boot 4.1.2 transition; LambdaOps demo work is separate",
+  "base_source_commit": "7ec7140307b8368ef125f1e24e1c01a2c69c3304",
+  "baseline_tests": {
+    "tests": 566,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "evidence": "2026-10-29-java-security-remediation.json"
+  },
+  "tests": {
+    "postgres16": {
+      "tests": 569,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "postgres18": {
+      "tests": 569,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "postgres16_scope": "observed compatibility only; not jOOQ 3.21 OSS supported database",
+    "postgres18_scope": "supported database; cleanTest forced actual rerun after database target changed",
+    "first_run": {
+      "tests": 566,
+      "failures": 3,
+      "causes": [
+        "Test bean selection became ambiguous with Boot Redis auto-configuration",
+        "Pub/Sub message published before subscription completed"
+      ],
+      "resolution": "Select existing ws bean and await actual subscription readiness; message assertions/timeouts unchanged"
+    },
+    "new_regressions": [
+      "Stored JSONB fields, explicit null, large integer, API timezone and omitted fields",
+      "Legacy JSON envelope delivered through actual Valkey Pub/Sub",
+      "ACK serialization failure preserves already-stored result and connection"
+    ]
+  },
+  "database": {
+    "migration_sql_changed": false,
+    "histories": {
+      "postgres16": {
+        "slash_boot4": [
+          {
+            "version": "001",
+            "script": "V001__create_users.sql",
+            "checksum": 1596894260,
+            "success": true
+          },
+          {
+            "version": "002",
+            "script": "V002__create_set_updated_at_function.sql",
+            "checksum": 449856060,
+            "success": true
+          },
+          {
+            "version": "003",
+            "script": "V003__create_devices.sql",
+            "checksum": 1285044830,
+            "success": true
+          },
+          {
+            "version": "004",
+            "script": "V004__create_tasks.sql",
+            "checksum": 493016231,
+            "success": true
+          },
+          {
+            "version": "005",
+            "script": "V005__create_agent_dispatches.sql",
+            "checksum": -1509410683,
+            "success": true
+          },
+          {
+            "version": "006",
+            "script": "V006__create_async_jobs_outbox.sql",
+            "checksum": 42463574,
+            "success": true
+          },
+          {
+            "version": "007",
+            "script": "V007__create_audit_events.sql",
+            "checksum": 1255137145,
+            "success": true
+          },
+          {
+            "version": "008",
+            "script": "V008__add_device_token.sql",
+            "checksum": -620756790,
+            "success": true
+          },
+          {
+            "version": "009",
+            "script": "V009__create_device_search_folders.sql",
+            "checksum": 2003540285,
+            "success": true
+          },
+          {
+            "version": "010",
+            "script": "V010__add_device_accepting_tasks.sql",
+            "checksum": 840115307,
+            "success": true
+          }
+        ],
+        "slash_legacy": [
+          {
+            "version": "001",
+            "script": "V001__create_users.sql",
+            "checksum": 1596894260,
+            "success": true
+          },
+          {
+            "version": "002",
+            "script": "V002__create_set_updated_at_function.sql",
+            "checksum": 449856060,
+            "success": true
+          },
+          {
+            "version": "003",
+            "script": "V003__create_devices.sql",
+            "checksum": 1285044830,
+            "success": true
+          },
+          {
+            "version": "004",
+            "script": "V004__create_tasks.sql",
+            "checksum": 493016231,
+            "success": true
+          },
+          {
+            "version": "005",
+            "script": "V005__create_agent_dispatches.sql",
+            "checksum": -1509410683,
+            "success": true
+          },
+          {
+            "version": "006",
+            "script": "V006__create_async_jobs_outbox.sql",
+            "checksum": 42463574,
+            "success": true
+          },
+          {
+            "version": "007",
+            "script": "V007__create_audit_events.sql",
+            "checksum": 1255137145,
+            "success": true
+          },
+          {
+            "version": "008",
+            "script": "V008__add_device_token.sql",
+            "checksum": -620756790,
+            "success": true
+          },
+          {
+            "version": "009",
+            "script": "V009__create_device_search_folders.sql",
+            "checksum": 2003540285,
+            "success": true
+          },
+          {
+            "version": "010",
+            "script": "V010__add_device_accepting_tasks.sql",
+            "checksum": 840115307,
+            "success": true
+          }
+        ],
+        "migration_history_matches": true,
+        "server_version": "16.15 (Debian 16.15-1.pgdg13+2)"
+      },
+      "postgres18": {
+        "slash_boot4": [
+          {
+            "version": "001",
+            "script": "V001__create_users.sql",
+            "checksum": 1596894260,
+            "success": true
+          },
+          {
+            "version": "002",
+            "script": "V002__create_set_updated_at_function.sql",
+            "checksum": 449856060,
+            "success": true
+          },
+          {
+            "version": "003",
+            "script": "V003__create_devices.sql",
+            "checksum": 1285044830,
+            "success": true
+          },
+          {
+            "version": "004",
+            "script": "V004__create_tasks.sql",
+            "checksum": 493016231,
+            "success": true
+          },
+          {
+            "version": "005",
+            "script": "V005__create_agent_dispatches.sql",
+            "checksum": -1509410683,
+            "success": true
+          },
+          {
+            "version": "006",
+            "script": "V006__create_async_jobs_outbox.sql",
+            "checksum": 42463574,
+            "success": true
+          },
+          {
+            "version": "007",
+            "script": "V007__create_audit_events.sql",
+            "checksum": 1255137145,
+            "success": true
+          },
+          {
+            "version": "008",
+            "script": "V008__add_device_token.sql",
+            "checksum": -620756790,
+            "success": true
+          },
+          {
+            "version": "009",
+            "script": "V009__create_device_search_folders.sql",
+            "checksum": 2003540285,
+            "success": true
+          },
+          {
+            "version": "010",
+            "script": "V010__add_device_accepting_tasks.sql",
+            "checksum": 840115307,
+            "success": true
+          }
+        ],
+        "slash_legacy": [
+          {
+            "version": "001",
+            "script": "V001__create_users.sql",
+            "checksum": 1596894260,
+            "success": true
+          },
+          {
+            "version": "002",
+            "script": "V002__create_set_updated_at_function.sql",
+            "checksum": 449856060,
+            "success": true
+          },
+          {
+            "version": "003",
+            "script": "V003__create_devices.sql",
+            "checksum": 1285044830,
+            "success": true
+          },
+          {
+            "version": "004",
+            "script": "V004__create_tasks.sql",
+            "checksum": 493016231,
+            "success": true
+          },
+          {
+            "version": "005",
+            "script": "V005__create_agent_dispatches.sql",
+            "checksum": -1509410683,
+            "success": true
+          },
+          {
+            "version": "006",
+            "script": "V006__create_async_jobs_outbox.sql",
+            "checksum": 42463574,
+            "success": true
+          },
+          {
+            "version": "007",
+            "script": "V007__create_audit_events.sql",
+            "checksum": 1255137145,
+            "success": true
+          },
+          {
+            "version": "008",
+            "script": "V008__add_device_token.sql",
+            "checksum": -620756790,
+            "success": true
+          },
+          {
+            "version": "009",
+            "script": "V009__create_device_search_folders.sql",
+            "checksum": 2003540285,
+            "success": true
+          },
+          {
+            "version": "010",
+            "script": "V010__add_device_accepting_tasks.sql",
+            "checksum": 840115307,
+            "success": true
+          }
+        ],
+        "migration_history_matches": true,
+        "server_version": "18.6 (Debian 18.6-1.pgdg13+2)"
+      }
+    },
+    "codegen": "jOOQ 3.21.9 generation on PostgreSQL 18 succeeded without unsupported-dialect warning",
+    "local_compose": "New explicit docker-compose.boot4.yml; separate project, loopback ports and volume; existing PG16 data not migrated",
+    "ci_database": "Disposable PostgreSQL 18 service",
+    "aws_database": "No changes or current-state queries; earlier saved AWS run used RDS18.3"
+  },
+  "resolved_dependencies": {
+    "runtimeClasspath": [
+      {
+        "group": "ch.qos.logback",
+        "name": "logback-classic",
+        "version": "1.5.38"
+      },
+      {
+        "group": "ch.qos.logback",
+        "name": "logback-core",
+        "version": "1.5.38"
+      },
+      {
+        "group": "com.fasterxml.jackson.core",
+        "name": "jackson-annotations",
+        "version": "2.21"
+      },
+      {
+        "group": "com.fasterxml",
+        "name": "classmate",
+        "version": "1.7.3"
+      },
+      {
+        "group": "com.nimbusds",
+        "name": "nimbus-jose-jwt",
+        "version": "10.9.1"
+      },
+      {
+        "group": "com.zaxxer",
+        "name": "HikariCP",
+        "version": "7.0.2"
+      },
+      {
+        "group": "commons-logging",
+        "name": "commons-logging",
+        "version": "1.3.6"
+      },
+      {
+        "group": "io.lettuce",
+        "name": "lettuce-core",
+        "version": "7.5.2.RELEASE"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-commons",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-core",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-jakarta9",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-observation",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-registry-prometheus",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-buffer",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-base",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-compression",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-dns",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-http",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-http2",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-marshalling",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-protobuf",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-common",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-handler",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-resolver",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-resolver-dns",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport-classes-epoll",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport-native-unix-common",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.projectreactor",
+        "name": "reactor-core",
+        "version": "3.8.8"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-config",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-core",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-exposition-formats",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-exposition-textformats",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-model",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-tracer-common",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.r2dbc",
+        "name": "r2dbc-spi",
+        "version": "1.0.0.RELEASE"
+      },
+      {
+        "group": "jakarta.activation",
+        "name": "jakarta.activation-api",
+        "version": "2.1.4"
+      },
+      {
+        "group": "jakarta.annotation",
+        "name": "jakarta.annotation-api",
+        "version": "3.0.0"
+      },
+      {
+        "group": "jakarta.validation",
+        "name": "jakarta.validation-api",
+        "version": "3.1.1"
+      },
+      {
+        "group": "jakarta.xml.bind",
+        "name": "jakarta.xml.bind-api",
+        "version": "4.0.5"
+      },
+      {
+        "group": "org.apache.httpcomponents.client5",
+        "name": "httpclient5",
+        "version": "5.6.5"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5-h2",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.apache.logging.log4j",
+        "name": "log4j-api",
+        "version": "2.25.5"
+      },
+      {
+        "group": "org.apache.logging.log4j",
+        "name": "log4j-to-slf4j",
+        "version": "2.25.5"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-core",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-el",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-websocket",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.checkerframework",
+        "name": "checker-qual",
+        "version": "3.55.1"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-core",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-database-postgresql",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.hdrhistogram",
+        "name": "HdrHistogram",
+        "version": "2.2.2"
+      },
+      {
+        "group": "org.hibernate.validator",
+        "name": "hibernate-validator",
+        "version": "9.1.5.Final"
+      },
+      {
+        "group": "org.jboss.logging",
+        "name": "jboss-logging",
+        "version": "3.6.3.Final"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq",
+        "version": "3.21.9"
+      },
+      {
+        "group": "org.jspecify",
+        "name": "jspecify",
+        "version": "1.0.1"
+      },
+      {
+        "group": "org.postgresql",
+        "name": "postgresql",
+        "version": "42.7.14"
+      },
+      {
+        "group": "org.reactivestreams",
+        "name": "reactive-streams",
+        "version": "1.0.4"
+      },
+      {
+        "group": "org.slf4j",
+        "name": "jul-to-slf4j",
+        "version": "2.0.20"
+      },
+      {
+        "group": "org.slf4j",
+        "name": "slf4j-api",
+        "version": "2.0.20"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-actuator",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-actuator-autoconfigure",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-autoconfigure",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-data-commons",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-flyway",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-health",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-http-client",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-http-converter",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jackson",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jdbc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jooq",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-micrometer-metrics",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-micrometer-observation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-netty",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-persistence",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-restclient",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-security",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-security-oauth2-resource-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-servlet",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-sql",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-actuator",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-flyway",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jackson",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jdbc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jooq",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-logging",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-micrometer-metrics",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-restclient",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-security",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-security-oauth2-resource-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-tomcat",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-tomcat-runtime",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-validation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-webmvc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-websocket",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-tomcat",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-transaction",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-validation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-web-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-webmvc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-websocket",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-commons",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-keyvalue",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-config",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-core",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-crypto",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-core",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-jose",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-resource-server",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-web",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-aop",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-beans",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-context",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-context-support",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-core",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-expression",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-jdbc",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-messaging",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-oxm",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-tx",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-web",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-webmvc",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-websocket",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.yaml",
+        "name": "snakeyaml",
+        "version": "2.6"
+      },
+      {
+        "group": "redis.clients.authentication",
+        "name": "redis-authx-core",
+        "version": "0.1.1-beta2"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "annotations",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "apache5-client",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "auth",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "aws-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "aws-json-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "checksums",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "checksums-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "cloudwatch",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "endpoints-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-aws",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-aws-eventstream",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-client-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "identity-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "json-utils",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "metrics-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "netty-nio-client",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "profiles",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "protocol-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "regions",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "retries",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "retries-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "sdk-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "smithy-rpcv2-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "third-party-jackson-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "third-party-jackson-dataformat-cbor",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "utils",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "utils-lite",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.eventstream",
+        "name": "eventstream",
+        "version": "1.0.1"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-core",
+        "version": "3.1.7"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-databind",
+        "version": "3.1.7"
+      }
+    ],
+    "testRuntimeClasspath": [
+      {
+        "group": "ch.qos.logback",
+        "name": "logback-classic",
+        "version": "1.5.38"
+      },
+      {
+        "group": "ch.qos.logback",
+        "name": "logback-core",
+        "version": "1.5.38"
+      },
+      {
+        "group": "com.fasterxml.jackson.core",
+        "name": "jackson-annotations",
+        "version": "2.21"
+      },
+      {
+        "group": "com.fasterxml",
+        "name": "classmate",
+        "version": "1.7.3"
+      },
+      {
+        "group": "com.jayway.jsonpath",
+        "name": "json-path",
+        "version": "2.10.0"
+      },
+      {
+        "group": "com.nimbusds",
+        "name": "nimbus-jose-jwt",
+        "version": "10.9.1"
+      },
+      {
+        "group": "com.vaadin.external.google",
+        "name": "android-json",
+        "version": "0.0.20131108.vaadin1"
+      },
+      {
+        "group": "com.zaxxer",
+        "name": "HikariCP",
+        "version": "7.0.2"
+      },
+      {
+        "group": "commons-logging",
+        "name": "commons-logging",
+        "version": "1.3.6"
+      },
+      {
+        "group": "io.lettuce",
+        "name": "lettuce-core",
+        "version": "7.5.2.RELEASE"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-commons",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-core",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-jakarta9",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-observation",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.micrometer",
+        "name": "micrometer-registry-prometheus",
+        "version": "1.17.2"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-buffer",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-base",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-compression",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-dns",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-http",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-http2",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-marshalling",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-codec-protobuf",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-common",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-handler",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-resolver",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-resolver-dns",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport-classes-epoll",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.netty",
+        "name": "netty-transport-native-unix-common",
+        "version": "4.2.19.Final"
+      },
+      {
+        "group": "io.projectreactor",
+        "name": "reactor-core",
+        "version": "3.8.8"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-config",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-core",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-exposition-formats",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-exposition-textformats",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-model",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.prometheus",
+        "name": "prometheus-metrics-tracer-common",
+        "version": "1.7.0"
+      },
+      {
+        "group": "io.r2dbc",
+        "name": "r2dbc-spi",
+        "version": "1.0.0.RELEASE"
+      },
+      {
+        "group": "jakarta.activation",
+        "name": "jakarta.activation-api",
+        "version": "2.1.4"
+      },
+      {
+        "group": "jakarta.annotation",
+        "name": "jakarta.annotation-api",
+        "version": "3.0.0"
+      },
+      {
+        "group": "jakarta.validation",
+        "name": "jakarta.validation-api",
+        "version": "3.1.1"
+      },
+      {
+        "group": "jakarta.xml.bind",
+        "name": "jakarta.xml.bind-api",
+        "version": "4.0.5"
+      },
+      {
+        "group": "net.bytebuddy",
+        "name": "byte-buddy",
+        "version": "1.18.15"
+      },
+      {
+        "group": "net.bytebuddy",
+        "name": "byte-buddy-agent",
+        "version": "1.18.15"
+      },
+      {
+        "group": "net.minidev",
+        "name": "accessors-smart",
+        "version": "2.6.0"
+      },
+      {
+        "group": "net.minidev",
+        "name": "json-smart",
+        "version": "2.6.0"
+      },
+      {
+        "group": "org.apache.httpcomponents.client5",
+        "name": "httpclient5",
+        "version": "5.6.5"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5-h2",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.apache.logging.log4j",
+        "name": "log4j-api",
+        "version": "2.25.5"
+      },
+      {
+        "group": "org.apache.logging.log4j",
+        "name": "log4j-to-slf4j",
+        "version": "2.25.5"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-core",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-el",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.apache.tomcat.embed",
+        "name": "tomcat-embed-websocket",
+        "version": "11.0.27"
+      },
+      {
+        "group": "org.assertj",
+        "name": "assertj-core",
+        "version": "3.27.7"
+      },
+      {
+        "group": "org.awaitility",
+        "name": "awaitility",
+        "version": "4.3.0"
+      },
+      {
+        "group": "org.checkerframework",
+        "name": "checker-qual",
+        "version": "3.55.1"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-core",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-database-postgresql",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.hamcrest",
+        "name": "hamcrest",
+        "version": "3.0"
+      },
+      {
+        "group": "org.hdrhistogram",
+        "name": "HdrHistogram",
+        "version": "2.2.2"
+      },
+      {
+        "group": "org.hibernate.validator",
+        "name": "hibernate-validator",
+        "version": "9.1.5.Final"
+      },
+      {
+        "group": "org.jboss.logging",
+        "name": "jboss-logging",
+        "version": "3.6.3.Final"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq",
+        "version": "3.21.9"
+      },
+      {
+        "group": "org.jspecify",
+        "name": "jspecify",
+        "version": "1.0.1"
+      },
+      {
+        "group": "org.junit.jupiter",
+        "name": "junit-jupiter",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.jupiter",
+        "name": "junit-jupiter-api",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.jupiter",
+        "name": "junit-jupiter-engine",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.jupiter",
+        "name": "junit-jupiter-params",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.platform",
+        "name": "junit-platform-commons",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.platform",
+        "name": "junit-platform-engine",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.junit.platform",
+        "name": "junit-platform-launcher",
+        "version": "6.0.3"
+      },
+      {
+        "group": "org.mockito",
+        "name": "mockito-core",
+        "version": "5.23.0"
+      },
+      {
+        "group": "org.mockito",
+        "name": "mockito-junit-jupiter",
+        "version": "5.23.0"
+      },
+      {
+        "group": "org.objenesis",
+        "name": "objenesis",
+        "version": "3.3"
+      },
+      {
+        "group": "org.opentest4j",
+        "name": "opentest4j",
+        "version": "1.3.0"
+      },
+      {
+        "group": "org.ow2.asm",
+        "name": "asm",
+        "version": "9.7.1"
+      },
+      {
+        "group": "org.postgresql",
+        "name": "postgresql",
+        "version": "42.7.14"
+      },
+      {
+        "group": "org.reactivestreams",
+        "name": "reactive-streams",
+        "version": "1.0.4"
+      },
+      {
+        "group": "org.skyscreamer",
+        "name": "jsonassert",
+        "version": "1.5.3"
+      },
+      {
+        "group": "org.slf4j",
+        "name": "jul-to-slf4j",
+        "version": "2.0.20"
+      },
+      {
+        "group": "org.slf4j",
+        "name": "slf4j-api",
+        "version": "2.0.20"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-actuator",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-actuator-autoconfigure",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-autoconfigure",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-data-commons",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-flyway",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-health",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-http-client",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-http-converter",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jackson",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jdbc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-jooq",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-micrometer-metrics",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-micrometer-observation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-netty",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-persistence",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-restclient",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-resttestclient",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-security",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-security-oauth2-resource-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-security-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-servlet",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-sql",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-actuator",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-flyway",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jackson",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jackson-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jdbc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-jooq",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-logging",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-micrometer-metrics",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-restclient",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-security",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-security-oauth2-resource-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-security-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-tomcat",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-tomcat-runtime",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-validation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-webmvc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-webmvc-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-starter-websocket",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-test-autoconfigure",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-tomcat",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-transaction",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-validation",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-web-server",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-webmvc",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-webmvc-test",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-websocket",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-commons",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-keyvalue",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.data",
+        "name": "spring-data-redis",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-config",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-core",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-crypto",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-core",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-jose",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-oauth2-resource-server",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-test",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework.security",
+        "name": "spring-security-web",
+        "version": "7.1.2"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-aop",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-beans",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-context",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-context-support",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-core",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-expression",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-jdbc",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-messaging",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-oxm",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-test",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-tx",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-web",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-webmvc",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-websocket",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.xmlunit",
+        "name": "xmlunit-core",
+        "version": "2.11.0"
+      },
+      {
+        "group": "org.yaml",
+        "name": "snakeyaml",
+        "version": "2.6"
+      },
+      {
+        "group": "redis.clients.authentication",
+        "name": "redis-authx-core",
+        "version": "0.1.1-beta2"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "annotations",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "apache5-client",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "auth",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "aws-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "aws-json-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "checksums",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "checksums-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "cloudwatch",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "endpoints-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-aws",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-aws-eventstream",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-auth-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "http-client-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "identity-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "json-utils",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "metrics-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "netty-nio-client",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "profiles",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "protocol-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "regions",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "retries",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "retries-spi",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "sdk-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "smithy-rpcv2-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "third-party-jackson-core",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "third-party-jackson-dataformat-cbor",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "utils",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.awssdk",
+        "name": "utils-lite",
+        "version": "2.55.3"
+      },
+      {
+        "group": "software.amazon.eventstream",
+        "name": "eventstream",
+        "version": "1.0.1"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-core",
+        "version": "3.1.7"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-databind",
+        "version": "3.1.7"
+      }
+    ],
+    "jooqGenerator": [
+      {
+        "group": "io.r2dbc",
+        "name": "r2dbc-spi",
+        "version": "1.0.0.RELEASE"
+      },
+      {
+        "group": "jakarta.activation",
+        "name": "jakarta.activation-api",
+        "version": "2.1.4"
+      },
+      {
+        "group": "jakarta.xml.bind",
+        "name": "jakarta.xml.bind-api",
+        "version": "4.0.5"
+      },
+      {
+        "group": "org.checkerframework",
+        "name": "checker-qual",
+        "version": "3.55.1"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq",
+        "version": "3.21.9"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq-codegen",
+        "version": "3.21.9"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq-meta",
+        "version": "3.21.9"
+      },
+      {
+        "group": "org.postgresql",
+        "name": "postgresql",
+        "version": "42.7.14"
+      },
+      {
+        "group": "org.reactivestreams",
+        "name": "reactive-streams",
+        "version": "1.0.4"
+      }
+    ],
+    "buildscriptClasspath": [
+      {
+        "group": "com.fasterxml.jackson.core",
+        "name": "jackson-annotations",
+        "version": "2.21"
+      },
+      {
+        "group": "com.google.code.findbugs",
+        "name": "jsr305",
+        "version": "3.0.2"
+      },
+      {
+        "group": "com.sun.activation",
+        "name": "jakarta.activation",
+        "version": "2.0.1"
+      },
+      {
+        "group": "com.sun.istack",
+        "name": "istack-commons-runtime",
+        "version": "4.0.1"
+      },
+      {
+        "group": "commons-codec",
+        "name": "commons-codec",
+        "version": "1.17.1"
+      },
+      {
+        "group": "commons-io",
+        "name": "commons-io",
+        "version": "2.16.1"
+      },
+      {
+        "group": "commons-logging",
+        "name": "commons-logging",
+        "version": "1.3.5"
+      },
+      {
+        "group": "gradle.plugin.org.flywaydb",
+        "name": "gradle-plugin-publishing",
+        "version": "12.4.0"
+      },
+      {
+        "group": "io.r2dbc",
+        "name": "r2dbc-spi",
+        "version": "1.0.0.RELEASE"
+      },
+      {
+        "group": "io.spring.gradle",
+        "name": "dependency-management-plugin",
+        "version": "1.1.7"
+      },
+      {
+        "group": "jakarta.activation",
+        "name": "jakarta.activation-api",
+        "version": "2.1.0"
+      },
+      {
+        "group": "jakarta.xml.bind",
+        "name": "jakarta.xml.bind-api",
+        "version": "4.0.0"
+      },
+      {
+        "group": "net.java.dev.jna",
+        "name": "jna",
+        "version": "5.17.0"
+      },
+      {
+        "group": "net.java.dev.jna",
+        "name": "jna-platform",
+        "version": "5.17.0"
+      },
+      {
+        "group": "nu.studer",
+        "name": "gradle-jooq-plugin",
+        "version": "9.0"
+      },
+      {
+        "group": "org.antlr",
+        "name": "antlr4-runtime",
+        "version": "4.7.2"
+      },
+      {
+        "group": "org.apache.commons",
+        "name": "commons-compress",
+        "version": "1.27.1"
+      },
+      {
+        "group": "org.apache.commons",
+        "name": "commons-lang3",
+        "version": "3.16.0"
+      },
+      {
+        "group": "org.apache.httpcomponents.client5",
+        "name": "httpclient5",
+        "version": "5.6.5"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.apache.httpcomponents.core5",
+        "name": "httpcore5-h2",
+        "version": "5.4.4"
+      },
+      {
+        "group": "org.checkerframework",
+        "name": "checker-qual",
+        "version": "3.55.1"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-core",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.flywaydb",
+        "name": "flyway-database-postgresql",
+        "version": "12.4.0"
+      },
+      {
+        "group": "org.glassfish.jaxb",
+        "name": "jaxb-core",
+        "version": "3.0.2"
+      },
+      {
+        "group": "org.glassfish.jaxb",
+        "name": "jaxb-runtime",
+        "version": "3.0.2"
+      },
+      {
+        "group": "org.glassfish.jaxb",
+        "name": "txw2",
+        "version": "3.0.2"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq",
+        "version": "3.19.1"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq-codegen",
+        "version": "3.19.1"
+      },
+      {
+        "group": "org.jooq",
+        "name": "jooq-meta",
+        "version": "3.19.1"
+      },
+      {
+        "group": "org.jspecify",
+        "name": "jspecify",
+        "version": "1.0.1"
+      },
+      {
+        "group": "org.postgresql",
+        "name": "postgresql",
+        "version": "42.7.14"
+      },
+      {
+        "group": "org.reactivestreams",
+        "name": "reactive-streams",
+        "version": "1.0.3"
+      },
+      {
+        "group": "org.slf4j",
+        "name": "slf4j-api",
+        "version": "1.7.36"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-buildpack-platform",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-gradle-plugin",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework.boot",
+        "name": "spring-boot-loader-tools",
+        "version": "4.1.2"
+      },
+      {
+        "group": "org.springframework",
+        "name": "spring-core",
+        "version": "7.0.10"
+      },
+      {
+        "group": "org.tomlj",
+        "name": "tomlj",
+        "version": "1.0.0"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-core",
+        "version": "3.1.7"
+      },
+      {
+        "group": "tools.jackson.core",
+        "name": "jackson-databind",
+        "version": "3.1.7"
+      }
+    ]
+  },
+  "image": {
+    "local_tag": "slash-personal-api:m2-20261029-boot412",
+    "manifest_digest": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+    "config_digest": "sha256:cc99492a1aa513fb5363da4c4b60cd058986e53b942ade323f34596c3a70cc41",
+    "platform": "linux/amd64",
+    "runtime_user": "slash",
+    "size_bytes": 132765050,
+    "build_input_manifest_sha256": "3498489c2ec8c562bdc5b78d25619ef1bbe1d0d91a3eacfc39815ac121a47035",
+    "build_inputs_match_worktree": true,
+    "ecr_published": false
+  },
+  "scan": {
+    "tool": "Trivy 0.76.1",
+    "scanner_image": "aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c",
+    "baseline": [
+      {
+        "type": "alpine",
+        "packages": 73,
+        "findings": {}
+      },
+      {
+        "type": "jar",
+        "packages": 123,
+        "findings": {
+          "MEDIUM": 2,
+          "CRITICAL": 2
+        }
+      }
+    ],
+    "candidate": [
+      {
+        "type": "alpine",
+        "packages": 73,
+        "findings": {}
+      },
+      {
+        "type": "jar",
+        "packages": 151,
+        "findings": {}
+      }
+    ],
+    "no_longer_detected": [
+      {
+        "cve": "CVE-2026-64607",
+        "package": "org.apache.httpcomponents.client5:httpclient5",
+        "before_version": "5.5.2",
+        "severity": "MEDIUM"
+      },
+      {
+        "cve": "CVE-2026-49844",
+        "package": "org.apache.logging.log4j:log4j-api",
+        "before_version": "2.24.3",
+        "severity": "MEDIUM"
+      },
+      {
+        "cve": "CVE-2026-47884",
+        "package": "org.springframework:spring-webmvc",
+        "before_version": "6.2.19",
+        "severity": "CRITICAL"
+      },
+      {
+        "cve": "CVE-2026-47890",
+        "package": "org.springframework:spring-webmvc",
+        "before_version": "6.2.19",
+        "severity": "CRITICAL"
+      }
+    ],
+    "raw_report_sha256": "791ca3c96d7c711fc273c51d73ec24769f9f374b8336760f8bab0ec5b218e7cd",
+    "vulnerability_db": {
+      "Version": 2,
+      "NextUpdate": "2026-10-29T19:18:03.419608078Z",
+      "UpdatedAt": "2026-10-28T19:18:03.419608319Z",
+      "DownloadedAt": "2026-10-28T23:46:17.411572217Z"
+    },
+    "java_db": {
+      "Version": 1,
+      "NextUpdate": "2026-10-31T01:07:04.331012865Z",
+      "UpdatedAt": "2026-10-28T01:07:04.331013306Z",
+      "DownloadedAt": "2026-10-28T23:49:58.302301542Z"
+    },
+    "same_database_as_baseline": true,
+    "offline": true,
+    "scanner_network": "none",
+    "suppressions_added": false,
+    "scope": "Runtime image OS and Java; not build-tool vulnerability clearance"
+  },
+  "runtime_smoke": {
+    "started_at": "2026-10-29T01:20:17.262892+00:00",
+    "actual_cognito_verified": false,
+    "aws_calls": false,
+    "server_creation_in_aws": false,
+    "image": "slash-personal-api:m2-20261029-boot412",
+    "expected_manifest_digest": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+    "checks": [
+      {
+        "name": "image_identity_and_architecture",
+        "passed": true
+      },
+      {
+        "name": "network_is_internal",
+        "passed": true
+      },
+      {
+        "name": "anchor_has_no_host_ports",
+        "passed": true
+      },
+      {
+        "name": "non_root_runtime",
+        "passed": true,
+        "uid": 100
+      },
+      {
+        "name": "read_only_root_filesystem",
+        "passed": true
+      },
+      {
+        "name": "no_host_ports",
+        "passed": true
+      },
+      {
+        "name": "no_aws_credentials_mounted_or_injected",
+        "passed": true
+      },
+      {
+        "name": "personal_image_liveness",
+        "passed": true
+      },
+      {
+        "name": "signed_local_jwt_me_200",
+        "passed": true
+      },
+      {
+        "name": "local_userinfo_profile_loaded",
+        "passed": true
+      },
+      {
+        "name": "repeat_me_same_user",
+        "passed": true
+      },
+      {
+        "name": "normal_response_security_headers",
+        "passed": true
+      },
+      {
+        "name": "missing_jwt_401",
+        "passed": true
+      },
+      {
+        "name": "invalid_signature_401",
+        "passed": true
+      },
+      {
+        "name": "authenticated_missing_route_404",
+        "passed": true
+      },
+      {
+        "name": "public_metrics_unauthenticated_401",
+        "passed": true
+      },
+      {
+        "name": "public_metrics_authenticated_404",
+        "passed": true
+      },
+      {
+        "name": "forwarded_port_does_not_expose_metrics",
+        "passed": true
+      },
+      {
+        "name": "internal_prometheus_200",
+        "passed": true
+      },
+      {
+        "name": "management_business_route_403",
+        "passed": true
+      },
+      {
+        "name": "me_response_ids_present_and_unique",
+        "passed": true
+      },
+      {
+        "name": "websocket_ticket_201",
+        "passed": true
+      },
+      {
+        "name": "actual_websocket_101_and_connected",
+        "passed": true
+      },
+      {
+        "name": "reused_ticket_closed_4401",
+        "passed": true,
+        "close_code": 4401
+      },
+      {
+        "name": "exactly_one_fixture_user_in_new_database",
+        "passed": true
+      },
+      {
+        "name": "each_me_response_matches_one_timing_record",
+        "passed": true,
+        "records": 4
+      },
+      {
+        "name": "timing_records_contain_no_token_profile_or_password",
+        "passed": true
+      },
+      {
+        "name": "fixture_key_and_token_files_removed",
+        "passed": true
+      }
+    ],
+    "observed_image_id": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+    "postgresql_server_version_num": 180006,
+    "database": "new isolated slash_runtime_boot4; PostgreSQL 18 port 5433; existing slash_boot4 and slash_legacy left unchanged",
+    "observer_summary": {
+      "passed": 17,
+      "total": 17,
+      "failed_names": []
+    },
+    "timing_records": [
+      {
+        "event": "personal_request_timing",
+        "timestamp": "2026-10-29T01:20:36.228464469Z",
+        "route": "/api/v1/me",
+        "clientProbeId": "bf36ac5e-5de2-4b30-b2b0-3b385eccfb36",
+        "appRequestId": "5d5de947-b51e-479a-a92d-7db6d8c86ca9",
+        "gatewayRequestId": "Synthetic_1234=",
+        "status": 200,
+        "durationMs": 826.449667
+      },
+      {
+        "event": "personal_request_timing",
+        "timestamp": "2026-10-29T01:20:36.291574469Z",
+        "route": "/api/v1/me",
+        "clientProbeId": "ee12f4f0-40d7-43be-99be-4cc2d289413a",
+        "appRequestId": "7ef2916c-5429-4bec-9dfc-fcfbe219844a",
+        "gatewayRequestId": "Synthetic_1234=",
+        "status": 200,
+        "durationMs": 31.662833
+      },
+      {
+        "event": "personal_request_timing",
+        "timestamp": "2026-10-29T01:20:36.346130053Z",
+        "route": "/api/v1/me",
+        "clientProbeId": "bac1fa4c-70f1-4f91-a954-454248a97efc",
+        "appRequestId": "b5d9b8a7-b84c-479c-9425-2cb5eaa4ea56",
+        "gatewayRequestId": "Synthetic_1234=",
+        "status": 401,
+        "durationMs": 47.607917
+      },
+      {
+        "event": "personal_request_timing",
+        "timestamp": "2026-10-29T01:20:36.358084219Z",
+        "route": "/api/v1/me",
+        "clientProbeId": "7123dc09-1de0-47a8-a62e-3193ca40fe91",
+        "appRequestId": "114f396e-5062-4149-841a-be136112a0f2",
+        "gatewayRequestId": "Synthetic_1234=",
+        "status": 401,
+        "durationMs": 9.774334
+      }
+    ],
+    "owned_containers_removed": true,
+    "finished_at": "2026-10-29T01:20:36.998273+00:00",
+    "passed": 28,
+    "total": 28,
+    "failed_names": []
+  },
+  "cleanup": {
+    "checked_at_utc": "2026-10-29T01:22:48.133020+00:00",
+    "owned_containers_remaining": 0,
+    "owned_network_removed": true,
+    "temporary_db_storage": "tmpfs removed",
+    "developer_db_data_modified": false,
+    "aws_calls": false
+  },
+  "boundaries": {
+    "lambdaops_repository_modified": false,
+    "notion_modified": false,
+    "cognito_configuration_modified": false,
+    "actual_cognito_verified": false,
+    "aws_control_plane_calls": false,
+    "terraform_apply": false,
+    "aws_servers_created": false,
+    "fault_or_load_test_in_aws": false,
+    "deployment_image_selection_promoted": false,
+    "existing_developer_database_modified": false
+  },
+  "release_status": "Local Boot4 candidate functional and runtime-image scan checks passed; actual Cognito/AWS validation and deployment selection still pending",
+  "remaining_separate_items": [
+    "DB fault-tool historical High4 not rescanned or resolved",
+    "Past AWS2.05s request root cause still unverified",
+    "Original PostgreSQL16 data migration not performed",
+    "Build-plugin/codegen classpath not included in image vulnerability scan"
+  ],
+  "sources": [
+    "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide",
+    "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.1-Release-Notes",
+    "https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html",
+    "https://www.jooq.org/download/support-matrix"
+  ],
+  "independent_review": {
+    "reviewed_at_utc": "2026-10-29T01:26:45.191959+00:00",
+    "reviewer": "independent_security_review_agent",
+    "status": "PASS_WITH_SCOPE_LIMITATIONS",
+    "blocking_findings": [],
+    "scope": "Independent read-only verification of existing local build, image archive, scan, dependency inventory, test XML and runtime-smoke evidence. No builds, scans, Docker/AWS actions, source/docs changes or Git changes were performed by this review. Only this temporary JSON report was written.",
+    "image_identity": {
+      "manifest_digest": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+      "config_digest": "sha256:cc99492a1aa513fb5363da4c4b60cd058986e53b942ade323f34596c3a70cc41",
+      "archive_manifest_hash_verified": true,
+      "archive_config_hash_verified": true,
+      "archive_layer_hashes_verified": true,
+      "archive_layer_count": 13,
+      "scanner_config_matches": true,
+      "build_config_matches": true,
+      "runtime_manifest_matches": true,
+      "architecture": "amd64",
+      "os": "linux",
+      "user": "slash",
+      "entrypoint": [
+        "java",
+        "-XX:MaxRAMPercentage=75.0",
+        "org.springframework.boot.loader.launch.JarLauncher"
+      ]
+    },
+    "scanner_comparison": {
+      "before_version": "0.76.1",
+      "after_version": "0.76.1",
+      "same_version_verified": true,
+      "before_created_at": "2026-10-29T00:32:08.119237221Z",
+      "after_created_at": "2026-10-29T01:20:21.849120671Z",
+      "cache_database_metadata": {
+        "db/metadata.json": {
+          "Version": 2,
+          "NextUpdate": "2026-10-29T19:18:03.419608078Z",
+          "UpdatedAt": "2026-10-28T19:18:03.419608319Z",
+          "DownloadedAt": "2026-10-28T23:46:17.411572217Z"
+        },
+        "java-db/metadata.json": {
+          "Version": 1,
+          "NextUpdate": "2026-10-31T01:07:04.331012865Z",
+          "UpdatedAt": "2026-10-28T01:07:04.331013306Z",
+          "DownloadedAt": "2026-10-28T23:49:58.302301542Z"
+        }
+      },
+      "cache_metadata_matches_prior_review": true,
+      "metadata_hashes": {
+        "db/metadata.json": "8dfd0cd7c66ef011746e47bc3a246cf06c12c0743adee8924b1badf5fbe69f68",
+        "java-db/metadata.json": "f36037bd55d801efccd9b56c9e5ec8a2157fc74f212b321a67c370bf36ed114d"
+      },
+      "execution_options": "Parent executor reports same cache, offline/skip database updates, and no ignore/suppression. Report JSON and scan.log do not independently encode the complete invocation; reviewer did not re-run scanning.",
+      "comparison_limit": "Controlled comparison against the same recorded database snapshot, not a scan using a newly refreshed database."
+    },
+    "before": {
+      "package_findings": 4,
+      "unique_cves": 4,
+      "affected_packages": 3,
+      "severity": {
+        "CRITICAL": 2,
+        "HIGH": 0,
+        "MEDIUM": 2,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "inventory": [
+        {
+          "class": "os-pkgs",
+          "type": "alpine",
+          "detected_packages": 73,
+          "findings": 0
+        },
+        {
+          "class": "lang-pkgs",
+          "type": "jar",
+          "detected_packages": 123,
+          "findings": 4
+        }
+      ]
+    },
+    "after": {
+      "package_findings": 0,
+      "unique_cves": 0,
+      "affected_packages": 0,
+      "severity": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "inventory": [
+        {
+          "class": "os-pkgs",
+          "type": "alpine",
+          "detected_packages": 73,
+          "findings": 0
+        },
+        {
+          "class": "lang-pkgs",
+          "type": "jar",
+          "detected_packages": 151,
+          "findings": 0
+        }
+      ]
+    },
+    "previous_four_findings": [
+      {
+        "cve": "CVE-2026-64607",
+        "package": "org.apache.httpcomponents.client5:httpclient5",
+        "previous_version": "5.5.2",
+        "previous_severity": "MEDIUM",
+        "previous_scanner_fix_versions": "5.6.3",
+        "candidate_image_version": "5.6.5",
+        "candidate_dependency_inventory_version": "5.6.5",
+        "image_and_dependency_versions_match": true,
+        "finding_present_in_candidate": false,
+        "vendor_reference": "https://hc.apache.org/news.html"
+      },
+      {
+        "cve": "CVE-2026-49844",
+        "package": "org.apache.logging.log4j:log4j-api",
+        "previous_version": "2.24.3",
+        "previous_severity": "MEDIUM",
+        "previous_scanner_fix_versions": "2.25.5, 2.26.1",
+        "candidate_image_version": "2.25.5",
+        "candidate_dependency_inventory_version": "2.25.5",
+        "image_and_dependency_versions_match": true,
+        "finding_present_in_candidate": false,
+        "vendor_reference": "https://logging.apache.org/security.html#CVE-2026-49844"
+      },
+      {
+        "cve": "CVE-2026-47884",
+        "package": "org.springframework:spring-webmvc",
+        "previous_version": "6.2.19",
+        "previous_severity": "CRITICAL",
+        "previous_scanner_fix_versions": "7.0.9",
+        "candidate_image_version": "7.0.10",
+        "candidate_dependency_inventory_version": "7.0.10",
+        "image_and_dependency_versions_match": true,
+        "finding_present_in_candidate": false,
+        "vendor_reference": "https://spring.io/security/cve-2026-47884/"
+      },
+      {
+        "cve": "CVE-2026-47890",
+        "package": "org.springframework:spring-webmvc",
+        "previous_version": "6.2.19",
+        "previous_severity": "CRITICAL",
+        "previous_scanner_fix_versions": "7.0.9",
+        "candidate_image_version": "7.0.10",
+        "candidate_dependency_inventory_version": "7.0.10",
+        "image_and_dependency_versions_match": true,
+        "finding_present_in_candidate": false,
+        "vendor_reference": "https://spring.io/security/cve-2026-47890/"
+      }
+    ],
+    "comparison": {
+      "removed_package_findings": 4,
+      "previous_unique_cves_no_longer_detected": [
+        "CVE-2026-47884",
+        "CVE-2026-47890",
+        "CVE-2026-49844",
+        "CVE-2026-64607"
+      ],
+      "new_unique_cves": [],
+      "meaning": "The four previously reported vulnerabilities are not detected in the newly built image, and corresponding packages are upgraded. This is not proof that all possible security vulnerabilities are absent."
+    },
+    "dependency_verification": {
+      "key_runtime_versions": {
+        "org.springframework.boot:spring-boot": {
+          "image": "4.1.2",
+          "gradle": "4.1.2",
+          "matches": true
+        },
+        "org.springframework:spring-webmvc": {
+          "image": "7.0.10",
+          "gradle": "7.0.10",
+          "matches": true
+        },
+        "org.springframework.security:spring-security-core": {
+          "image": "7.1.2",
+          "gradle": "7.1.2",
+          "matches": true
+        },
+        "org.apache.tomcat.embed:tomcat-embed-core": {
+          "image": "11.0.27",
+          "gradle": "11.0.27",
+          "matches": true
+        },
+        "tools.jackson.core:jackson-databind": {
+          "image": "3.1.7",
+          "gradle": "3.1.7",
+          "matches": true
+        },
+        "org.jooq:jooq": {
+          "image": "3.21.9",
+          "gradle": "3.21.9",
+          "matches": true
+        },
+        "org.flywaydb:flyway-core": {
+          "image": "12.4.0",
+          "gradle": "12.4.0",
+          "matches": true
+        },
+        "org.postgresql:postgresql": {
+          "image": "42.7.14",
+          "gradle": "42.7.14",
+          "matches": true
+        },
+        "org.apache.httpcomponents.client5:httpclient5": {
+          "image": "5.6.5",
+          "gradle": "5.6.5",
+          "matches": true
+        },
+        "org.apache.logging.log4j:log4j-api": {
+          "image": "2.25.5",
+          "gradle": "2.25.5",
+          "matches": true
+        }
+      },
+      "gradle_runtime_modules": 163,
+      "scanner_detected_java_packages": 151,
+      "common_names": 146,
+      "common_name_version_mismatches": [],
+      "scanner_only_packages": [
+        {
+          "name": "com.github.stephenc.jcip:jcip-annotations",
+          "version": "1.0-1"
+        },
+        {
+          "name": "com.google.code.gson:gson",
+          "version": "2.13.1"
+        },
+        {
+          "name": "org.jctools:jctools-core",
+          "version": "4.0.7"
+        },
+        {
+          "name": "org.jctools:jctools-core-jdk11",
+          "version": "4.0.7"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-jarmode-tools",
+          "version": "4.1.2"
+        }
+      ],
+      "gradle_only_packages": [
+        {
+          "name": "org.springframework.boot:spring-boot-starter",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-actuator",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-data-redis",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-flyway",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-jackson",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-jdbc",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-jooq",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-logging",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-micrometer-metrics",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-restclient",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-security",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-tomcat",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-tomcat-runtime",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-validation",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-webmvc",
+          "version": "4.1.2"
+        },
+        {
+          "name": "org.springframework.boot:spring-boot-starter-websocket",
+          "version": "4.1.2"
+        }
+      ],
+      "inventory_count_note": "Gradle module coordinates and scanner package discovery are different inventories. All 17 Gradle-only coordinates are starter modules; five additional scanner-detected entries include jar mode tools and embedded packages. Counts must not be presented as identical coverage.",
+      "build_test_codegen_classpaths": "Their inventory is available, but image runtime vulnerability scanning does not certify separate build/test/code-generation classpath security."
+    },
+    "tests": {
+      "pg16": {
+        "xml_files": 75,
+        "testcases_independently_counted": 569,
+        "tests": 569,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "summary_json_matches_xml": true,
+        "sorted_xml_sha256_index_hash": "de0bfb7d343aeedce0fa81c64567e990854a780c674cad485144bc3f92bfce9d"
+      },
+      "pg18": {
+        "xml_files": 75,
+        "testcases_independently_counted": 569,
+        "tests": 569,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "summary_json_matches_xml": true,
+        "sorted_xml_sha256_index_hash": "e861c0f382964dcb944ea0fbbbed8b7cb75cb240a6677c969fb77f2d45d9fd96"
+      }
+    },
+    "runtime_smoke": {
+      "passed": 28,
+      "total": 28,
+      "failed_names": [],
+      "postgresql_server_version_num": 180006,
+      "image_identity_verified": true,
+      "entrypoint": [
+        "java",
+        "-XX:MaxRAMPercentage=75.0",
+        "org.springframework.boot.loader.launch.JarLauncher"
+      ],
+      "actual_cognito_verified": false,
+      "aws_calls": false,
+      "server_creation_in_aws": false,
+      "owned_smoke_containers_removed": true,
+      "observer_is_subset_not_extra_test_total": true
+    },
+    "source_identity": {
+      "recorded_file_count": 301,
+      "matching_current_file_count": 300,
+      "changed_since_image_snapshot": [
+        "apps/api/README.md"
+      ],
+      "note": "Only API README differs from the image source snapshot; runtime source/build/generated/test inputs remain matched."
+    },
+    "completion_limits": [
+      "Zero findings applies to the recorded image, Trivy version, database snapshot, and detected packages; it is not a general security certification.",
+      "Local runtime checks use a synthetic JWT issuer; actual Cognito login, AWS deployment and AWS incident scenarios were not verified.",
+      "PG16 test success is compatibility evidence only and does not change the jOOQ OSS 3.21 PostgreSQL 18 support boundary. A separate disposable PostgreSQL 18 environment was tested.",
+      "No ECR publication, GitHub CI result, production deployment approval or existing user database migration is established by this review."
+    ],
+    "evidence_sha256": {
+      "candidate_scan_report": "791ca3c96d7c711fc273c51d73ec24769f9f374b8336760f8bab0ec5b218e7cd",
+      "previous_patch_scan_report": "2a98c18b7468855bc59949c8154a56da04d807967252371312682e96366f3ddf",
+      "candidate_build_metadata": "7ecf5098a2d1401b64af1254a793cc7ebf1eda0f0b09c76e4c0f8b26e80dd8fe",
+      "postgres16_test_summary": "e067fc9276bcb48e48971dfaee2485d3895df8e9d67c561ebc109a68286834bf",
+      "postgres18_test_summary": "e067fc9276bcb48e48971dfaee2485d3895df8e9d67c561ebc109a68286834bf",
+      "candidate_runtime_smoke": "f1f1a1aceb35b1b8921d1907f191aa8e157695b059cb0d00ccb77be451891aae",
+      "gradle_dependency_inventory": "b7d8658231faa0fd0a798bbaa5950fb51621fb780fc5f887a30007fd11504a38",
+      "candidate_source_hash_inventory": "d88851987bd870135c851eaa02a1dd72c077e0097a0c7071520caef69faa5439"
+    }
+  }
+}

@@ -2,7 +2,7 @@ package com.likelion.slash;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.common.response.ApiResponse;
 import java.time.OffsetDateTime;
 import org.jooq.DSLContext;

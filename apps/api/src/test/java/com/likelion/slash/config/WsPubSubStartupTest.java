@@ -7,6 +7,7 @@ import com.likelion.slash.health.dto.DependencyHealthResponse.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
@@ -23,6 +24,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 class WsPubSubStartupTest {
 
     @Autowired
+    @Qualifier("wsMessageListenerContainer")
     private RedisMessageListenerContainer container;
 
     @Autowired

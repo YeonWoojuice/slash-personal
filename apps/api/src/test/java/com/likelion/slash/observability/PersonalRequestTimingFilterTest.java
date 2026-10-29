@@ -3,7 +3,7 @@ package com.likelion.slash.observability;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.ServletException;
 import java.time.Clock;
@@ -55,9 +55,9 @@ class PersonalRequestTimingFilterTest {
         assertThat(event.appRequestId()).isNotEqualTo(PROBE);
         assertThat(event.status()).isEqualTo(200);
         assertThat(event.durationMs()).isEqualTo(25.0);
-        var json = new ObjectMapper().writeValueAsString(event);
+        var json = JsonMapper.builder().configureForJackson2().build().writeValueAsString(event);
         assertThat(json).doesNotContain("private-token", "private@example", "private-body", "198.51.100.17");
-        assertThat(new ObjectMapper().readTree(json).properties()).hasSize(8);
+        assertThat(JsonMapper.builder().configureForJackson2().build().readTree(json).properties()).hasSize(8);
         assertThat(event.timestamp()).isEqualTo("2026-10-29T00:00:00Z");
     }
 
@@ -90,7 +90,9 @@ class PersonalRequestTimingFilterTest {
         assertThat(events).hasSize(1);
         assertThat(events.getFirst().status()).isNull();
         assertThat(events.getFirst().durationMs()).isEqualTo(25.0);
-        var mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        var mapper = JsonMapper.builder().configureForJackson2()
+                .changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .build();
         String serialized = mapper.writeValueAsString(events.getFirst());
         assertThat(serialized).doesNotContain("private failure detail");
         assertThat(mapper.readTree(serialized).get("status").isNull()).isTrue();

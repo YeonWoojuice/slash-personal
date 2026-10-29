@@ -1,7 +1,7 @@
 package com.likelion.slash.task.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

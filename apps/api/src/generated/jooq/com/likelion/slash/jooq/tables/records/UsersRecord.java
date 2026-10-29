@@ -193,6 +193,6 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
         setTimezone(timezone);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -212,6 +212,6 @@ public class OutboxEventsRecord extends UpdatableRecordImpl<OutboxEventsRecord> 
         setAvailableAt(availableAt);
         setPublishedAt(publishedAt);
         setCreatedAt(createdAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

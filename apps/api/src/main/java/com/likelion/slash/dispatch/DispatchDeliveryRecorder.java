@@ -1,6 +1,6 @@
 package com.likelion.slash.dispatch;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;

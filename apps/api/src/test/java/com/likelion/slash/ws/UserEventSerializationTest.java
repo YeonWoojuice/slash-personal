@@ -2,8 +2,8 @@ package com.likelion.slash.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.common.enums.TaskStatus;
 import com.likelion.slash.ws.dto.ConnectedEvent;
 import com.likelion.slash.ws.dto.TaskResultAvailableEvent;

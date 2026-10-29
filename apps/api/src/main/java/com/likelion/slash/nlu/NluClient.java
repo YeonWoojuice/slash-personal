@@ -1,6 +1,6 @@
 package com.likelion.slash.nlu;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.error.ErrorCode;
 import com.likelion.slash.common.error.SlashException;
 import com.likelion.slash.nlu.dto.NluAnalyzeRequest;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -47,7 +47,7 @@ public class NluClient {
     private static final Duration CONNECT_TIMEOUT = Duration.ofMillis(500);
 
     private final RestClient restClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     /**
      * @param objectMapper 애플리케이션 Mapper 를 <b>명시적으로</b> 넣는다. 기본 변환기에 맡기면
@@ -55,7 +55,7 @@ public class NluClient {
      *                     걸린다. 계약이 요구하는 모양을 우연에 기대지 않는다.
      */
     public NluClient(RestClient.Builder builder,
-                     ObjectMapper objectMapper,
+                     JsonMapper objectMapper,
                      @Value("${slash.nlu.base-url}") String baseUrl,
                      @Value("${slash.nlu.timeout}") Duration timeout) {
 
@@ -68,8 +68,8 @@ public class NluClient {
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
                 .messageConverters(converters -> {
-                    converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
-                    converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+                    converters.removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
+                    converters.add(new JacksonJsonHttpMessageConverter(objectMapper));
                 })
                 .build();
     }

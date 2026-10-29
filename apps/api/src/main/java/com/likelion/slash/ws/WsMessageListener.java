@@ -1,6 +1,6 @@
 package com.likelion.slash.ws;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.dispatch.DispatchDeliveryRecorder;
 import com.likelion.slash.ws.dto.WsEnvelope;
 import java.nio.charset.StandardCharsets;

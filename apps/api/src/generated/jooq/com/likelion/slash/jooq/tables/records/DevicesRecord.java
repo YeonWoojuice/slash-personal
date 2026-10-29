@@ -345,6 +345,6 @@ public class DevicesRecord extends UpdatableRecordImpl<DevicesRecord> {
         setDeviceTokenHash(deviceTokenHash);
         setDeviceTokenExpiresAt(deviceTokenExpiresAt);
         setAcceptingTasks(acceptingTasks);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

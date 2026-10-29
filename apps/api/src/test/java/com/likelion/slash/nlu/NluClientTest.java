@@ -3,11 +3,9 @@ package com.likelion.slash.nlu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.SlashTime;
 import com.likelion.slash.common.error.ErrorCode;
 import com.likelion.slash.common.error.SlashException;
@@ -59,9 +57,9 @@ class NluClientTest {
      * <p>시각을 ISO 문자열로, 기준 시간대를 한국 시각으로 둔다. 이 설정이 아니면 {@code now} 가
      * epoch 숫자로 나가고 slash-nlu 가 400 으로 거부한다.
      */
-    private final ObjectMapper objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    private final JsonMapper objectMapper = JsonMapper.builder()
+            .configureForJackson2()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .defaultTimeZone(TimeZone.getTimeZone(SlashTime.ZONE))
             .build();
 

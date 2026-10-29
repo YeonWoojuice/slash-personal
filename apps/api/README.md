@@ -19,16 +19,27 @@ Slash(/)는 자연어 질문과 `/` 슬래시 명령어를 한 입력창에서 �
 
 ### 로컬 실행
 
+Boot 4.1의 jOOQ 3.21 OSS에 맞춰 **새 PostgreSQL 18 환경**을 사용한다. 기존 `docker-compose.yml`의 PostgreSQL 16 볼륨은 보존한다. 아래 구성은 별도 이름·포트·볼륨으로 시작하며 기존 데이터를 자동으로 옮기지 않는다. [jOOQ 지원 범위](https://www.jooq.org/download/support-matrix)
+
 ```bash
-# 1. 로컬 DB 기동 (PostgreSQL 16, Valkey 8)
-docker compose up -d
+# 1. 새 로컬 DB 기동 (PostgreSQL 18, Valkey 8)
+docker compose -f docker-compose.boot4.yml up -d --wait
 
-# 2. 마이그레이션 적용 + jOOQ 코드 생성
-./gradlew generateJooq
+# 2. 앱과 테스트를 새 DB·캐시에 연결
+export SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:15432/slash
+export SPRING_DATASOURCE_USERNAME=slash
+export SPRING_DATASOURCE_PASSWORD=slash
+export SPRING_DATA_REDIS_HOST=127.0.0.1
+export SPRING_DATA_REDIS_PORT=16379
 
-# 3. 애플리케이션 실행
+# 3. 마이그레이션 적용 + jOOQ 코드 생성 (Gradle DB 설정은 별도로 지정)
+./gradlew generateJooq -Pdb.url=jdbc:postgresql://127.0.0.1:15432/slash
+
+# 4. 애플리케이션 실행
 ./gradlew bootRun
 ```
+
+테스트도 위 연결 환경에서 `JAVA_TOOL_OPTIONS=-Dspring.test.context.cache.maxSize=4 ./gradlew --max-workers=2 test`로 실행한다. 종료할 때는 `docker compose -f docker-compose.boot4.yml down`을 사용한다. 새 DB 데이터는 유지된다. 기존 PostgreSQL 16 데이터를 이전하는 작업은 별도로 검토한다. 위 구성의 비밀번호는 로컬 시험용 값이며 실제 서비스 자격 증명과 분리한다.
 
 ### 로컬 인증
 
@@ -61,7 +72,7 @@ IDE 에서 실행한다면 `.env` 가 아니라 실행 구성의 환경 변수�
    - 파일명 `V{번호}__{설명}.sql`
    - 번호는 서비스 백엔드 담당자가 배정한다
    - **이미 공유된 마이그레이션은 수정하지 않고 새 번호를 추가한다**
-2. `./gradlew generateJooq` 로 적용·재생성한다.
+2. 위 로컬 실행의 DB 주소를 지정한 `generateJooq`로 적용·재생성한다.
 3. 생성 코드(`src/generated`)와 쿼리 시험을 **함께** 커밋한다.
 
 ### 디렉터리 구조
@@ -95,7 +106,7 @@ SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
 
 ### 환경 변수
 
-`local` 은 값이 모두 기본 설정되어 있어 별도 주입이 필요 없다.
+Boot 4 로컬 실행은 위 `SPRING_DATASOURCE_*`·`SPRING_DATA_REDIS_*`를 주입해 별도 PostgreSQL 18·Valkey에 연결한다. 환경 변수를 생략하면 이전 개발 환경의 기본 포트로 연결되므로 두 구성을 혼용하지 않는다.
 `dev`·`demo` 는 아래 값을 Secrets Manager 에서 주입한다.
 
 | 변수 | 설명 |

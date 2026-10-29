@@ -193,6 +193,6 @@ public class TaskEventsRecord extends UpdatableRecordImpl<TaskEventsRecord> {
         setReasonCode(reasonCode);
         setMessage(message);
         setOccurredAt(occurredAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

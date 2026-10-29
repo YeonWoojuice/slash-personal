@@ -1,7 +1,7 @@
 package com.likelion.slash.ws;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.ws.dto.ConnectedEvent;
 import com.likelion.slash.ws.dto.PongEvent;
 import java.io.IOException;

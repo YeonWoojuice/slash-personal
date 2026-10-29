@@ -192,6 +192,6 @@ public class IdempotencyRecordsRecord extends UpdatableRecordImpl<IdempotencyRec
         setResponseStatus(responseStatus);
         setExpiresAt(expiresAt);
         setCreatedAt(createdAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

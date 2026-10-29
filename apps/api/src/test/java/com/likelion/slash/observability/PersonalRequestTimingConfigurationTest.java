@@ -2,10 +2,11 @@ package com.likelion.slash.observability;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.core.env.StandardEnvironment;
@@ -14,7 +15,7 @@ import org.springframework.core.env.SystemEnvironmentPropertySource;
 class PersonalRequestTimingConfigurationTest {
     private final ApplicationContextRunner context = new ApplicationContextRunner()
             .withUserConfiguration(PersonalRequestTimingConfiguration.class)
-            .withBean(ObjectMapper.class, ObjectMapper::new);
+            .withBean(ObjectMapper.class, () -> JsonMapper.builder().configureForJackson2().build());
 
     @Test void remainsOffWithoutExplicitEnablement() {
         context.withPropertyValues("spring.profiles.active=personal").run(c ->
@@ -31,7 +32,7 @@ class PersonalRequestTimingConfigurationTest {
                 .run(c -> {
                     assertThat(c).hasSingleBean(FilterRegistrationBean.class);
                     var registration = c.getBean(FilterRegistrationBean.class);
-                    assertThat(registration.getOrder()).isEqualTo(SecurityProperties.DEFAULT_FILTER_ORDER - 1);
+                    assertThat(registration.getOrder()).isEqualTo(SecurityFilterProperties.DEFAULT_FILTER_ORDER - 1);
                     assertThat(registration.getUrlPatterns()).containsExactly("/api/v1/me");
                     // The filter is deliberately not also a separately auto-registered bean.
                     assertThat(c).doesNotHaveBean(PersonalRequestTimingFilter.class);

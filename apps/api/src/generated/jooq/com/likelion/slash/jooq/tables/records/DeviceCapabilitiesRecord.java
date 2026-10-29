@@ -112,6 +112,6 @@ public class DeviceCapabilitiesRecord extends UpdatableRecordImpl<DeviceCapabili
         setTaskType(taskType);
         setAvailable(available);
         setReportedAt(reportedAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -297,6 +297,28 @@ Trivy는 공개 취약점 DB를 먼저 받은 뒤 애플리케이션 이미지�
 
 Medium은 HttpClient 5.5.2와 Log4j API 2.24.3 각 1건이며 별도 보완 항목으로 유지한다. DB 장애 도구의 기존 High 4건도 이번 API 보완과 별개다. [변경 전후·의존성·검사 근거](../../docs/observability/results/2026-10-29-java-security-remediation.json)를 연결한다. 새 이미지는 로컬 검증 후보로 보관하며 ECR 추가 게시·선택 이미지 승격·Terraform apply·AWS 서버 생성·실제 부하 및 장애 시험은 하지 않았다. 새 이미지의 실제 Cognito 검증과 AWS 지연 원인은 여전히 미검증이며 M2·M3는 In Progress다.
 
+### Boot 4.1 전환 — 로컬 후보 검증
+
+사용자가 승인한 큰 버전 전환은 별도 `codex/slash-boot4` 작업 폴더에서 진행했다. 위 기존 계열 보완 결과는 당시 기록이며, 최신 로컬 후보는 `slash-personal-api:m2-20261029-boot412`다. LambdaOps 저장소의 조회 UI·Cognito·CORS·시험 Incident·영상 작업은 이 변경에 포함하지 않는다.
+
+| 구성 | 이전 → 현재 후보 | 검증 내용 |
+| --- | --- | --- |
+| Boot / Framework / Security | 3.5.16 / 6.2.19 / 6.5.11 → 4.1.2 / 7.0.10 / 7.1.2 | 기술별 모듈·테스트 패키지·보안 필터 순서 연결 |
+| Tomcat / Jackson | 10.1.61 / 2.21.7 → 11.0.27 / 3.1.7 | HTTP·WebSocket·한국 시각·null·오류 응답 유지 |
+| jOOQ / Flyway | 3.19.35 / 런타임 11.7.2 → 3.21.9 / 12.4.0 | 실행/생성기 정렬, SQL 구조 유지, 기존 이력 검증 |
+| HttpClient / Log4j API | 5.5.2 / 2.24.3 → 5.6.5 / 2.25.5 | Boot 관리 버전 적용 후 이미지 검사 |
+| Java / Gradle | 21 / 8.14.5 유지 | 로컬 테스트·실행 파일·이미지 생성 |
+
+기존 테스트 566개를 보존하고 구 JSONB 결과 조회·이전 Redis 봉투 수신·ACK 직렬화 실패 격리 3개를 추가했다. **PostgreSQL 16과 18에서 각각 569개가 통과**했고 실패·오류·건너뜀은 0개다. 최초 실패 3개는 테스트의 구독 컨테이너 선택과 발행 전 구독 준비 순서로 보완했다. 실제 전달의 제한 시간과 기대값은 완화하지 않았다. 새 DB를 만들 때와 Flyway 11로 만든 기존 이력을 Flyway 12가 읽을 때 모두 성공했으며 SQL migration 10개의 이력이 일치한다.
+
+jOOQ 3.21 OSS의 공식 PostgreSQL 최소 버전은 18이다. 따라서 16의 성공은 관측한 호환성 결과로만 기록한다. 코드 생성과 새 이미지 실행 검사는 18.6에서 수행했다. CI는 일회성 PostgreSQL 18을 사용하고, [별도 로컬 구성](../../apps/api/docker-compose.boot4.yml)은 기존 16 볼륨과 다른 이름·포트·볼륨을 사용한다. [실행 방법](../../apps/api/README.md#로컬-실행)을 따른다. 기존 데이터를 자동 이전하거나 기본 compose를 교체하지 않았다. 과거 AWS 기록의 RDS는 18.3이었으며 이번에는 AWS 상태를 조회·변경하지 않았다. [jOOQ 지원 표](https://www.jooq.org/download/support-matrix)
+
+새 이미지 manifest는 `sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b`다. 동일한 Trivy 0.76.1·취약점 DB를 사용해 **OS 73개·Java 151개 패키지에서 검출 0건**을 확인했다. 이전 후보의 Critical 2·Medium 2도 더 이상 검출되지 않는다. 검사 예외를 추가하지 않았으며, Gradle 플러그인·코드 생성기의 별도 의존성 전체를 보안 통과로 표시하지 않는다.
+
+정확히 이 이미지를 실행한 검사 28개가 통과했다. 로컬 합성 JWT·401/404·보안 헤더·관리 포트 격리·WebSocket 연결과 접속표 재사용 거부·시간 로그 4건의 일대일 연결을 확인했다. 임시 컨테이너·네트워크·DB와 합성 키·토큰은 정리했다. [전환·테스트·이미지 검사 근거](../../docs/observability/results/2026-10-29-boot4-security-remediation.json)에 결과와 한계를 기록한다.
+
+현재 상태는 **로컬 전환 후보 검증 완료**다. 새 이미지의 실제 Cognito·AWS 검증, ECR 게시, 배포 선택 승격, Terraform 실행과 장애 시험은 남아 있다. DB 장애 도구의 기존 High 4건과 과거 2.05초의 원인도 별도 미해결 항목이다. 기존 Alarm·Incident 계약과 M2·M3의 환경 검증 상태는 바꾸지 않는다. 다음 단계는 실제 로그인 검증 일정 분리 → ECR 후보 게시·검사 → 배포 계획 검토이며, 실제 서버 생성은 별도 승인 범위다.
+
 ## 검증의 범위
 
 Terraform validate·포맷·인프라 경계 검사, 로컬 Java·Python 시험, 임시 TLS PostgreSQL 동작 검사를 실행한다. Grafana의 `/m2/grafana/` 로그인·정적 파일·보안 쿠키는 로컬 이미지로 확인했다. GitHub CI도 AWS 자원 생성 없이 같은 종류의 검사를 수행한다.

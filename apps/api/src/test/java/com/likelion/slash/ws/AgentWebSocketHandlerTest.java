@@ -7,16 +7,18 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.Sha256;
 import com.likelion.slash.common.SlashTime;
 import com.likelion.slash.common.enums.AgentDispatchStatus;
@@ -34,6 +36,7 @@ import com.likelion.slash.jooq.tables.records.TasksRecord;
 import com.likelion.slash.task.TaskRepository;
 import com.likelion.slash.task.TaskService;
 import com.likelion.slash.task.TaskStateWriter;
+import com.likelion.slash.ws.dto.ResultAckFrame;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.security.KeyPair;
@@ -84,17 +87,17 @@ class AgentWebSocketHandlerTest {
     private static final UUID 상관ID = UUID.randomUUID();
 
     /**
-     * 애플리케이션이 쓰는 설정을 그대로 맞춘 Mapper.
+     * 프레임의 날짜 형식과 시간대를 애플리케이션 계약에 맞춘 Mapper.
      *
-     * <p>시간 모듈이 없으면 {@code OffsetDateTime} 직렬화 자체가 실패하고,
+     * <p>Java Time 지원은 Jackson 3에 내장되어 있다. 날짜는 ISO 문자열로 내보낸다.
      * 기준 시간대를 안 맞추면 {@code sentAt} 이 {@code Z} 로 나가 계약(한국 시각)과 어긋난다.
      * 시험이 실제 응답과 다른 Mapper 를 쓰면 이 차이를 잡지 못한다.
      */
-    private final ObjectMapper objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    private final ObjectMapper objectMapper = spy(JsonMapper.builder()
+            .configureForJackson2()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .defaultTimeZone(TimeZone.getTimeZone(SlashTime.ZONE))
-            .build();
+            .build());
 
     private final WsSessionRegistry registry = new WsSessionRegistry();
 
@@ -561,6 +564,28 @@ class AgentWebSocketHandlerTest {
         assertThat(ack.path("taskId").asText()).isEqualTo(작업_공개ID.toString());
         assertThat(ack.path("dispatchId").asText()).isEqualTo(dispatchId.toString());
         assertThat(ack.path("correlationId").asText()).isEqualTo(상관ID.toString());
+    }
+
+    @Test
+    @DisplayName("ACK 직렬화 실패가 저장한 결과를 되돌리거나 연결을 끊지 않는다")
+    void ACK_직렬화_실패를_격리한다() throws Exception {
+        인증한다();
+        UUID dispatchId = 전달을_준비한다(기기_PK, AgentDispatchStatus.DISPATCHED);
+        given(stateWriter.succeed(anyLong(), any(), any())).willReturn(true);
+        // Jackson 3의 예외는 IOException 하위가 아니다. ACK 실패 격리가 유지되어야 한다.
+        doThrow(mock(JacksonException.class)).when(objectMapper).writeValueAsString(any(ResultAckFrame.class));
+
+        보낸다(프레임("RESULT",
+                "\"dispatchId\":\"" + dispatchId + "\"",
+                "\"status\":\"SUCCEEDED\"",
+                "\"result\":{}",
+                "\"error\":null"));
+
+        verify(objectMapper).writeValueAsString(any(ResultAckFrame.class));
+        verify(stateWriter).succeed(eq(작업_PK), any(), any());
+        verify(stateWriter, never()).failFromWorker(anyLong(), any(), any());
+        verify(session, never()).close(any());
+        assertThat(registry.holds(WsTarget.DEVICE, 기기_PK)).isTrue();
     }
 
     @Test

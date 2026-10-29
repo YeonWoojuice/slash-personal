@@ -1,6 +1,7 @@
 package com.likelion.slash.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -9,17 +10,22 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -51,7 +57,23 @@ class WsPodRoutingTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private StringRedisTemplate redis;
+
+    @Autowired
+    @Qualifier("wsMessageListenerContainer")
+    private RedisMessageListenerContainer container;
+
     private WebSocketSession session;
+
+    @BeforeEach
+    void 구독이_준비된_뒤_발행한다() {
+        // 컨텍스트 재사용 시 구독 재시작은 비동기다. Pub/Sub은 구독 전 메시지를 저장하지 않는다.
+        // 발행 준비와 실제 전달을 분리해, 메시지 유실을 단순한 대기 시간 증가로 감추지 않는다.
+        await().alias("WSS 채널 구독 완료")
+                .atMost(Duration.ofSeconds(5))
+                .until(container::isListening);
+    }
 
     @AfterEach
     void tearDown() {
@@ -134,6 +156,37 @@ class WsPodRoutingTest {
         verify(session, timeout(5_000)).sendMessage(any(TextMessage.class));
         verify(session, never()).close(any(CloseStatus.class));
         assertThat(registry.holds(WsTarget.DEVICE, 기기)).isTrue();
+    }
+
+    @Test
+    @DisplayName("이전 JSON 봉투도 Valkey 를 거쳐 원래 프레임으로 전달된다")
+    void 이전_JSON_봉투를_수신한다() throws Exception {
+        session = 세션();
+        registry.register(WsTarget.DEVICE, 기기, session);
+        UUID dispatchId = UUID.randomUUID();
+        // publisher의 새 직렬화 결과로 입력을 만들면 구버전 봉투 읽기 실패를 놓친다.
+        String legacyEnvelope = """
+                {"target":"DEVICE","targetId":%d,
+                 "frame":{"type":"TASK","dispatchId":"%s",
+                          "sentAt":"2026-10-28T10:00:00+09:00",
+                          "parameters":{"path":"문서/보고서","optional":null}},
+                 "issuedAt":"2026-10-28T10:00:00+09:00",
+                 "originPod":"previous-version-fixture","closeAfterSend":false}
+                """.formatted(기기, dispatchId);
+        redis.convertAndSend(WsTarget.DEVICE.channel(), legacyEnvelope);
+
+        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
+        verify(session, timeout(5_000)).sendMessage(captor.capture());
+        var frame = objectMapper.readTree(captor.getValue().getPayload());
+        assertThat(frame.path("type").asText()).isEqualTo("TASK");
+        assertThat(frame.path("dispatchId").asText()).isEqualTo(dispatchId.toString());
+        assertThat(frame.path("sentAt").asText()).isEqualTo("2026-10-28T10:00:00+09:00");
+        assertThat(frame.path("parameters").path("path").asText()).isEqualTo("문서/보고서");
+        assertThat(frame.path("parameters").has("optional")).isTrue();
+        assertThat(frame.path("parameters").get("optional").isNull()).isTrue();
+        assertThat(frame.has("targetId")).isFalse();
+        assertThat(frame.has("originPod")).isFalse();
+        verify(session, never()).close(any(CloseStatus.class));
     }
 
     private static Map<String, Object> 해제_프레임() {

@@ -1,0 +1,34 @@
+name: slash-boot4-local
+
+# Boot 4 / jOOQ 3.21 검증용 새 개발 DB. 기존 PostgreSQL 16 볼륨은 사용하지 않는다.
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: slash
+      POSTGRES_USER: slash
+      POSTGRES_PASSWORD: slash
+      TZ: Asia/Seoul
+    command: ["postgres", "-c", "timezone=Asia/Seoul"]
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - pg18-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slash -d slash"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    ports:
+      - "127.0.0.1:16379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pg18-data:

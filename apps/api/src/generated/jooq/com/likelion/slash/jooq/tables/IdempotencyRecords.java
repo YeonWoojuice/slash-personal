@@ -30,10 +30,10 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -66,7 +66,7 @@ public class IdempotencyRecords extends TableImpl<IdempotencyRecordsRecord> {
     /**
      * The column <code>public.idempotency_records.id</code>.
      */
-    public final TableField<IdempotencyRecordsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<IdempotencyRecordsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
     /**
      * The column <code>public.idempotency_records.user_id</code>.
@@ -276,7 +276,7 @@ public class IdempotencyRecords extends TableImpl<IdempotencyRecordsRecord> {
      */
     @Override
     public IdempotencyRecords where(Condition condition) {
-        return new IdempotencyRecords(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new IdempotencyRecords(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -343,7 +343,7 @@ public class IdempotencyRecords extends TableImpl<IdempotencyRecordsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public IdempotencyRecords whereExists(Select<?> select) {
+    public IdempotencyRecords whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -351,7 +351,7 @@ public class IdempotencyRecords extends TableImpl<IdempotencyRecordsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public IdempotencyRecords whereNotExists(Select<?> select) {
+    public IdempotencyRecords whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

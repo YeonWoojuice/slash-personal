@@ -1,6 +1,6 @@
 package com.likelion.slash.pairing;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;

@@ -195,6 +195,6 @@ public class DevicePairingRequestsRecord extends UpdatableRecordImpl<DevicePairi
         setConsumedAt(consumedAt);
         setConsumedDeviceId(consumedDeviceId);
         setCreatedAt(createdAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

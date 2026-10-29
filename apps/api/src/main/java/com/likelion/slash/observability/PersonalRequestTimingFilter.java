@@ -1,8 +1,8 @@
 package com.likelion.slash.observability;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public final class PersonalRequestTimingFilter extends OncePerRequestFilter {
             try {
                 // The record contains only fixed labels, generated/validated IDs and timings.
                 log.info("{}", objectMapper.writeValueAsString(event));
-            } catch (JsonProcessingException ignored) {
+            } catch (JacksonException ignored) {
                 // Do not let telemetry serialization replace the application result or expose data.
                 log.warn("personal_request_timing_serialization_failed");
             }

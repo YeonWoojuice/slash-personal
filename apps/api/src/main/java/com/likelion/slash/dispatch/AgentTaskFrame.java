@@ -1,6 +1,6 @@
 package com.likelion.slash.dispatch;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.likelion.slash.common.SlashTime;
 import com.likelion.slash.jooq.tables.records.AgentDispatchesRecord;
 import com.likelion.slash.jooq.tables.records.TasksRecord;

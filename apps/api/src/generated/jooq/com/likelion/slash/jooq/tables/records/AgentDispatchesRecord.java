@@ -259,6 +259,6 @@ public class AgentDispatchesRecord extends UpdatableRecordImpl<AgentDispatchesRe
         setReasonCode(reasonCode);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

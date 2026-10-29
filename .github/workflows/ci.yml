@@ -19,7 +19,8 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        image: postgres:16
+        # jOOQ 3.21 OSS 지원 버전. 이 서비스의 데이터는 CI 종료 때 삭제된다.
+        image: postgres:18
         env:
           POSTGRES_DB: slash_ci
           POSTGRES_USER: slash

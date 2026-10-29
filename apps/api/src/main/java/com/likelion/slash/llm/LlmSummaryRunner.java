@@ -1,6 +1,6 @@
 package com.likelion.slash.llm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.common.enums.AsyncJobType;
 import com.likelion.slash.common.enums.TaskStatus;
 import com.likelion.slash.job.AsyncJobRepository;

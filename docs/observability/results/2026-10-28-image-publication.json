@@ -791,7 +791,7 @@
     "existing_selection_preserved": true,
     "old_api_not_a_verified_java_security_fallback": true
   },
-  "current_image_selection_status": "Historical runtime-tested image references only. No API image is currently approved as Java-security-verified. ECR latency candidate remains blocked; later local javafix1 candidate is recorded under java_security_remediation_followup and is not published or promoted.",
+  "current_image_selection_status": "Historical AWS image selection only. New Boot4 image passed local runtime and image scan checks but has not been published to ECR or verified against actual Cognito/AWS.",
   "java_security_remediation_followup": {
     "recorded_at_utc": "2026-10-29T00:37:08.869660+00:00",
     "local_candidate": {
@@ -845,5 +845,25 @@
     },
     "evidence": "2026-10-29-java-security-remediation.json",
     "status": "Local candidate only; unresolved Critical2/Medium2; not published or promoted"
+  },
+  "boot4_security_remediation_followup": {
+    "local_candidate": {
+      "local_tag": "slash-personal-api:m2-20261029-boot412",
+      "manifest_digest": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+      "config_digest": "sha256:cc99492a1aa513fb5363da4c4b60cd058986e53b942ade323f34596c3a70cc41",
+      "platform": "linux/amd64",
+      "runtime_user": "slash",
+      "size_bytes": 132765050,
+      "build_input_manifest_sha256": "3498489c2ec8c562bdc5b78d25619ef1bbe1d0d91a3eacfc39815ac121a47035",
+      "build_inputs_match_worktree": true,
+      "ecr_published": false
+    },
+    "evidence": "2026-10-29-boot4-security-remediation.json",
+    "tests_each_database": 569,
+    "runtime_checks_passed": 28,
+    "runtime_image_os_findings": 0,
+    "runtime_image_java_findings": 0,
+    "aws_or_ecr_changed": false,
+    "deployment_selection_promoted": false
   }
 }

@@ -2,7 +2,7 @@ package com.likelion.slash.llm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.error.ErrorCode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -29,7 +29,7 @@ import org.springframework.web.client.RestClient;
  */
 class LlmClientTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
 
     private HttpServer server;
 

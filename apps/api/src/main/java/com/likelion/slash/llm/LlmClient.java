@@ -1,6 +1,6 @@
 package com.likelion.slash.llm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.llm.dto.LlmErrorResponse;
 import com.likelion.slash.llm.dto.LlmReadinessResponse;
 import com.likelion.slash.llm.dto.LlmSummaryRequest;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -56,10 +56,10 @@ public class LlmClient {
     /** 준비 상태 전용. 요약보다 훨씬 짧은 제한을 쓴다. */
     private final RestClient readyClient;
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     public LlmClient(RestClient.Builder builder,
-                     ObjectMapper objectMapper,
+                     JsonMapper objectMapper,
                      @Value("${slash.llm.base-url}") String baseUrl,
                      @Value("${slash.llm.timeout}") Duration timeout,
                      @Value("${slash.llm.ready-timeout}") Duration readyTimeout) {
@@ -78,8 +78,8 @@ public class LlmClient {
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
                 .messageConverters(converters -> {
-                    converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
-                    converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+                    converters.removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
+                    converters.add(new JacksonJsonHttpMessageConverter(objectMapper));
                 })
                 .build();
     }

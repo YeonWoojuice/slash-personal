@@ -132,6 +132,6 @@ public class DeviceSearchFoldersRecord extends UpdatableRecordImpl<DeviceSearchF
         setDisplayName(displayName);
         setIndexStatus(indexStatus);
         setReportedAt(reportedAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

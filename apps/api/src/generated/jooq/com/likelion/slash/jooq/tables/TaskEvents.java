@@ -28,10 +28,10 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -64,7 +64,7 @@ public class TaskEvents extends TableImpl<TaskEventsRecord> {
     /**
      * The column <code>public.task_events.id</code>.
      */
-    public final TableField<TaskEventsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<TaskEventsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
     /**
      * The column <code>public.task_events.public_id</code>.
@@ -260,7 +260,7 @@ public class TaskEvents extends TableImpl<TaskEventsRecord> {
      */
     @Override
     public TaskEvents where(Condition condition) {
-        return new TaskEvents(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new TaskEvents(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -327,7 +327,7 @@ public class TaskEvents extends TableImpl<TaskEventsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public TaskEvents whereExists(Select<?> select) {
+    public TaskEvents whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -335,7 +335,7 @@ public class TaskEvents extends TableImpl<TaskEventsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public TaskEvents whereNotExists(Select<?> select) {
+    public TaskEvents whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

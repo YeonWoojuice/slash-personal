@@ -26,10 +26,10 @@ import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -62,7 +62,7 @@ public class OutboxEvents extends TableImpl<OutboxEventsRecord> {
     /**
      * The column <code>public.outbox_events.id</code>.
      */
-    public final TableField<OutboxEventsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<OutboxEventsRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
     /**
      * The column <code>public.outbox_events.public_id</code>.
@@ -217,7 +217,7 @@ public class OutboxEvents extends TableImpl<OutboxEventsRecord> {
      */
     @Override
     public OutboxEvents where(Condition condition) {
-        return new OutboxEvents(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new OutboxEvents(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -284,7 +284,7 @@ public class OutboxEvents extends TableImpl<OutboxEventsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OutboxEvents whereExists(Select<?> select) {
+    public OutboxEvents whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -292,7 +292,7 @@ public class OutboxEvents extends TableImpl<OutboxEventsRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OutboxEvents whereNotExists(Select<?> select) {
+    public OutboxEvents whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

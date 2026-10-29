@@ -40,13 +40,16 @@ spring:
     sql-dialect: postgres
 
   jackson:
+    # Jackson 3에서도 기존 입력 허용 범위와 JSON 필드 순서를 유지한다.
+    use-jackson2-defaults: true
     # 프로젝트 시각 기준은 한국 시각이다. (메시지 프로토콜 정의 3.5 · 11.3)
     # API·WSS·SQS·DB Session·SQL 조회를 모두 Asia/Seoul 로 통일한다.
     time-zone: Asia/Seoul
-    serialization:
-      # 시각을 epoch 숫자가 아니라 ISO 8601 문자열로 내보낸다.
-      # 예: 2026-08-04T10:47:00+09:00
-      write-dates-as-timestamps: false
+    datatype:
+      datetime:
+        # 시각을 epoch 숫자가 아니라 ISO 8601 문자열로 내보낸다.
+        # 예: 2026-08-04T10:47:00+09:00
+        write-dates-as-timestamps: false
     default-property-inclusion: non_null
 
 server:

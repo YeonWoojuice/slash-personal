@@ -11,7 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.likelion.slash.common.SlashTime;
 import com.likelion.slash.common.enums.TaskType;
 import com.likelion.slash.jooq.tables.records.AgentDispatchesRecord;
@@ -61,7 +61,7 @@ class PendingDispatchSweeperTest {
                 taskRepository,
                 publisher,
                 redis,
-                new ObjectMapper(),
+                JsonMapper.builder().configureForJackson2().build(),
                 Duration.ofSeconds(5),
                 100);
     }

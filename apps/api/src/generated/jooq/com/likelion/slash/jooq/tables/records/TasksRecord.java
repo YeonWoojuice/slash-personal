@@ -324,6 +324,6 @@ public class TasksRecord extends UpdatableRecordImpl<TasksRecord> {
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         setCompletedAt(completedAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

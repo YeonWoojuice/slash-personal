@@ -1,5 +1,7 @@
 package com.likelion.slash.task;
 
+import static com.likelion.slash.jooq.Tables.TASKS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,8 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.likelion.slash.common.enums.TaskStatus;
 import com.likelion.slash.dispatch.TaskDispatcher;
 import com.likelion.slash.nlu.NluClient;
@@ -18,11 +20,13 @@ import com.likelion.slash.nlu.dto.NluDecision;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.jooq.DSLContext;
+import org.jooq.JSONB;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -47,6 +51,9 @@ class RequestControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private DSLContext dsl;
 
     @MockitoBean
     private NluClient nluClient;
@@ -148,6 +155,45 @@ class RequestControllerTest {
         String status = objectMapper.readTree(응답).path("data").path("status").asText();
 
         TaskStatus.valueOf(status);
+    }
+
+    @Test
+    @DisplayName("이전 형식으로 저장한 JSONB 는 구조·null·큰 정수를 유지한 채 조회된다")
+    void 이전_저장_JSON_조회_계약을_유지한다() throws Exception {
+        String accepted = post_요청("/status", null).andReturn().getResponse().getContentAsString();
+        UUID taskId = UUID.fromString(objectMapper.readTree(accepted).path("data").path("taskId").asText());
+        // 새 mapper로 만들지 않은 고정 JSON이다. PostgreSQL에 이미 저장된 문서의 읽기를 검증한다.
+        String legacyResult = """
+                {"message":"완료","nullable":null,"count":9007199254740993,
+                 "samples":[1,2.5],"nested":{"enabled":true},"observedAt":"2026-10-28T10:00:00+09:00"}
+                """;
+        dsl.update(TASKS)
+                .set(TASKS.STATUS, TaskStatus.SUCCEEDED.name())
+                .set(TASKS.ERROR_CODE, (String) null)
+                .set(TASKS.PARAMETERS, JSONB.valueOf("{\"path\":\"문서/보고서\",\"recursive\":false}"))
+                .set(TASKS.RESULT, JSONB.valueOf(legacyResult))
+                .where(TASKS.PUBLIC_ID.eq(taskId))
+                .execute();
+
+        String response = mockMvc.perform(get("/api/v1/tasks/" + taskId).header("Authorization", 사용자))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode body = objectMapper.readTree(response);
+        JsonNode data = body.path("data");
+        assertThat(data.path("result").isObject()).isTrue();
+        assertThat(data.path("result").path("message").asText()).isEqualTo("완료");
+        assertThat(data.path("result").has("nullable")).isTrue();
+        assertThat(data.path("result").get("nullable").isNull()).isTrue();
+        assertThat(data.path("result").path("count").asLong()).isEqualTo(9_007_199_254_740_993L);
+        assertThat(data.path("result").path("samples").get(1).asDouble()).isEqualTo(2.5);
+        assertThat(data.path("result").path("nested").path("enabled").asBoolean()).isTrue();
+        assertThat(data.path("result").path("observedAt").asText()).isEqualTo("2026-10-28T10:00:00+09:00");
+        assertThat(data.path("parameters").path("path").asText()).isEqualTo("문서/보고서");
+        assertThat(data.path("parameters").path("recursive").asBoolean()).isFalse();
+        assertThat(data.path("createdAt").asText()).endsWith("+09:00");
+        assertThat(body.path("meta").path("serverTime").asText()).endsWith("+09:00");
+        assertThat(data.has("deviceId")).isFalse();
+        assertThat(data.has("errorCode")).isFalse();
     }
 
     private org.springframework.test.web.servlet.ResultActions post_요청(String text, String idempotencyKey)

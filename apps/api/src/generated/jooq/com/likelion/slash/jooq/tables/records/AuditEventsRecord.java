@@ -212,6 +212,6 @@ public class AuditEventsRecord extends UpdatableRecordImpl<AuditEventsRecord> {
         setDetail(detail);
         setIpHash(ipHash);
         setOccurredAt(occurredAt);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

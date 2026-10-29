@@ -7,33 +7,25 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.postgresql:postgresql:42.7.12")
-        classpath("org.flywaydb:flyway-database-postgresql:11.18.0")
+        classpath("org.postgresql:postgresql:42.7.14")
+        classpath("org.flywaydb:flyway-database-postgresql:12.4.0")
     }
 }
 
 plugins {
     java
-    id("org.springframework.boot") version "3.5.16"
+    id("org.springframework.boot") version "4.1.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.flywaydb.flyway") version "11.18.0"
+    id("org.flywaydb.flyway") version "12.4.0"
     id("nu.studer.jooq") version "9.0"
 }
 
 group = "com.likelion"
 version = "0.0.1-SNAPSHOT"
 
-// 3.5 계열을 유지하면서 BOM 이후 발표된 수정판을 모듈 묶음 단위로 적용한다.
-// Jackson 2.21 / HttpCore 5.4는 같은 주버전 안의 minor 변경이므로 JSON·HTTP 회귀 검증이 필요하다.
-// Framework 6.2의 남은 두 항목은 별도 검토 대상이며 7.x 모듈을 혼합하지 않는다.
-extra["tomcat.version"] = "10.1.61"
-extra["netty.version"] = "4.1.137.Final"
-extra["jackson-bom.version"] = "2.21.7"
-extra["postgresql.version"] = "42.7.12"
-extra["httpcore5.version"] = "5.4.3"
-
-// 런타임과 코드 생성기는 같은 버전이어야 한다.
-val alignedJooqVersion = "3.19.35"
+// 서버·보안·JSON·HTTP 라이브러리는 Boot 4.1이 관리하는 버전 묶음을 사용한다.
+// jOOQ는 런타임과 코드 생성기를 함께 맞춘다. Java 21을 유지한다.
+val alignedJooqVersion = "3.21.9"
 extra["jooq.version"] = alignedJooqVersion
 
 java {
@@ -53,7 +45,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
@@ -61,14 +54,14 @@ dependencies {
 
     // 인증 — Cognito Access Token(JWT) 검증 (W1-01)
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
 
     // 실시간 연결 — 사용자 WSS, Agent WSS (W1-06)
     implementation("org.springframework.boot:spring-boot-starter-websocket")
 
     // 데이터 — jOOQ + Flyway + PostgreSQL
     implementation("org.springframework.boot:spring-boot-starter-jooq")
-    implementation("org.flywaydb:flyway-core")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.flywaydb:flyway-database-postgresql")
 
     // 상태 공유·짧은 잠금 — ElastiCache for Valkey (Redis 프로토콜 호환)
@@ -81,10 +74,10 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // jOOQ 코드 생성기가 사용하는 의존성
-    jooqGenerator("org.postgresql:postgresql:42.7.12")
+    jooqGenerator("org.postgresql:postgresql:42.7.14")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
