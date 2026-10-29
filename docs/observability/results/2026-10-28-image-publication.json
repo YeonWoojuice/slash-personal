@@ -791,5 +791,59 @@
     "existing_selection_preserved": true,
     "old_api_not_a_verified_java_security_fallback": true
   },
-  "current_image_selection_status": "Historical runtime-tested image references. No API image is currently approved as Java-security-verified; new latency candidate remains blocked. Read latency_image_followup before planning deployment."
+  "current_image_selection_status": "Historical runtime-tested image references only. No API image is currently approved as Java-security-verified. ECR latency candidate remains blocked; later local javafix1 candidate is recorded under java_security_remediation_followup and is not published or promoted.",
+  "java_security_remediation_followup": {
+    "recorded_at_utc": "2026-10-29T00:37:08.869660+00:00",
+    "local_candidate": {
+      "local_tag": "slash-personal-api:m2-20261029-javafix1",
+      "manifest_digest": "sha256:08b0bd91a641298d281e6c1746fa0e3b2b0aa2e0d9ec2a067eea6e59243085c2",
+      "config_digest": "sha256:ebd8c61d45821cb0e36dd5eed9c3563cdc1acd8fa57ad9a57fc4d7ab81a1a69d",
+      "local_image_id": "sha256:08b0bd91a641298d281e6c1746fa0e3b2b0aa2e0d9ec2a067eea6e59243085c2",
+      "platform": "linux/amd64",
+      "runtime_user": "slash",
+      "size_bytes": 131264436,
+      "base_source_commit": "9cd208fb6d8ea45b477264ddf8f40c1e70c47e8a",
+      "source_manifest_sha256": "1093ec46313a37d20b77d3f7d6f8961745604f753aa72cf33d48cabe1e3d1936",
+      "built_from": "clean committed apps/api plus scoped dependency and regression-test changes",
+      "ecr_published": false
+    },
+    "before": {
+      "os-pkgs": {
+        "packages": 73,
+        "findings": 0,
+        "unique_cves": 0,
+        "severity_counts": {}
+      },
+      "lang-pkgs": {
+        "packages": 124,
+        "findings": 105,
+        "unique_cves": 104,
+        "severity_counts": {
+          "LOW": 9,
+          "HIGH": 41,
+          "MEDIUM": 45,
+          "CRITICAL": 10
+        }
+      }
+    },
+    "after": {
+      "os-pkgs": {
+        "packages": 73,
+        "findings": 0,
+        "unique_cves": 0,
+        "severity_counts": {}
+      },
+      "lang-pkgs": {
+        "packages": 123,
+        "findings": 4,
+        "unique_cves": 4,
+        "severity_counts": {
+          "MEDIUM": 2,
+          "CRITICAL": 2
+        }
+      }
+    },
+    "evidence": "2026-10-29-java-security-remediation.json",
+    "status": "Local candidate only; unresolved Critical2/Medium2; not published or promoted"
+  }
 }

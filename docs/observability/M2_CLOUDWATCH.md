@@ -109,7 +109,13 @@ CloudWatch `LambdaOps/Slash`, `Service=slash-api`, `Environment=dev`에서 기�
 | Terraform 검토 | 구성 검사 통과, 인증 조건에서 plan 차단. 부분 생성 93·변경/삭제 0. 전체 예상 98은 최종 계획 수치가 아님 |
 | 실제 실행 | apply·서버 생성·부하 및 장애 시험 없음. experiment state 0 유지 |
 
-Java 검출은 이전 ECR Basic의 운영체제 검사와 범위가 다르다. 심각도는 스캐너 기준이며 일부 공식 공급자 판정과 차이를 함께 기록했다. 실제 악용 가능성은 미검증이고 예외 처리·위험 수락·해결 완료로 바꾸지 않았다. DB 장애 도구의 기존 High 4건도 미해결이며 새로 재검사한 결과는 아니다. [전체 검사·독립 검토 근거](results/2026-10-29-api-image-security-review.json)와 [자원·비용·후속 보완 순서](../../infra/personal/README.md#새-api-이미지-검사배포-검토--게시-완료-배포-보류)를 연결한다. 기존 여섯 지표·Alarm·Incident 계약과 M2·M3 In Progress 상태는 유지한다.
+Java 검출은 이전 ECR Basic의 운영체제 검사와 범위가 다르다. 위 표는 최초 후보 검사 기록이다. [최초 검사·독립 검토 근거](results/2026-10-29-api-image-security-review.json)와 [자원·비용 계획](../../infra/personal/README.md#새-api-이미지-검사배포-검토--게시-완료-배포-보류)을 연결한다.
+
+이후 승인된 기존 계열 Java 보완에서 변경 전 551개·변경 후 566개 테스트가 모두 통과했다. 새 15개는 실제 로컬 서명 검증과 응답 보안 헤더 검사이며 실제 Cognito 로그인은 아니다. CI의 API job도 임시 DB·캐시를 사용하는 전체 검사로 확대했다. 새 `m2-20261029-javafix1` 이미지를 같은 도구·취약점 DB로 재검사한 결과는 **Java Critical 10→2·High 41→0·Medium 45→2·Low 9→0, OS 0 유지**다.
+
+새 이미지의 실제 로컬 기동 검사 28개도 통과했다. 합성 발급자 JWT의 `/me`·오류 처리·지표 포트 격리·WebSocket 연결과 접속표 재사용 차단, 응답 ID와 지연 JSON 4건의 일대일 연결을 확인했다. 실제 Cognito·Gateway 검증이나 AWS 지연 원인 확인은 아니다. 검증용 컨테이너·네트워크·임시 DB·합성 인증자료를 정리했다.
+
+남은 Spring Framework 두 건은 무료 수정판이 큰 버전 전환을 요구하므로 사용 조건·전환 범위를 별도로 검토한다. 스캐너와 공급자 심각도를 구분하고 실제 악용 가능성 미검증·미해결 상태를 유지한다. 검사 예외를 추가하지 않았다. [패치·테스트·재검사 근거](results/2026-10-29-java-security-remediation.json)에 상세 결과를 기록한다. 새 이미지는 로컬 후보이며 ECR 추가 게시·선택 이미지 승격·AWS 서버 생성·실제 장애 시험은 하지 않았다. DB 장애 도구의 기존 High 4건은 별개로 미해결이다. 기존 여섯 지표·Alarm·Incident 계약과 M2·M3 In Progress 상태는 유지한다.
 
 ## AWS 시험 준비 — 2026-10-28
 

@@ -7,14 +7,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.postgresql:postgresql:42.7.8")
+        classpath("org.postgresql:postgresql:42.7.12")
         classpath("org.flywaydb:flyway-database-postgresql:11.18.0")
     }
 }
 
 plugins {
     java
-    id("org.springframework.boot") version "3.5.9"
+    id("org.springframework.boot") version "3.5.16"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.flywaydb.flyway") version "11.18.0"
     id("nu.studer.jooq") version "9.0"
@@ -22,6 +22,19 @@ plugins {
 
 group = "com.likelion"
 version = "0.0.1-SNAPSHOT"
+
+// 3.5 계열을 유지하면서 BOM 이후 발표된 수정판을 모듈 묶음 단위로 적용한다.
+// Jackson 2.21 / HttpCore 5.4는 같은 주버전 안의 minor 변경이므로 JSON·HTTP 회귀 검증이 필요하다.
+// Framework 6.2의 남은 두 항목은 별도 검토 대상이며 7.x 모듈을 혼합하지 않는다.
+extra["tomcat.version"] = "10.1.61"
+extra["netty.version"] = "4.1.137.Final"
+extra["jackson-bom.version"] = "2.21.7"
+extra["postgresql.version"] = "42.7.12"
+extra["httpcore5.version"] = "5.4.3"
+
+// 런타임과 코드 생성기는 같은 버전이어야 한다.
+val alignedJooqVersion = "3.19.35"
+extra["jooq.version"] = alignedJooqVersion
 
 java {
     toolchain {
@@ -68,7 +81,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // jOOQ 코드 생성기가 사용하는 의존성
-    jooqGenerator("org.postgresql:postgresql:42.7.8")
+    jooqGenerator("org.postgresql:postgresql:42.7.12")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -198,7 +211,7 @@ listOf("flywayClean", "flywayUndo").forEach { taskName ->
 jooq {
     // Spring Boot 가 관리하는 jOOQ 런타임 버전과 반드시 일치시킨다.
     // 어긋나면 codegen 이 Version check 경고를 내고, 생성 코드가 런타임과 미묘하게 달라질 수 있다.
-    version = "3.19.29"
+    version = alignedJooqVersion
 
     configurations {
         create("main") {

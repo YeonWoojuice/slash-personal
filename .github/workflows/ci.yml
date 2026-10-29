@@ -14,9 +14,36 @@ concurrency:
 
 jobs:
   api:
-    name: API authentication and metrics
+    name: API full regression and security contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: slash_ci
+          POSTGRES_USER: slash
+          POSTGRES_PASSWORD: local-ci-fixture-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U slash -d slash_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+      valkey:
+        image: valkey/valkey:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      # Job 전용 임시 서비스다. 개발자 DB나 AWS 자격 증명을 사용하지 않는다.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/slash_ci
+      SPRING_DATASOURCE_USERNAME: slash
+      SPRING_DATASOURCE_PASSWORD: local-ci-fixture-only
+      SPRING_DATA_REDIS_HOST: 127.0.0.1
+      SPRING_DATA_REDIS_PORT: '6379'
+      JAVA_TOOL_OPTIONS: -Dspring.test.context.cache.maxSize=4
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,14 +56,10 @@ jobs:
           cache-dependency-path: |
             apps/api/*.gradle.kts
             apps/api/gradle/wrapper/gradle-wrapper.properties
-      - name: Check personal runtime, metrics and JWT validation
+      - name: Check API, DB, WebSocket, JWT, headers and metrics
         working-directory: apps/api
         run: >-
-          ./gradlew --no-daemon test
-          --tests 'com.likelion.slash.observability.*'
-          --tests 'com.likelion.slash.config.PersonalRuntimeConfigTest'
-          --tests 'com.likelion.slash.config.CognitoJwtConfigTest'
-          bootJar
+          ./gradlew --no-daemon --max-workers=2 test bootJar
 
   tools:
     name: Bounded request and task tools
