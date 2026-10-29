@@ -756,5 +756,40 @@
     "prometheus": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
     "db-test": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
     "api": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735"
-  }
+  },
+  "latency_image_followup": {
+    "at": "2026-10-28T23:52:45.115813+00:00",
+    "candidate": {
+      "promotion_status": "blocked_java_vulnerabilities_and_fresh_auth_unverified",
+      "source_commit": "e705095257c53290da63573ce5c3b1cbc8f24b6a",
+      "at": "2026-10-28T23:52:45.115813+00:00",
+      "name": "api",
+      "tag": "m2-20261029-latency1",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+      "manifest_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "scan_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "local_image_id": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "platform": "linux/amd64",
+      "size_bytes": 131123066,
+      "scan_status": "COMPLETE",
+      "scan_counts": {}
+    },
+    "trivy_counts": {
+      "os_packages": 73,
+      "os_findings": 0,
+      "java_packages": 124,
+      "java_findings": 105,
+      "CRITICAL": 10,
+      "HIGH": 41,
+      "MEDIUM": 45,
+      "LOW": 9,
+      "UNKNOWN": 0
+    },
+    "status": "published candidate only; not deployment-ready",
+    "evidence": "2026-10-29-api-image-security-review.json",
+    "existing_selection_preserved": true,
+    "old_api_not_a_verified_java_security_fallback": true
+  },
+  "current_image_selection_status": "Historical runtime-tested image references. No API image is currently approved as Java-security-verified; new latency candidate remains blocked. Read latency_image_followup before planning deployment."
 }

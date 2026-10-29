@@ -99,7 +99,17 @@ CloudWatch `LambdaOps/Slash`, `Service=slash-api`, `Environment=dev`에서 기�
 
 앱 시간과 클라이언트 시간은 측정 범위가 겹치므로 더하거나 차이를 네트워크 시간으로 단정하지 않는다. 저장한 요청과 앱 로그를 비교하는 `latency_report.py`는 ID가 충돌하면 연결하지 않으며, AWS 호출 없이 과거 전체 시간만 있는 기록도 구분한다. [측정 계약·사용법](../../observability/personal/requests/README.md#지연-구간과-같은-요청의-앱-기록-비교)과 [로컬 검증 근거](results/2026-10-29-latency-instrumentation.json)를 연결한다.
 
-이번 작업은 코드·설정과 로컬 검증이다. 새 API 이미지를 게시하거나 시험 서버를 생성하지 않았다. 실제 Gateway 헤더 전달과 앱 로그 연결은 새 이미지·배포 계획 이후 환경 검증이다. 서울 REST Gateway 공용 로그 역할이 없어 요청별 Gateway 내부 시간 로그는 켜지 않았고, 일반 ALB access log도 활성화하지 않았다. 기존 여섯 지표·Alarm·Incident 계약과 M2·M3 In Progress 상태는 유지한다.
+위 계측 구현 시점에는 코드·설정과 로컬 검증까지만 진행했다. 후속 2026-10-29 작업에서 새 API 이미지 `m2-20261029-latency1`을 만들어 ECR에 게시했으며 로컬·원격 digest 일치를 확인했다. 실제 Gateway 헤더 전달과 앱 로그 연결은 여전히 환경 검증 전이다. 서울 REST Gateway 공용 로그 역할이 없어 요청별 Gateway 내부 시간 로그는 켜지 않았고, 일반 ALB access log도 활성화하지 않았다.
+
+| 후속 이미지 검사 | 결과 |
+| --- | --- |
+| ECR Basic / Trivy OS 73개 | 각각 검출 0건 |
+| Trivy Java 124개 | Critical 10·High 41·Medium 45·Low 9, 총 105개 패키지 검출·고유 CVE 104개 |
+| 배포 판정 | 보안 보완 전 후보로 보관. 기존 선택 이미지로 승격하지 않음 |
+| Terraform 검토 | 구성 검사 통과, 인증 조건에서 plan 차단. 부분 생성 93·변경/삭제 0. 전체 예상 98은 최종 계획 수치가 아님 |
+| 실제 실행 | apply·서버 생성·부하 및 장애 시험 없음. experiment state 0 유지 |
+
+Java 검출은 이전 ECR Basic의 운영체제 검사와 범위가 다르다. 심각도는 스캐너 기준이며 일부 공식 공급자 판정과 차이를 함께 기록했다. 실제 악용 가능성은 미검증이고 예외 처리·위험 수락·해결 완료로 바꾸지 않았다. DB 장애 도구의 기존 High 4건도 미해결이며 새로 재검사한 결과는 아니다. [전체 검사·독립 검토 근거](results/2026-10-29-api-image-security-review.json)와 [자원·비용·후속 보완 순서](../../infra/personal/README.md#새-api-이미지-검사배포-검토--게시-완료-배포-보류)를 연결한다. 기존 여섯 지표·Alarm·Incident 계약과 M2·M3 In Progress 상태는 유지한다.
 
 ## AWS 시험 준비 — 2026-10-28
 

@@ -1,0 +1,2533 @@
+{
+  "recorded_at_utc": "2026-10-28T23:56:32.787458+00:00",
+  "scope": "Build, isolated OS/Java scan, ECR candidate publication and blocked deployment preview; no AWS servers or fault tests",
+  "build": {
+    "source_commit": "e705095257c53290da63573ce5c3b1cbc8f24b6a",
+    "local_tag": "slash-personal-api:m2-20261029-latency1",
+    "local_image_id": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "build_manifest_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "build_config_digest": "sha256:35f5a732bf6db2fee8c8fe12aaad6a66e9a7a17ed0dbd43f667bb70b2491d5d3",
+    "platform": "linux/amd64",
+    "runtime_user": "slash",
+    "image_size_bytes": 131125922,
+    "dockerfile_sha256": "ee611fab754faccba7786859e4c36481e74750461d9aef42c208feb168a70dc2",
+    "source_export": "git archive of committed apps/api only; no unrelated worktree changes"
+  },
+  "runtime_checks": {
+    "status": "PASS",
+    "uid": 100,
+    "runtime_user": "slash",
+    "java_version_output": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\nopenjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+    "packaged_checks": {
+      "PersonalRequestTimingFilter.class": {
+        "present": true,
+        "sha256": "8c38c55ea947143f5b26d0baf946108f77f6233626bfe381465111adb91192a2"
+      },
+      "PersonalRequestTimingConfiguration.class": {
+        "present": true,
+        "sha256": "2a93101e4edeb3410db0acbd897dee608ad99ce34d3151e3f5f1f77375703c95"
+      },
+      "timing_default_off": true
+    },
+    "verification_container_removed": true,
+    "aws_calls": false,
+    "ports_published": false,
+    "network": "none"
+  },
+  "source_ci": {
+    "commit": "e705095257c53290da63573ce5c3b1cbc8f24b6a",
+    "url": "https://github.com/YeonWoojuice/slash-personal/actions/runs/40740970716",
+    "conclusion": "success",
+    "job_count": 5,
+    "meaning": "functional checks; not a vulnerability scan"
+  },
+  "ecr_candidate": {
+    "promotion_status": "blocked_java_vulnerabilities_and_fresh_auth_unverified",
+    "source_commit": "e705095257c53290da63573ce5c3b1cbc8f24b6a",
+    "at": "2026-10-28T23:52:45.115813+00:00",
+    "name": "api",
+    "tag": "m2-20261029-latency1",
+    "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+    "manifest_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "scan_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "local_image_id": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+    "platform": "linux/amd64",
+    "size_bytes": 131123066,
+    "scan_status": "COMPLETE",
+    "scan_counts": {}
+  },
+  "trivy": {
+    "version": "0.76.1",
+    "scanner_image": "aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c",
+    "created_at": "2026-10-28T23:50:21.604228636Z",
+    "network": "none during scan; public databases downloaded beforehand without application image mounted",
+    "scanners": [
+      "vuln"
+    ],
+    "package_types": [
+      "os",
+      "library"
+    ],
+    "offline_scan": true,
+    "telemetry_disabled": true,
+    "vulnerability_db": {
+      "Version": 2,
+      "NextUpdate": "2026-10-29T19:18:03.419608078Z",
+      "UpdatedAt": "2026-10-28T19:18:03.419608319Z",
+      "DownloadedAt": "2026-10-28T23:46:17.411572217Z"
+    },
+    "java_db": {
+      "Version": 1,
+      "NextUpdate": "2026-10-31T01:07:04.331012865Z",
+      "UpdatedAt": "2026-10-28T01:07:04.331013306Z",
+      "DownloadedAt": "2026-10-28T23:49:58.302301542Z"
+    },
+    "raw_report_sha256": "963155f98b8ecdd2e51c919d3b55b611fed9da6287a66aa1a0c1ab30002a4d6f",
+    "raw_log_sha256": "33d588d5382d6c5c8aeab34ec02f2ceb798b020bfe62e1465178394aead7b0d7",
+    "by_class": {
+      "os-pkgs": {
+        "packages": 73,
+        "findings": 0,
+        "severity_counts": {}
+      },
+      "lang-pkgs": {
+        "packages": 124,
+        "findings": 105,
+        "severity_counts": {
+          "LOW": 9,
+          "HIGH": 41,
+          "MEDIUM": 45,
+          "CRITICAL": 10
+        }
+      }
+    },
+    "findings": [
+      {
+        "VulnerabilityID": "CVE-2026-10532",
+        "PkgName": "ch.qos.logback:logback-core",
+        "InstalledVersion": "1.5.22",
+        "FixedVersion": "1.5.34",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-10532",
+        "Title": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback ..."
+      },
+      {
+        "VulnerabilityID": "CVE-2026-1225",
+        "PkgName": "ch.qos.logback:logback-core",
+        "InstalledVersion": "1.5.22",
+        "FixedVersion": "1.5.25",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-1225",
+        "Title": "ch.qos.logback/logback-core: Malicious logback.xml configuration file allows instantiation of arbitrary classes"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-9828",
+        "PkgName": "ch.qos.logback:logback-core",
+        "InstalledVersion": "1.5.22",
+        "FixedVersion": "1.5.33",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-9828",
+        "Title": "Deserialization of untrusted data vulnerability in QOS.CH Sarl logback ..."
+      },
+      {
+        "VulnerabilityID": "CVE-2026-68494",
+        "PkgName": "com.fasterxml.jackson.core:jackson-core",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.8, 2.21.4",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-68494",
+        "Title": "com.fasterxml.jackson.core/jackson-core: tools.jackson.core/jackson-core: jackson-core: Denial of Service via incomplete fix in async JSON parser"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-89407",
+        "PkgName": "com.fasterxml.jackson.core:jackson-core",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.11, 2.21.7, 2.22.3",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-89407",
+        "Title": "com.fasterxml.jackson/jackson-core: tools.jackson.core/jackson-core: Jackson-core: Denial of Service via regular expression backtracking"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-89425",
+        "PkgName": "com.fasterxml.jackson.core:jackson-core",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.21.7, 2.22.3, 2.18.11",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-89425",
+        "Title": "com.fasterxml.jackson.core/jackson-core: Jackson-core: Denial of Service via unbounded StringBuilder growth during malformed token processing"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-18401",
+        "PkgName": "com.fasterxml.jackson.core:jackson-core",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.21.1, 2.18.6",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-18401",
+        "Title": "tools.jackson.core/jackson-core: com.fasterxml.jackson.core/jackson-core: jackson-core: Denial of Service due to number length bypass in asynchronous JSON parser"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54512",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.8, 3.1.4, 2.21.4",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54512",
+        "Title": "jackson-databind: jackson-databind: Arbitrary code execution via PolymorphicTypeValidator bypass"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54513",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.8, 2.21.4, 3.1.4",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54513",
+        "Title": "jackson-databind: Jackson-databind: Security bypass allows arbitrary code execution"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-68497",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.10, 2.21.6, 2.22.2",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-68497",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: CPU Denial of Service via unbounded numeric parsing"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-91776",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.11, 2.21.7, 2.22.3",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-91776",
+        "Title": "jackson-databind: com.fasterxml.jackson/jackson-core: jackson-databind: Denial of Service via unbounded cache growth in TypeDeserializerBase"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-91777",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.21.7, 2.18.11, 2.22.3",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-91777",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core:jackson-databind: Jackson-databind: Denial of Service via quadratic forward-reference completion"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-19032",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.10, 2.21.6, 2.22.2",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-19032",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: Jackson-databind: Uncontrolled URI scheme resolution in Path deserialization"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54514",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.8, 2.21.4, 3.1.4",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54514",
+        "Title": "jackson-databind: jackson-databind: Information Disclosure via Eager DNS Resolution"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54515",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "3.1.4, 2.18.9, 2.21.5, 2.22.1",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54515",
+        "Title": "jackson-databind: jackson-databind: Ignored properties can be unexpectedly modified"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59888",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.8, 2.21.4",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59888",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: @JsonIgnore bypass in Java Records"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59889",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.21.5, 2.18.9, 2.22.1",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59889",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: Jackson-databind: Privilege escalation via improper handling of @JsonUnwrapped properties"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-77310",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.9, 2.21.5, 2.22.1",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-77310",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: jackson-databind: Server-Side Request Forgery and internal host enumeration via eager DNS resolution"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-83557",
+        "PkgName": "com.fasterxml.jackson.core:jackson-databind",
+        "InstalledVersion": "2.19.4",
+        "FixedVersion": "2.18.10, 2.21.6, 2.22.2",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-83557",
+        "Title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: Path traversal via incomplete type validation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-40983",
+        "PkgName": "io.micrometer:micrometer-core",
+        "InstalledVersion": "1.15.7",
+        "FixedVersion": "1.16.6, 1.15.12",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-40983",
+        "Title": "micrometer: micrometer-core: Micrometer: Denial of Service via specially crafted gRPC requests"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-40984",
+        "PkgName": "io.micrometer:micrometer-core",
+        "InstalledVersion": "1.15.7",
+        "FixedVersion": "1.16.6, 1.15.12",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-40984",
+        "Title": "micrometer-core: micrometer-jetty11: micrometer-jetty12: Micrometer: Denial of Service via specially crafted HTTP requests"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42583",
+        "PkgName": "io.netty:netty-codec",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.133.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42583",
+        "Title": "netty: io.netty/netty-codec-compression: io.netty/netty-codec: Netty: Denial of Service via excessive memory allocation in LZ4FrameDecoder"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59901",
+        "PkgName": "io.netty:netty-codec",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.136.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59901",
+        "Title": "io.netty/netty-codec-compression: Netty: Infinite loop in netty-codec-compression (bzip2)"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-33870",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+        "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42584",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42584",
+        "Title": "netty: io.netty/netty-codec-http: Netty: Incorrect HTTP response parsing leads to data confusion"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42587",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42587",
+        "Title": "netty: io.netty/netty-codec-http: io.netty/netty-codec-http2: Netty: Denial of Service via unbounded memory allocation in HTTP content decompression"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-55831",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-55831",
+        "Title": "io.netty/netty-codec-http: Netty: Denial of Service via SPDY SETTINGS frame processing"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-55833",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-55833",
+        "Title": "netty: io.netty/netty-codec-http: Netty: Denial of Service via SPDY header decompression amplification"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-56745",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-56745",
+        "Title": "netty: io.netty/netty-codec-http: Netty: Denial of Service via memory exhaustion in SPDY-to-HTTP codec"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41417",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.133.Final, 4.2.13.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41417",
+        "Title": "netty: Netty: HTTP request smuggling via URI manipulation and CRLF injection"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42580",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42580",
+        "Title": "netty: Netty: Request smuggling via chunk size parser integer overflow"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42581",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42581",
+        "Title": "netty: io.netty/netty-codec-http: Netty: HTTP Request Smuggling due to improper handling of conflicting HTTP/1.0 headers"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42585",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42585",
+        "Title": "netty: io.netty/netty-codec-http: Netty: Request smuggling via malformed Transfer-Encoding parsing"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-50020",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-50020",
+        "Title": "netty-codec-http: Netty: Data manipulation via request-boundary confusion in HttpObjectDecoder"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-56746",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-56746",
+        "Title": "io.netty/netty-codec-http: Netty: Security control bypass allows unauthorized requests via null origin header"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59898",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59898",
+        "Title": "io.netty/netty-codec-http: Netty: Protocol version confusion in netty-codec-http (WebSocket)"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59899",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59899",
+        "Title": "io.netty/netty-codec-http: Netty: Memory exhaustion in netty-codec-http (decompression bomb)"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59903",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.17.Final, 4.1.137.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59903",
+        "Title": "io.netty/netty: Netty: Information disclosure via CORS Vary header overwrite"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59921",
+        "PkgName": "io.netty:netty-codec-http",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59921",
+        "Title": "io.netty/netty-codec-http: Netty: CRLF Injection via Multipart Filename in Netty HttpPostRequestEncoder"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-33871",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+        "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42587",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.13.Final, 4.1.133.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42587",
+        "Title": "netty: io.netty/netty-codec-http: io.netty/netty-codec-http2: Netty: Denial of Service via unbounded memory allocation in HTTP content decompression"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-56819",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-56819",
+        "Title": "io.netty/netty-codec-http2: Netty: Denial of Service via HTTP/2 DATA frame memory leak"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-47244",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-47244",
+        "Title": "netty-codec-http2: Netty: Denial of Service via uncontrolled HTTP/2 concurrent streams"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-48043",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.1.135.Final, 4.2.15.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-48043",
+        "Title": "netty-codec-http2: netty-codec-http2: Denial of Service due to resource leak"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-50560",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-50560",
+        "Title": "netty-codec-http2: Netty: Denial of Service due to HTTP/2 max header size handling"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-59900",
+        "PkgName": "io.netty:netty-codec-http2",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.16.Final, 4.1.136.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-59900",
+        "Title": "io.netty/netty-codec-http2: Netty: Improper header neutralization in netty-codec-http2"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-75595",
+        "PkgName": "io.netty:netty-handler",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.17.Final, 4.1.137.Final",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-75595",
+        "Title": "io.netty/netty-handler: Netty: SNI Routing Bypass via Fragmented TLS ClientHello Causing Fallback to Default SslContext"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-44249",
+        "PkgName": "io.netty:netty-handler",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44249",
+        "Title": "netty-handler: netty-handler: IPv6 subnet rule bypass due to incorrect masking operation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-45416",
+        "PkgName": "io.netty:netty-handler",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-45416",
+        "Title": "netty-handler: Netty: Denial of Service due to eager buffer allocation in TLS handshake"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-50010",
+        "PkgName": "io.netty:netty-handler",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.15.Final, 4.1.135.Final",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-50010",
+        "Title": "netty-handler: Netty: Improper trust manager handling leads to hostname verification bypass"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-75596",
+        "PkgName": "io.netty:netty-handler",
+        "InstalledVersion": "4.1.130.Final",
+        "FixedVersion": "4.2.17.Final, 4.1.137.Final",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-75596",
+        "Title": "Netty is an asynchronous, event-driven network application framework.  ..."
+      },
+      {
+        "VulnerabilityID": "CVE-2026-64607",
+        "PkgName": "org.apache.httpcomponents.client5:httpclient5",
+        "InstalledVersion": "5.5.1",
+        "FixedVersion": "5.6.3",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-64607",
+        "Title": "org.apache.httpcomponents.client5/httpclient5: Apache HttpComponents Client: Denial of Service due to connection leak"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54399",
+        "PkgName": "org.apache.httpcomponents.core5:httpcore5",
+        "InstalledVersion": "5.3.6",
+        "FixedVersion": "5.4.3, 5.5-beta2",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54399",
+        "Title": "org.apache.httpcomponents.core5/httpcore5: Apache HttpComponents Core: Denial of Service via excessive HTTP headers"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54428",
+        "PkgName": "org.apache.httpcomponents.core5:httpcore5-h2",
+        "InstalledVersion": "5.3.6",
+        "FixedVersion": "5.4.3, 5.5-beta2",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54428",
+        "Title": "org.apache.httpcomponents.core5/httpcore5-h2: Apache HttpComponents Core: Denial of Service via oversized HTTP/2 HPACK header blocks"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-49844",
+        "PkgName": "org.apache.logging.log4j:log4j-api",
+        "InstalledVersion": "2.24.3",
+        "FixedVersion": "2.25.5, 2.26.1",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-49844",
+        "Title": "org.apache.logging.log4j/log4j-api: Apache Log4j API: Malformed JSON output due to improper encoding of floating-point values"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41293",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41293",
+        "Title": "tomcat-coyote: Apache Tomcat: HTTP/2 request headers not validated"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-43512",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-43512",
+        "Title": "tomcat-coyote: Apache Tomcat: Authentication bypass via digest authentication"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-43515",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-43515",
+        "Title": "tomcat-coyote: tomcat: Improper Authorization allows security bypass"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-65182",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "11.0.25, 10.1.58, 9.0.121",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-65182",
+        "Title": "tomcat: Apache Tomcat: Security constraint bypass due to improper access control"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-65905",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "11.0.25, 10.1.58, 9.0.121",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-65905",
+        "Title": "tomcat: Apache Tomcat: Authentication bypass via limited replay attack in DIGEST authenticator"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-68525",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "11.0.25, 10.1.58, 9.0.121",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-68525",
+        "Title": "tomcat: Apache Tomcat: Unauthorized resource access via FORM authentication bypass"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-24734",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "11.0.18, 10.1.52, 9.0.115",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24734",
+        "Title": "tomcat: Apache Tomcat: Certificate revocation bypass due to improper OCSP response validation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-24880",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.116, 10.1.52, 11.0.20",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24880",
+        "Title": "Apache Tomcat: Apache Tomcat: HTTP Request/Response Smuggling via invalid chunk extension"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-34483",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.116, 10.1.54, 11.0.21",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34483",
+        "Title": "Apache Tomcat: Apache Tomcat: Information disclosure due to improper encoding in JsonAccessLogValve"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-34487",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.117, 10.1.54, 11.0.21",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34487",
+        "Title": "Apache Tomcat: Apache Tomcat: Information disclosure via sensitive data in log files"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41284",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41284",
+        "Title": "tomcat: Apache Tomcat: Denial of Service due to uncontrolled resource allocation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42498",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42498",
+        "Title": "tomcat-coyote: Apache Tomcat: Information disclosure due to HTTP Authentication Header exposure during WebSocket authentication."
+      },
+      {
+        "VulnerabilityID": "CVE-2026-43513",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-43513",
+        "Title": "tomcat-catalina: Apache Tomcat: Improper Handling of Case Sensitivity in LockOutRealm"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-25854",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-25854",
+        "Title": "Apache Tomcat: Apache Tomcat: Open Redirect vulnerability via LoadBalancerDrainingValve"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-32990",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32990",
+        "Title": "Apache Tomcat: Apache Tomcat: Improper Input Validation vulnerability due to incomplete fix"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-43514",
+        "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+        "InstalledVersion": "10.1.50",
+        "FixedVersion": "9.0.118, 10.1.55, 11.0.22",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-43514",
+        "Title": "tomcat: Apache Tomcat: Information disclosure via AJP secret timing discrepancy"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-42198",
+        "PkgName": "org.postgresql:postgresql",
+        "InstalledVersion": "42.7.8",
+        "FixedVersion": "42.7.11",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42198",
+        "Title": "jdbc.postgresql.org: pgjdbc: Client-side Denial of Service via malicious SCRAM-SHA-256 authentication"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-54291",
+        "PkgName": "org.postgresql:postgresql",
+        "InstalledVersion": "42.7.8",
+        "FixedVersion": "42.7.12",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54291",
+        "Title": "org.postgresql/postgresql: com.ongres.scram/scram-client: pgjdbc: Man-in-the-middle protection bypass via SCRAM-SHA-256-PLUS downgrade"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-40973",
+        "PkgName": "org.springframework.boot:spring-boot",
+        "InstalledVersion": "3.5.9",
+        "FixedVersion": "4.0.6, 3.5.14",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-40973",
+        "Title": "Spring Boot: Spring Boot: Arbitrary Code Execution and Session Hijacking via predictable temporary directory"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41001",
+        "PkgName": "org.springframework.boot:spring-boot-autoconfigure",
+        "InstalledVersion": "3.5.9",
+        "FixedVersion": "4.0.7, 3.5.15",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41001",
+        "Title": "spring-boot: Spring Boot: Local attacker can manipulate data directory due to predictable path"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41695",
+        "PkgName": "org.springframework.data:spring-data-commons",
+        "InstalledVersion": "3.5.7",
+        "FixedVersion": "4.0.6, 3.5.12",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41695",
+        "Title": "Spring Data Commons: Spring Data Commons: Denial of Service via crafted property path strings"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41716",
+        "PkgName": "org.springframework.data:spring-data-commons",
+        "InstalledVersion": "3.5.7",
+        "FixedVersion": "4.0.6, 3.5.12",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41716",
+        "Title": "Spring Data Commons: Spring Data Commons: Denial of Service due to cache exhaustion via attacker-supplied strings"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41711",
+        "PkgName": "org.springframework.data:spring-data-commons",
+        "InstalledVersion": "3.5.7",
+        "FixedVersion": "4.0.6, 3.5.12",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41711",
+        "Title": "Spring Data Commons: Spring Data Commons: Denial of Service via parsing Sort parameters"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41721",
+        "PkgName": "org.springframework.data:spring-data-commons",
+        "InstalledVersion": "3.5.7",
+        "FixedVersion": "4.0.6, 3.5.12",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41721",
+        "Title": "Spring Data Commons: Spring Data Commons: Denial of Service via specially crafted HTTP request with @ProjectedPayload"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41719",
+        "PkgName": "org.springframework.data:spring-data-keyvalue",
+        "InstalledVersion": "3.5.7",
+        "FixedVersion": "4.0.6, 3.5.12",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41719",
+        "Title": "spring-data-keyvalue: spring-data-redis: Spring Data KeyValue: Information Disclosure via SpEL Injection"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22751",
+        "PkgName": "org.springframework.security:spring-security-core",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "6.5.10, 7.0.5",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22751",
+        "Title": "Spring Security: JdbcOneTimeTokenService: Spring Security: Authentication bypass due to race condition in One-Time Token login"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22746",
+        "PkgName": "org.springframework.security:spring-security-core",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "6.5.10, 7.0.5",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22746",
+        "Title": "Spring Security: Spring Security: Timing attack defense bypass allows information disclosure"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22748",
+        "PkgName": "org.springframework.security:spring-security-oauth2-jose",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "6.5.10, 7.0.5",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22748",
+        "Title": "Spring Security: Spring Security: Integrity impact due to improper JSON Web Token (JWT) validation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22732",
+        "PkgName": "org.springframework.security:spring-security-web",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "6.5.9, 7.0.4",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22732",
+        "Title": "Spring Security: Spring Security: Security policy bypass and information disclosure due to unwritten HTTP headers"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41706",
+        "PkgName": "org.springframework.security:spring-security-web",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "7.0.6, 6.5.11",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41706",
+        "Title": "Spring Security: Open Redirect via Unvalidated Post-Login Redirect URL Stored in CookieRequestCache"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-47838",
+        "PkgName": "org.springframework.security:spring-security-web",
+        "InstalledVersion": "6.5.7",
+        "FixedVersion": "6.5.11",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-47838",
+        "Title": "Spring Security Vulnerable to Unauthorized User Impersonation when Using X.509 Client Certificates"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41848",
+        "PkgName": "org.springframework:spring-core",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41848",
+        "Title": "spring-framework: Spring Framework: Regular Expression Denial of Service in AntPathMatcher"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41850",
+        "PkgName": "org.springframework:spring-expression",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41850",
+        "Title": "spring-framework: Spring Framework: Denial of Service via specially crafted SpEL expressions"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41851",
+        "PkgName": "org.springframework:spring-expression",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41851",
+        "Title": "Spring Framework: Spring Framework: Denial of Service via unbounded cache growth in SpEL evaluation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41852",
+        "PkgName": "org.springframework:spring-expression",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41852",
+        "Title": "spring-framework: org.springframework/spring-expression: Spring Framework: SpEL vulnerability allows unintended application logic invocation"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41854",
+        "PkgName": "org.springframework:spring-web",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41854",
+        "Title": "spring-framework: Spring Framework: Server-Side Request Forgery via incorrect host parsing"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-47884",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.9",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-47884",
+        "Title": "org.springframework/spring-webmvc: Spring Framework: Remote Code Execution via improper path limitation in XsltView"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-47890",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.9",
+        "Severity": "CRITICAL",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-47890",
+        "Title": "org.springframework/spring-webmvc: org.springframework/spring-webflux: Spring Framework: Stream corruption in Server-Sent Events (SSE) with view fragments"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41842",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41842",
+        "Title": "spring-framework: Spring Framework: Denial of Service when resolving static resources"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41845",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "HIGH",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41845",
+        "Title": "org.springframework: Spring Framework: Cross-site scripting (XSS) via incorrect JavaScript escaping"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22737",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.6, 6.2.17",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22737",
+        "Title": "Spring Framework: Spring Framework: Information disclosure via Java scripting engine enabled template views"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22745",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.7, 6.2.18",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22745",
+        "Title": "spring-webflux: Spring MVC and Spring WebFlux: Denial of Service via slow static resource resolution on Windows"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41841",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41841",
+        "Title": "Spring Framework: Spring MVC and WebFlux applications: Information Disclosure via static resource resolution"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41843",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41843",
+        "Title": "spring-webflux: spring-webmvc: Spring Framework: Information Disclosure via Path Traversal"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41844",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41844",
+        "Title": "Spring Framework: Spring Framework: Open Redirect via crafted link"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41846",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41846",
+        "Title": "Spring Framework: Spring Framework: Cross-site scripting (XSS) via user-supplied values in JSP form tags"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41853",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41853",
+        "Title": "Spring Framework: Spring Framework: Request smuggling vulnerability in Spring MVC and WebFlux"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22735",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.6, 6.2.17",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22735",
+        "Title": "org.springframework/spring-webmvc: org.springframework/spring-webflux: Spring MVC and WebFlux: Stream corruption vulnerability when using Server-Sent Events"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-22741",
+        "PkgName": "org.springframework:spring-webmvc",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.7, 6.2.18",
+        "Severity": "LOW",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-22741",
+        "Title": "Spring MVC: Spring WebFlux: Spring MVC and Spring WebFlux: Denial of Service via cache poisoning"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-41838",
+        "PkgName": "org.springframework:spring-websocket",
+        "InstalledVersion": "6.2.15",
+        "FixedVersion": "7.0.8, 6.2.19",
+        "Severity": "MEDIUM",
+        "SeveritySource": "ghsa",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-41838",
+        "Title": "IDs for WebSocket sessions in the spring-websocket module are not cryp ..."
+      }
+    ],
+    "package_inventory": [
+      {
+        "class": "os-pkgs",
+        "name": "acl-libs",
+        "version": "2.3.2-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "alpine-baselayout",
+        "version": "3.7.2-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "alpine-baselayout-data",
+        "version": "3.7.2-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "alpine-keys",
+        "version": "2.6-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "alpine-release",
+        "version": "3.24.3-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "apk-tools",
+        "version": "3.0.8-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "brotli-libs",
+        "version": "1.2.1-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "busybox",
+        "version": "1.37.0-r31"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "busybox-binsh",
+        "version": "1.37.0-r31"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "ca-certificates",
+        "version": "20261020-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "ca-certificates-bundle",
+        "version": "20261020-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "coreutils",
+        "version": "9.11-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "coreutils-env",
+        "version": "9.11-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "coreutils-fmt",
+        "version": "9.11-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "coreutils-sha512sum",
+        "version": "9.11-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "encodings",
+        "version": "1.1.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "font-dejavu",
+        "version": "2.37-r6"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "fontconfig",
+        "version": "2.17.1-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "freetype",
+        "version": "2.14.3-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gdbm",
+        "version": "1.26-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gmp",
+        "version": "6.3.0-r4"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg-dirmngr",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg-gpgconf",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg-keyboxd",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg-utils",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnupg-wks-client",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gnutls",
+        "version": "3.8.13-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gpg",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gpg-agent",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gpg-wks-server",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gpgsm",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "gpgv",
+        "version": "2.4.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libapk",
+        "version": "3.0.8-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libassuan",
+        "version": "3.0.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libattr",
+        "version": "2.5.2-r2"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libbz2",
+        "version": "1.0.8-r6"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libcrypto3",
+        "version": "3.5.9-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libexpat",
+        "version": "2.9.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libffi",
+        "version": "3.5.2-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libfontenc",
+        "version": "1.1.9-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libgcrypt",
+        "version": "1.12.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libgpg-error",
+        "version": "1.61-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libidn2",
+        "version": "2.3.8-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libintl",
+        "version": "1.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libksba",
+        "version": "1.7.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libldap",
+        "version": "2.6.15-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libncursesw",
+        "version": "6.6_p20260516-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libpng",
+        "version": "1.6.59-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libsasl",
+        "version": "2.1.28-r9"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libssl3",
+        "version": "3.5.9-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libtasn1",
+        "version": "4.21.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "libunistring",
+        "version": "1.4.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "mkfontscale",
+        "version": "1.2.4-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "musl",
+        "version": "1.2.6-r3"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "musl-locales",
+        "version": "0.1.0-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "musl-locales-lang",
+        "version": "0.1.0-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "musl-utils",
+        "version": "1.2.6-r3"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "ncurses-terminfo-base",
+        "version": "6.6_p20260516-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "nettle",
+        "version": "3.10.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "npth",
+        "version": "1.8-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "openssl",
+        "version": "3.5.9-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "p11-kit",
+        "version": "0.26.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "p11-kit-trust",
+        "version": "0.26.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "pinentry",
+        "version": "1.3.2-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "scanelf",
+        "version": "1.3.9-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "skalibs-libs",
+        "version": "2.15.0.0-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "sqlite-libs",
+        "version": "3.53.4-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "ssl_client",
+        "version": "1.37.0-r31"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "tzdata",
+        "version": "2026e-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "utmps-libs",
+        "version": "0.1.3.3-r0"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "zlib",
+        "version": "1.3.2-r1"
+      },
+      {
+        "class": "os-pkgs",
+        "name": "zstd-libs",
+        "version": "1.5.7-r2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "ch.qos.logback:logback-classic",
+        "version": "1.5.22"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "ch.qos.logback:logback-core",
+        "version": "1.5.22"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.core:jackson-annotations",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.core:jackson-core",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.core:jackson-databind",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.dataformat:jackson-dataformat-toml",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml.jackson.module:jackson-module-parameter-names",
+        "version": "2.19.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.fasterxml:classmate",
+        "version": "1.7.1"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.github.stephenc.jcip:jcip-annotations",
+        "version": "1.0-1"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.google.code.gson:gson",
+        "version": "2.13.1"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.nimbusds:nimbus-jose-jwt",
+        "version": "9.37.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "com.zaxxer:HikariCP",
+        "version": "6.3.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.lettuce:lettuce-core",
+        "version": "6.6.0.RELEASE"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.micrometer:micrometer-commons",
+        "version": "1.15.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.micrometer:micrometer-core",
+        "version": "1.15.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.micrometer:micrometer-jakarta9",
+        "version": "1.15.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.micrometer:micrometer-observation",
+        "version": "1.15.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.micrometer:micrometer-registry-prometheus",
+        "version": "1.15.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-buffer",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-codec",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-codec-http",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-codec-http2",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-common",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-handler",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-resolver",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-transport",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-transport-classes-epoll",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.netty:netty-transport-native-unix-common",
+        "version": "4.1.130.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.projectreactor:reactor-core",
+        "version": "3.7.14"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-config",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-core",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-exposition-formats",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-exposition-textformats",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-model",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.prometheus:prometheus-metrics-tracer-common",
+        "version": "1.3.10"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "io.r2dbc:r2dbc-spi",
+        "version": "1.0.0.RELEASE"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "jakarta.activation:jakarta.activation-api",
+        "version": "2.1.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "jakarta.annotation:jakarta.annotation-api",
+        "version": "2.1.1"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "jakarta.validation:jakarta.validation-api",
+        "version": "3.0.2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+        "version": "4.0.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.httpcomponents.client5:httpclient5",
+        "version": "5.5.1"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.httpcomponents.core5:httpcore5",
+        "version": "5.3.6"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.httpcomponents.core5:httpcore5-h2",
+        "version": "5.3.6"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.logging.log4j:log4j-api",
+        "version": "2.24.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.logging.log4j:log4j-to-slf4j",
+        "version": "2.24.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "version": "10.1.50"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.tomcat.embed:tomcat-embed-el",
+        "version": "10.1.50"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.apache.tomcat.embed:tomcat-embed-websocket",
+        "version": "10.1.50"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.checkerframework:checker-qual",
+        "version": "3.49.5"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.flywaydb:flyway-core",
+        "version": "11.7.2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.flywaydb:flyway-database-postgresql",
+        "version": "11.7.2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.hdrhistogram:HdrHistogram",
+        "version": "2.2.2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.hibernate.validator:hibernate-validator",
+        "version": "8.0.3.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.jboss.logging:jboss-logging",
+        "version": "3.6.1.Final"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.jctools:jctools-core",
+        "version": "4.0.5"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.jooq:jooq",
+        "version": "3.19.29"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.latencyutils:LatencyUtils",
+        "version": "2.0.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.postgresql:postgresql",
+        "version": "42.7.8"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.reactivestreams:reactive-streams",
+        "version": "1.0.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.slf4j:jul-to-slf4j",
+        "version": "2.0.17"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.slf4j:slf4j-api",
+        "version": "2.0.17"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.boot:spring-boot",
+        "version": "3.5.9"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.boot:spring-boot-actuator",
+        "version": "3.5.9"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.boot:spring-boot-actuator-autoconfigure",
+        "version": "3.5.9"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.boot:spring-boot-autoconfigure",
+        "version": "3.5.9"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.boot:spring-boot-jarmode-tools",
+        "version": "3.5.9"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.data:spring-data-commons",
+        "version": "3.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.data:spring-data-keyvalue",
+        "version": "3.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.data:spring-data-redis",
+        "version": "3.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-config",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-core",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-crypto",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-oauth2-core",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-oauth2-jose",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-oauth2-resource-server",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework.security:spring-security-web",
+        "version": "6.5.7"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-aop",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-beans",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-context",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-context-support",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-core",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-expression",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-jcl",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-jdbc",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-messaging",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-oxm",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-tx",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-web",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-webmvc",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.springframework:spring-websocket",
+        "version": "6.2.15"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "org.yaml:snakeyaml",
+        "version": "2.4"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "redis.clients.authentication:redis-authx-core",
+        "version": "0.1.1-beta2"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:annotations",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:apache5-client",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:auth",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:aws-core",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:aws-json-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:checksums",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:checksums-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:cloudwatch",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:endpoints-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:http-auth",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:http-auth-aws",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:http-auth-aws-eventstream",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:http-auth-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:http-client-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:identity-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:json-utils",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:metrics-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:netty-nio-client",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:profiles",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:protocol-core",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:regions",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:retries",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:retries-spi",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:sdk-core",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:smithy-rpcv2-protocol",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:third-party-jackson-core",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:third-party-jackson-dataformat-cbor",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:utils",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.awssdk:utils-lite",
+        "version": "2.55.3"
+      },
+      {
+        "class": "lang-pkgs",
+        "name": "software.amazon.eventstream:eventstream",
+        "version": "1.0.1"
+      }
+    ]
+  },
+  "independent_security_review": {
+    "reviewed_at_utc": "2026-10-28T23:55:19.930492+00:00",
+    "review_mode": "independent read-only inspection of scanner report, scan log, source searches, and official vendor advisories",
+    "source_report": "private Trivy JSON; SHA-256 recorded in trivy.raw_report_sha256",
+    "scanned_image_id": "sha256:35f5a732bf6db2fee8c8fe12aaad6a66e9a7a17ed0dbd43f667bb70b2491d5d3",
+    "status": "blocked_for_deployment",
+    "scanner_counts": {
+      "os_packages": 73,
+      "os_findings": 0,
+      "java_packages": 124,
+      "java_findings": 105,
+      "CRITICAL": 10,
+      "HIGH": 41,
+      "MEDIUM": 45,
+      "LOW": 9,
+      "UNKNOWN": 0
+    },
+    "unique_counts": {
+      "cves": 104,
+      "CRITICAL": 10,
+      "HIGH": 40,
+      "MEDIUM": 45,
+      "LOW": 9,
+      "UNKNOWN": 0
+    },
+    "affected_package_count": 26,
+    "duplicate": {
+      "cve": "CVE-2026-42587",
+      "severity": "HIGH",
+      "packages": [
+        "io.netty:netty-codec-http",
+        "io.netty:netty-codec-http2"
+      ],
+      "explanation": "One CVE affects two distinct package findings; retain both findings."
+    },
+    "vendor_source_reviews": [
+      {
+        "cve": "CVE-2026-75595",
+        "package": "io.netty:netty-handler",
+        "vendor_severity": "HIGH",
+        "official_url": "https://github.com/netty/netty/security/advisories/GHSA-c4c3-7fpv-j4q5",
+        "conditions": "Per-SNI SslContext is the sole mTLS gate, fallback SslContext permits unauthenticated clients, and no secondary peer-certificate verification exists.",
+        "fix_path": "Same-line patch: 4.1.137.Final; align all Netty modules and test compatibility.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-41293",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "LOW",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "HTTP/2 requests with invalid headers can reach applications that assume Servlet header values are valid.",
+        "fix_path": "Originally fixed in 10.1.55; subsequent fixes/regressions require reviewing the current 10.1.x release, including 10.1.61.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-43512",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "MODERATE",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "Tomcat DIGEST authentication and its configured Realm are used.",
+        "fix_path": "Same-line patch originally 10.1.55; select a current 10.1.x security release.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-43515",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "MODERATE",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "Multiple security constraints specify HTTP methods for the same extension pattern.",
+        "fix_path": "Same-line patch originally 10.1.55; select a current 10.1.x security release.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-65182",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "IMPORTANT",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "A security constraint for a longer path precedes a more restrictive constraint for a shorter sub-path.",
+        "fix_path": "Scanner lists 10.1.58, but its release vote failed. Actual released fix is 10.1.59; review later 10.1.x fixes as well.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-65905",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "LOW",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "DIGEST authentication with a nonce count at the upper boundary of the replay window allows limited replay.",
+        "fix_path": "Scanner lists 10.1.58, but actual released fix is 10.1.59; review later 10.1.x fixes as well.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-68525",
+        "package": "org.apache.tomcat.embed:tomcat-embed-core",
+        "vendor_severity": "LOW",
+        "official_url": "https://tomcat.apache.org/security-10.html",
+        "conditions": "Tomcat FORM authentication redirects interact with a security constraint restricting POST but not GET.",
+        "fix_path": "Scanner lists 10.1.58, but actual released fix is 10.1.59; review later 10.1.x fixes as well.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-22732",
+        "package": "org.springframework.security:spring-security-web",
+        "vendor_severity": "CRITICAL",
+        "official_url": "https://spring.io/security/cve-2026-22732/",
+        "conditions": "Servlet applications relying on Spring Security response headers can fail to write those headers under some conditions.",
+        "fix_path": "OSS same-line fix 6.5.9 or later. Prefer aligned dependency updates; test response headers and authentication.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": false,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-47884",
+        "package": "org.springframework:spring-webmvc",
+        "vendor_severity": "MEDIUM",
+        "official_url": "https://spring.io/security/cve-2026-47884/",
+        "conditions": "XsltView is used with a /** mapping resulting in view rendering without an explicitly specified view name.",
+        "fix_path": "OSS fix 7.0.9; 6.2.20 is Enterprise Support Only. Assess applicability and a compatible Boot/Framework upgrade path separately.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      },
+      {
+        "cve": "CVE-2026-47890",
+        "package": "org.springframework:spring-webmvc",
+        "vendor_severity": "LOW",
+        "official_url": "https://spring.io/security/cve-2026-47890/",
+        "conditions": "MVC or WebFlux streams view fragments over SSE and attackers control data streamed to other users.",
+        "fix_path": "OSS fix 7.0.9; 6.2.20 is Enterprise Support Only. Assess applicability and a compatible Boot/Framework upgrade path separately.",
+        "scanner_severity": "CRITICAL",
+        "scanner_severity_source": "ghsa",
+        "severity_difference": true,
+        "exploitability": "not assessed",
+        "disposition": "open; no suppression or risk acceptance"
+      }
+    ],
+    "ecr_basic": {
+      "status": "COMPLETE",
+      "findings": 0,
+      "evidence_origin": "reported by parent agent; not independently queried in this review",
+      "scope": "OS package scanning; does not override Java findings"
+    },
+    "publication": {
+      "evidence_origin": "parent agent reports ECR candidate publication complete",
+      "deployment_promotion": "not approved",
+      "server_creation": "not performed by this review"
+    },
+    "source_applicability_limitations": [
+      "Exploitability is not assessed. No exploit, runtime reachability, or full configuration validation was performed.",
+      "A limited search of apps/api/src/main found no explicit XsltView, SSE helper, or SniHandler usage. This is insufficient to classify a finding as not affected.",
+      "Preserve original scanner severity and show vendor severity separately; differences do not constitute a false-positive determination or risk acceptance.",
+      "All 105 findings have a FixedVersion field, but this does not prove a compatible, publicly available, complete remediation exists.",
+      "No prior equivalent Java scan was established, so these findings cannot be attributed to the new request timing code.",
+      "OS findings of zero are limited to the scanned package inventory and vulnerability database; they do not establish overall application security."
+    ],
+    "recommended_followups": {
+      "same_line_remediation_candidates": [
+        {
+          "component": "Spring Boot",
+          "current": "3.5.9",
+          "candidate": "3.5.14 or later 3.5 patch for CVE-2026-40973",
+          "official_url": "https://spring.io/security/cve-2026-40973/"
+        },
+        {
+          "component": "Spring Security",
+          "current": "6.5.7",
+          "candidate": "6.5.9 or later aligned patch"
+        },
+        {
+          "component": "Tomcat",
+          "current": "10.1.50",
+          "candidate": "Review current 10.1.x security release, including 10.1.61; do not select un-released 10.1.58"
+        },
+        {
+          "component": "Netty",
+          "current": "4.1.130.Final",
+          "candidate": "4.1.137.Final or later reviewed 4.1 patch, with module alignment"
+        },
+        {
+          "component": "Other Java dependencies",
+          "candidate": "Review Jackson, Micrometer, PostgreSQL JDBC, Spring Data and HttpComponents findings; validate BOM/explicit-pin compatibility before changes"
+        }
+      ],
+      "separate_version_path_review": {
+        "cves": [
+          "CVE-2026-47884",
+          "CVE-2026-47890"
+        ],
+        "reason": "Framework 6.2.20 fixes are Enterprise Support Only; OSS 7.0.9 requires a compatible framework/Boot version path. Do not replace isolated Spring modules with 7.x.",
+        "boot_3_5_16_bom": {
+          "framework": "6.2.19",
+          "security": "6.5.11",
+          "tomcat": "10.1.55",
+          "netty": "4.1.135.Final"
+        },
+        "bom_official_url": "https://docs.spring.io/spring-boot/3.5/appendix/dependency-versions/coordinates.html",
+        "conclusion": "A Boot 3.5.16-only update cannot be claimed to remediate all current findings."
+      },
+      "validation_after_changes": [
+        "Run existing authentication, authorization, WebSocket, DB, and timing tests.",
+        "Build a new immutable image and repeat OS plus Java scans against that exact image.",
+        "Review remaining findings and vendor conditions without automatic suppression."
+      ],
+      "completion_rules": [
+        "Repository publication may be complete while security remediation remains open.",
+        "Do not mark security verification, deployability, or exploitability validation complete.",
+        "Do not promote the candidate digest or create AWS servers as part of this review."
+      ]
+    }
+  },
+  "deployment": {
+    "security_ready": false,
+    "promoted_to_current_image_selection": false,
+    "fresh_candidate_cognito_validation": false,
+    "apply_executed": false,
+    "aws_servers_created": false,
+    "load_or_fault_test_executed": false,
+    "m2_status": "In Progress",
+    "m3_status": "In Progress",
+    "old_api_reference_is_not_a_security_fallback": true
+  },
+  "cost_evidence": "2026-10-29-baseline-cost-estimate.json#latency_candidate_followup",
+  "remaining_db_test_high": {
+    "count": 4,
+    "status": "historical unresolved; DB image not rescanned in this step and excluded from planned baseline"
+  },
+  "privacy": "No auth tokens, passwords, current IP, tfvars, raw Terraform plan or personal user identifiers included",
+  "deployment_review": {
+    "reviewed_at": "2026-10-28T23:56:06.252134+00:00",
+    "scope": "Blocked candidate deployment preview only; no apply and no scheduled deployment",
+    "terraform_version": "1.5.7",
+    "terraform_validate_passed": true,
+    "terraform_plan_exit_code": 1,
+    "plan_status": "blocked by authentication/metrics contract",
+    "planned_create_partial": 93,
+    "planned_aws_create_partial": 91,
+    "planned_non_aws_create_partial": 2,
+    "planned_update": 0,
+    "planned_destroy": 0,
+    "expected_full_configuration_count_unverified": 98,
+    "not_planned_due_to_failed_dependency": [
+      "terraform_data.contract",
+      "aws_ecs_task_definition.core[0]",
+      "aws_ecs_task_definition.monitoring[0]",
+      "aws_ecs_service.core[0]",
+      "aws_ecs_service.monitoring[0]"
+    ],
+    "checks": {
+      "correct_account": true,
+      "baseline_only": true,
+      "workloads_requested_but_auth_gate_false": true,
+      "db_test_disabled": true,
+      "candidate_digest_matches_parent_build": true,
+      "exactly_three_images": true,
+      "prometheus_contract_matches_image_name_rendered_config": true,
+      "allowed_cidrs_single_private_32": true,
+      "review_deadline_is_future_at_review": true,
+      "original_source_unchanged": true,
+      "original_state_still_empty": true,
+      "rds_private_encrypted": true,
+      "cache_tls_encrypted": true,
+      "alb_internal": true,
+      "no_fault_task_or_fault_role_planned": true,
+      "no_nat_gateway_or_interface_endpoint_planned": true,
+      "no_new_foundation_or_lambdaops_or_alarm_resources": true,
+      "no_update_delete_replace": true,
+      "ecr_digest_matches_candidate_input": true,
+      "trivy_summary_matches_main_agent": true
+    },
+    "security_scan": {
+      "trivy_report_sha256": "963155f98b8ecdd2e51c919d3b55b611fed9da6287a66aa1a0c1ab30002a4d6f",
+      "trivy_package_findings_by_severity": {
+        "LOW": 9,
+        "HIGH": 41,
+        "MEDIUM": 45,
+        "CRITICAL": 10
+      },
+      "trivy_findings_by_class": {
+        "os-pkgs": {},
+        "lang-pkgs": {
+          "LOW": 9,
+          "HIGH": 41,
+          "MEDIUM": 45,
+          "CRITICAL": 10
+        }
+      },
+      "deployment_security_gate_passed": false,
+      "ecr_scan_status": "COMPLETE",
+      "ecr_reported_image_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "ecr_findings": {},
+      "interpretation": "ECR Basic zero does not negate independently detected Java application dependency findings.",
+      "report_evidence": "trivy section of this file"
+    },
+    "blockers": [
+      "New API image has not completed actual Cognito login/metrics isolation verification; cloud_contract_verified remains false.",
+      "New candidate Trivy scan contains Critical and High package findings; candidate must not be promoted as deployment-ready.",
+      "Current source IP was not reverified; prior private /32 retained for review only after external IP lookup automatic-approval rejection."
+    ],
+    "deadline": {
+      "review_only_expires_at": "2026-10-29T03:50:55Z",
+      "actual_deployment_scheduled": false,
+      "expires_at_is_only_a_tag": true
+    },
+    "runtime_expectations_from_configuration_not_successful_plan": {
+      "ecs_tasks": 2,
+      "total_vcpu": 2,
+      "total_memory_gib": 5,
+      "rds_class": "db.t4g.small",
+      "rds_allocated_gb": 20,
+      "cache_node_type": "cache.t4g.micro",
+      "internal_alb": true,
+      "custom_metric_series_max": 6
+    },
+    "aws_apply_executed": false,
+    "original_state_managed_instances_after_plan": 0,
+    "private_artifacts_must_not_be_committed": true,
+    "cache_encryption_note": "AWS provider 6 plan schema renders at_rest_encryption_enabled as string true while transit_encryption_enabled is boolean true; normalized before validation. TLS mode is required.",
+    "partial_resource_types": {
+      "random_password": 2,
+      "aws_api_gateway_rest_api": 1,
+      "aws_ecs_cluster": 1,
+      "aws_cloudwatch_log_group": 1,
+      "aws_secretsmanager_secret": 2,
+      "aws_vpc": 1,
+      "aws_iam_role": 6,
+      "aws_api_gateway_resource": 5,
+      "aws_security_group": 7,
+      "aws_service_discovery_private_dns_namespace": 1,
+      "aws_route_table": 1,
+      "aws_api_gateway_rest_api_policy": 1,
+      "aws_api_gateway_gateway_response": 2,
+      "aws_internet_gateway": 1,
+      "aws_lb_target_group": 2,
+      "aws_iam_role_policy_attachment": 3,
+      "aws_iam_role_policy": 3,
+      "aws_secretsmanager_secret_version": 2,
+      "aws_service_discovery_service": 2,
+      "aws_vpc_security_group_egress_rule": 11,
+      "aws_vpc_security_group_ingress_rule": 8,
+      "aws_route": 1,
+      "aws_api_gateway_method": 4,
+      "aws_subnet": 4,
+      "aws_route_table_association": 2,
+      "aws_elasticache_subnet_group": 1,
+      "aws_apigatewayv2_vpc_link": 1,
+      "aws_db_subnet_group": 1,
+      "aws_lb": 1,
+      "aws_elasticache_replication_group": 1,
+      "aws_db_instance": 1,
+      "aws_lb_listener": 1,
+      "aws_lb_listener_rule": 5,
+      "aws_api_gateway_integration": 4,
+      "aws_api_gateway_deployment": 1,
+      "aws_api_gateway_stage": 1,
+      "aws_api_gateway_method_settings": 1
+    }
+  }
+}

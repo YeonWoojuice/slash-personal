@@ -252,5 +252,361 @@
     "https://aws.amazon.com/route53/pricing/",
     "https://aws.amazon.com/ko/blogs/tech/aws-networking-dto-dp-01/",
     "https://docs.aws.amazon.com/whitepapers/latest/best-practices-api-gateway-private-apis-integration/cost-optimization.html"
-  ]
+  ],
+  "latency_candidate_followup": {
+    "checked_at_utc": "2026-10-28T23:45:57.879699+00:00",
+    "region": "ap-northeast-2",
+    "currency": "USD",
+    "scope": "New API image storage/basic scan now; future incremental Slash normal-baseline runtime. No servers/resources created or changed in this review. Estimates are not actual bill or hard budget cap.",
+    "configuration": {
+      "mode": "api-baseline",
+      "fargate_tasks": [
+        {
+          "purpose": "API",
+          "vcpu": 1,
+          "gib": 3,
+          "architecture": "X86_64"
+        },
+        {
+          "purpose": "Prometheus and Grafana",
+          "vcpu": 1,
+          "gib": 2,
+          "architecture": "X86_64"
+        }
+      ],
+      "task_public_ipv4": 2,
+      "rds": "PostgreSQL Single-AZ db.t4g.small,20GB gp3",
+      "valkey": "Valkey 8.0,1 cache.t4g.micro",
+      "ingress": "Regional REST API -> VPC link V2 -> internal ALB",
+      "nat_or_interface_endpoint_or_api_cache": false,
+      "new_alarm_resources": 0,
+      "custom_metrics_max": 6,
+      "secrets": 3,
+      "cloudmap_service_definitions": 2,
+      "cloudmap_registered_resources_baseline": 1,
+      "cloudmap_note": "Two service definitions exist, but only core ECS service registers in api-baseline mode; inference count=0, monitoring has no service_registry."
+    },
+    "current_image_work": {
+      "ecr_basic_scan_usd": 0,
+      "ecr_storage_usd_per_GB_month": 0.1,
+      "new_image_size_bytes": 131123066,
+      "incremental_storage_cost": "Additional unique compressed stored layers in GB * $0.10 per month; shared layers make per-image size a conservative comparison, not exact incremental charge.",
+      "examples_usd_month": {
+        "0.5GB": 0.05,
+        "1GB": 0.1
+      },
+      "server_compute_incremental_charge": 0,
+      "caveat": "Not an assertion that total AWS account spending is zero; retained resources may remain billable.",
+      "image_size_evidence": "/private/tmp/slash-api-image-20261029/publication-api.json",
+      "image_manifest_digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+      "new_image_size_decimal_GB": 0.131123066,
+      "new_image_size_GiB": 0.12211787141859531,
+      "full_image_new_storage_assumption": {
+        "definition": "Conservative arithmetic estimate: divide the reported compressed ECR image bytes by 1,000,000,000 (decimal GB), multiply by $0.10/GB-month, and assume every layer is newly stored for a full month. This is not a claim that AWS bills using decimal GB or that all layers add new storage.",
+        "usd_month_decimal_GB": 0.0131123066,
+        "usd_month_binary_GiB_comparison": 0.012211787141859531,
+        "rounded_up_usd_month": 0.014,
+        "billing_caveat": "Shared pre-existing layers reduce actual incremental storage. Retention for part of a month reduces byte-hour charges. Account allowances and tax are not applied. Existing images are excluded."
+      }
+    },
+    "main_hourly_usd": {
+      "api_task": 0.06189,
+      "monitor_task": 0.05678,
+      "rds_instance": 0.051,
+      "valkey_node": 0.0192,
+      "internal_alb": 0.0225,
+      "task_public_ipv4": 0.01,
+      "total": 0.22136999999999998
+    },
+    "scenarios": [
+      {
+        "creation_through_confirmed_deletion_hours": 1,
+        "low_usd": 0.490776,
+        "high_usd": 1.182814,
+        "main_resources_usd": 0.22137,
+        "storage_secrets_metrics_discovery_api_usd": 0.012401,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.076004,
+          0.768043
+        ]
+      },
+      {
+        "creation_through_confirmed_deletion_hours": 2,
+        "low_usd": 0.720586,
+        "high_usd": 1.420663,
+        "main_resources_usd": 0.44274,
+        "storage_secrets_metrics_discovery_api_usd": 0.020837,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.076009,
+          0.776086
+        ]
+      },
+      {
+        "creation_through_confirmed_deletion_hours": 6,
+        "low_usd": 1.639825,
+        "high_usd": 2.372058,
+        "main_resources_usd": 1.32822,
+        "storage_secrets_metrics_discovery_api_usd": 0.054579,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.076026,
+          0.808258
+        ]
+      }
+    ],
+    "test_time_plus_one_hour_setup_cleanup": [
+      {
+        "test_hours": 1,
+        "creation_through_confirmed_deletion_hours": 2,
+        "low_usd": 0.720586,
+        "high_usd": 1.420663,
+        "main_resources_usd": 0.44274,
+        "storage_secrets_metrics_discovery_api_usd": 0.020837,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.076009,
+          0.776086
+        ]
+      },
+      {
+        "test_hours": 2,
+        "creation_through_confirmed_deletion_hours": 3,
+        "low_usd": 0.950396,
+        "high_usd": 1.658512,
+        "main_resources_usd": 0.66411,
+        "storage_secrets_metrics_discovery_api_usd": 0.029273,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.076013,
+          0.784129
+        ]
+      },
+      {
+        "test_hours": 6,
+        "creation_through_confirmed_deletion_hours": 7,
+        "low_usd": 1.869635,
+        "high_usd": 2.609906,
+        "main_resources_usd": 1.54959,
+        "storage_secrets_metrics_discovery_api_usd": 0.063015,
+        "requests_egress_crossaz_usd": 0.181,
+        "logs_and_lcu_usd_range": [
+          0.07603,
+          0.816301
+        ]
+      }
+    ],
+    "range_assumptions": {
+      "time": "Lifecycle hours from creation through confirmed deletion; 1/2/6h scenarios use whole-hour lifecycle assumptions, not pure test duration.",
+      "per_run_REST_requests_including_Grafana_and_OPTIONS": 10000,
+      "per_run_log_GB_low_high": [
+        0.1,
+        1
+      ],
+      "average_ALB_LCU_low_high": [
+        0,
+        1
+      ],
+      "per_run_paid_internet_egress_GB": 1,
+      "per_run_cross_AZ_allowance_usd": 0.02,
+      "monthly_proration_hours": 730,
+      "CloudWatch_metric_hours": "elapsed hours + 1, allowing for partial clock-hour boundaries",
+      "CloudWatch_API_calls": "60/hour publishing + 100 reads/run",
+      "Secrets_API_calls": 100,
+      "private_DNS": "Deleted within 12h: hosted-zone test exemption; private-zone queries free.",
+      "RDS_surplus_CPU_credits": 0,
+      "task_replacement_or_parallel_redeployment": false,
+      "discounts_credits_free_tier_and_tax": "Not applied; actual charges can be lower with account allowances."
+    },
+    "billing_rules": {
+      "fargate_linux": "Per second from image download to task termination, minimum 60 seconds; default 20 GiB ephemeral disk included.",
+      "public_ipv4": "Per second, minimum 60 seconds per address.",
+      "rds_compute": "Per second, minimum 10 minutes after a billable status change; stopping does not stop storage charges.",
+      "valkey_node": "Every partial node-hour billed as a full hour.",
+      "alb": "Every partial ALB-hour billed as a full hour; LCU charged separately by usage.",
+      "private_hosted_zone": "No charge if deleted within 12h of creation; otherwise $0.50 for the first 25 zones, not prorated.",
+      "secrets": "Hourly prorated storage; API calls charged separately.",
+      "metrics": "Charged for hours in which custom metric data is published; old metric history alone does not keep producing ingestion charges."
+    },
+    "additional_or_retained_costs": [
+      "Surplus RDS T4g CPU credits $0.075/vCPU-hour. For this 2-vCPU instance, a conservative extra bound before baseline/credit offsets is $0.15 per elapsed hour; not included in the normal-baseline totals.",
+      "Private hosted zone retained past 12h: $0.50/month, not prorated. Additional elapsed time and partial ALB/Valkey hours add charges.",
+      "Request/log/LCU/network volume above assumptions and duplicate/retried tasks can exceed this range. The range is not a spending cap.",
+      "Existing ECR, Cognito and LambdaOps/alarms/state are outside future experiment-only totals. New API image storage is separately described in current_image_work; no messaging assumed.",
+      "Manual snapshots/backups, extra KMS API calls, Logs Insights queries, tax and exchange conversion are not included."
+    ],
+    "verified_price_api_rates": {
+      "rds_db_t4g_small_hour": {
+        "usd": 0.051,
+        "unit": "Hrs",
+        "sku": "UMH398UHTY46K8BK",
+        "service": "AmazonRDS",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "rds_gp3_gb_month": {
+        "usd": 0.131,
+        "unit": "GB-Mo",
+        "sku": "8TFTRRBWJSP95DQP",
+        "service": "AmazonRDS",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "rds_surplus_vcpu_hour": {
+        "usd": 0.075,
+        "unit": "vCPU-Hours",
+        "sku": "GYPHBB4HSCMUCDNK",
+        "service": "AmazonRDS",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "valkey_cache_t4g_micro_hour": {
+        "usd": 0.0192,
+        "unit": "Hrs",
+        "sku": "JWGV22RACS6825AS",
+        "service": "AmazonElastiCache",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "alb_hour": {
+        "usd": 0.0225,
+        "unit": "Hrs",
+        "sku": "VUV9M7PZ543S2SC9",
+        "service": "AWSELB",
+        "effective_date": "2026-08-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "alb_lcu_hour": {
+        "usd": 0.008,
+        "unit": "LCU-Hrs",
+        "sku": "CX4ZBV2SE6F5HJV3",
+        "service": "AWSELB",
+        "effective_date": "2026-08-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "public_ipv4_hour": {
+        "usd": 0.005,
+        "unit": "Hrs",
+        "sku": "ZKBHEVDXYBRCKFQ8",
+        "service": "AmazonVPC",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "rest_request": {
+        "usd": 3.5e-06,
+        "unit": "Requests",
+        "sku": "3U6J7Z7NQKKPWAZ9",
+        "service": "AmazonApiGateway",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "cw_metric_month": {
+        "usd": 0.3,
+        "unit": "Metrics",
+        "sku": "92QAN7T7PQUAG6NQ",
+        "service": "AmazonCloudWatch",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "cw_logs_ingest_gb": {
+        "usd": 0.76,
+        "unit": "GB",
+        "sku": "5P9Q77R2ADUJCNJ2",
+        "service": "AmazonCloudWatch",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "cw_logs_store_gb_month": {
+        "usd": 0.0314,
+        "unit": "GB-Mo",
+        "sku": "E7V5NF3GN7MQKCB6",
+        "service": "AmazonCloudWatch",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "cw_api_request": {
+        "usd": 1e-05,
+        "unit": "Requests",
+        "sku": "CY5JMB5JBHJAY5XB",
+        "service": "AmazonCloudWatch",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "secret_month": {
+        "usd": 0.4,
+        "unit": "Secrets",
+        "sku": "8TY6BPQ52JVYCRQD",
+        "service": "AWSSecretsManager",
+        "effective_date": "2025-07-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "secrets_api_request": {
+        "usd": 5e-06,
+        "unit": "API Requests",
+        "sku": "9779GVGYGTKZ2UJA",
+        "service": "AWSSecretsManager",
+        "effective_date": "2025-07-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "cloudmap_resource_month": {
+        "usd": 0.1,
+        "unit": "CloudMapResource",
+        "sku": "JAF56EEF95B2NSXP",
+        "service": "AWSCloudMap",
+        "effective_date": "2025-08-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "internet_egress_gb": {
+        "usd": 0.126,
+        "unit": "GB",
+        "sku": "9AS8NERTGECRPGT7",
+        "service": "AWSDataTransfer",
+        "effective_date": "2026-06-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "existing_ecr_gb_month": {
+        "usd": 0.1,
+        "unit": "GB-Mo",
+        "sku": "FP58BXCX2RHZR3B2",
+        "service": "AmazonECR",
+        "effective_date": "2025-11-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "fargate_x86_vcpu_hour": {
+        "usd": 0.04656,
+        "unit": "hours",
+        "sku": "DS579H2QDYXPJDKE",
+        "service": "AmazonECS",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      },
+      "fargate_x86_gib_hour": {
+        "usd": 0.00511,
+        "unit": "hours",
+        "sku": "KJE68NNYFF2BQG98",
+        "service": "AmazonECS",
+        "effective_date": "2026-10-01T00:00:00Z",
+        "location": "Asia Pacific (Seoul)"
+      }
+    },
+    "source_method": "AWS Price List Query API GetProducts; read-only exact SKU query",
+    "official_sources": [
+      "https://aws.amazon.com/fargate/pricing/",
+      "https://aws.amazon.com/rds/postgresql/pricing/",
+      "https://aws.amazon.com/elasticache/pricing/",
+      "https://aws.amazon.com/elasticloadbalancing/pricing/",
+      "https://aws.amazon.com/vpc/pricing/",
+      "https://aws.amazon.com/api-gateway/pricing/",
+      "https://aws.amazon.com/cloudwatch/pricing/",
+      "https://aws.amazon.com/secrets-manager/pricing/",
+      "https://aws.amazon.com/cloud-map/pricing/",
+      "https://aws.amazon.com/route53/pricing/",
+      "https://aws.amazon.com/ko/blogs/tech/aws-networking-dto-dp-01/",
+      "https://docs.aws.amazon.com/whitepapers/latest/best-practices-api-gateway-private-apis-integration/cost-optimization.html",
+      "https://aws.amazon.com/ecr/pricing/",
+      "https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/",
+      "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
+    ]
+  }
 }
