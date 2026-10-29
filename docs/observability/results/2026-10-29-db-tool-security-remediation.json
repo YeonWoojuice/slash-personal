@@ -1,0 +1,660 @@
+{
+  "recorded_at_utc": "2026-10-29T01:51:45.309683+00:00",
+  "scope": "Approved DB fault-tool image remediation in separate codex/slash-db-highfix worktree; no AWS operations",
+  "base_source_commit": "9b5a6c5b3df62d7840db5f4b66ff64f2b3d1aed8",
+  "image": {
+    "tag": "slash-personal-db-test:m2-20261029-highfix2",
+    "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+    "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+    "platform": "linux/amd64",
+    "user": "999:999",
+    "base": "alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a",
+    "source_sha256": {
+      "observability/personal/db-test/Dockerfile": "5212163f654f90f5b638f45a1f42c87cc3ca0b125aa890a2fa2e7acc4b87fff2",
+      "observability/personal/db-test/Dockerfile.dockerignore": "3455bbb631d8f27ab7a4a6a50e658db8627c0d3455e392715b0ab8366fbb8e77",
+      "observability/personal/db-test/entrypoint.sh": "a7c9bd9754e377f5c8f018049a2a5cfd032996bbd60355d6fcfae7f4c8cf3c9f",
+      "observability/personal/db-test/pulses.sh": "e24cb98f031064f05682afd96eb54b596b3bc3044f8b8a186d45f275536d77a9",
+      "observability/personal/db-test/rds-ap-northeast-2-bundle.crt": "913fb5b814f17af79d4c1622584a8d0ceddf5b0d76fe353d0c7d1186cdd6b229",
+      "observability/personal/sql/db-query-delay.sql": "6537633f6c606f80f0b991948b435415aced5e69b3ca04359baf8d1410ee87f1",
+      "observability/personal/sql/db-query-cancel-one.sql": "6eaad63bffd1a5c4149fc26f556209c7c1e3da0d036012c74d92990a2db0d24b"
+    },
+    "runtime_inventory": "uid=999(dbtest) gid=999(dbtest) groups=999(dbtest)\n3.24.3\nacl-libs-2.3.2-r1\nalpine-baselayout-3.7.2-r1\nalpine-baselayout-data-3.7.2-r1\nalpine-keys-2.6-r0\nalpine-release-3.24.3-r0\napk-tools-3.0.8-r0\nbusybox-1.37.0-r31\nbusybox-binsh-1.37.0-r31\nca-certificates-20261020-r0\nca-certificates-bundle-20261020-r0\ncoreutils-9.11-r0\ncoreutils-env-9.11-r0\ncoreutils-fmt-9.11-r0\ncoreutils-sha512sum-9.11-r0\nlibapk-3.0.8-r0\nlibattr-2.5.2-r2\nlibcrypto3-3.5.9-r0\nlibncursesw-6.6_p20260516-r0\nlibpq-18.6-r0\nlibssl3-3.5.9-r0\nlz4-libs-1.10.0-r1\nmusl-1.2.6-r3\nmusl-utils-1.2.6-r3\nncurses-terminfo-base-6.6_p20260516-r0\npostgresql-common-1.3-r0\npostgresql18-client-18.6-r0\nreadline-8.3.3-r1\nscanelf-1.3.9-r1\nskalibs-libs-2.15.0.0-r0\nssl_client-1.37.0-r31\nutmps-libs-0.1.3.3-r0\nzlib-1.3.2-r1\nzstd-libs-1.5.7-r2\npsql (PostgreSQL) 18.6\ntimeout (GNU coreutils) 9.11\nCopyright (C) 2026 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Pádraig Brady.\n\t/lib/ld-musl-x86_64.so.1 (0x7ffffff58000)\n\tlibpq.so.5 => /usr/lib/libpq.so.5 (0x7fffff643000)\n\tlibreadline.so.8 => /usr/lib/libreadline.so.8 (0x7fffff5f9000)\n\tlibc.musl-x86_64.so.1 => /lib/ld-musl-x86_64.so.1 (0x7ffffff58000)\n\tlibssl.so.3 => /usr/lib/libssl.so.3 (0x7fffff52a000)\n\tlibcrypto.so.3 => /usr/lib/libcrypto.so.3 (0x7fffff063000)\n\tlibncursesw.so.6 => /usr/lib/libncursesw.so.6 (0x7fffff00e000)\n\t/lib/ld-musl-x86_64.so.1 (0x7ffffff58000)\n\tlibssl.so.3 => /usr/lib/libssl.so.3 (0x7fffff62f000)\n\tlibcrypto.so.3 => /usr/lib/libcrypto.so.3 (0x7fffff168000)\n\tlibc.musl-x86_64.so.1 => /lib/ld-musl-x86_64.so.1 (0x7ffffff58000)\ndrwxr-xr-x 1 root root 4096 Oct 29 01:47 /opt/db-test\n-r--r--r-- 1 root root 4066 Oct 29 01:37 /opt/db-test/db-query-cancel-one.sql\n-r--r--r-- 1 root root  600 Oct 29 01:37 /opt/db-test/db-query-delay.sql\n-r-xr-xr-x 1 root root 2822 Oct 29 01:37 /opt/db-test/entrypoint.sh\n-r-xr-xr-x 1 root root 1542 Oct 29 01:37 /opt/db-test/pulses.sh\n-r--r--r-- 1 root root 4620 Oct 29 01:37 /opt/db-test/rds-ap-northeast-2-bundle.crt\n",
+    "published_to_ecr": false
+  },
+  "historical_ecr": {
+    "manifest_digest": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+    "record": "2026-10-28-image-publication.json",
+    "counts": {
+      "HIGH": 4,
+      "MEDIUM": 9,
+      "LOW": 3
+    },
+    "new_ecr_scan_performed": false,
+    "historical_result_changed": false
+  },
+  "scan": {
+    "scanner_image": "aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c",
+    "database_metadata": {
+      "Version": 2,
+      "NextUpdate": "2026-10-29T19:18:03.419608078Z",
+      "UpdatedAt": "2026-10-28T19:18:03.419608319Z",
+      "DownloadedAt": "2026-10-28T23:46:17.411572217Z"
+    },
+    "database_metadata_unchanged": true,
+    "before": {
+      "tool_version": "0.76.1",
+      "created_at": "2026-10-29T01:39:07.190192428Z",
+      "config_id": "sha256:18fc9f3a0de0e0f136e1f010b6791ebbd2f73ebf002e20472bf60b0aba8f051c",
+      "inventory": [
+        {
+          "class": "os-pkgs",
+          "type": "debian",
+          "packages": 101
+        }
+      ],
+      "counts": {
+        "CRITICAL": 0,
+        "HIGH": 46,
+        "MEDIUM": 71,
+        "LOW": 84,
+        "UNKNOWN": 4
+      },
+      "package_findings": 205,
+      "unique_cves": 83
+    },
+    "after": {
+      "tool_version": "0.76.1",
+      "created_at": "2026-10-29T01:48:24.014106505Z",
+      "config_id": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+      "inventory": [
+        {
+          "class": "os-pkgs",
+          "type": "alpine",
+          "packages": 33
+        }
+      ],
+      "counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "package_findings": 0,
+      "unique_cves": 0
+    },
+    "options": [
+      "--scanners vuln",
+      "--pkg-types os,library",
+      "--list-all-pkgs",
+      "--offline-scan",
+      "--skip-db-update",
+      "--skip-java-db-update",
+      "--skip-version-check",
+      "--disable-telemetry"
+    ],
+    "network": "none",
+    "ignores_or_suppressions_added": false,
+    "comparison_note": "Same Trivy version and cached database snapshot. Debian and Alpine use different vendor records. Historical ECR High4 are Medium7 package findings in baseline Trivy; do not compare ECR counts directly to Trivy counts."
+  },
+  "tests": {
+    "baseline_pg16_original_suite": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 54.177,
+      "names": [
+        "test_cancel_mode_requires_explicit_single_private_target",
+        "test_client_image_is_nonroot_readonly_and_supports_forced_timeout",
+        "test_connection_override_environment_cannot_bypass_fixed_target",
+        "test_exact_blocked_me_query_cancelled_once_and_lock_released",
+        "test_invalid_limits_are_rejected",
+        "test_invalid_target_or_confirmation_never_starts_pulse",
+        "test_lock_conflict_fails_without_leaving_transaction",
+        "test_multiple_blocked_app_queries_are_not_cancelled",
+        "test_real_query_waits_then_rollback_preserves_data",
+        "test_stop_task_signal_releases_actual_db_lock",
+        "test_trusted_certificate_with_wrong_hostname_fails_closed",
+        "test_untrusted_server_certificate_fails_closed",
+        "test_wrong_ip_application_name_or_role_is_not_cancelled",
+        "test_wrong_query_shape_is_not_cancelled",
+        "test_zero_matching_queries_refuses_without_leaving_lock"
+      ],
+      "log_sha256": "f1bd4bdf01ff94d036252c89ef2bbee7382067dd9b6b7f693b58ef085a31603d"
+    },
+    "candidate_pg18": {
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 58.728,
+      "names": [
+        "test_cancel_mode_requires_explicit_single_private_target",
+        "test_client_image_is_nonroot_readonly_and_supports_forced_timeout",
+        "test_connection_override_environment_cannot_bypass_fixed_target",
+        "test_exact_blocked_me_query_cancelled_once_and_lock_released",
+        "test_invalid_limits_are_rejected",
+        "test_invalid_target_or_confirmation_never_starts_pulse",
+        "test_lock_conflict_fails_without_leaving_transaction",
+        "test_multiple_blocked_app_queries_are_not_cancelled",
+        "test_real_query_waits_then_rollback_preserves_data",
+        "test_stop_cancel_controller_releases_lock_without_cancelling_query",
+        "test_stop_during_start_delay_never_opens_database_session",
+        "test_stop_task_signal_releases_actual_db_lock",
+        "test_trusted_certificate_with_wrong_hostname_fails_closed",
+        "test_untrusted_server_certificate_fails_closed",
+        "test_wrong_ip_application_name_or_role_is_not_cancelled",
+        "test_wrong_query_shape_is_not_cancelled",
+        "test_zero_matching_queries_refuses_without_leaving_lock"
+      ],
+      "log_sha256": "39980cc5a006afa1df6dabb85a11d33c3860b3c4e658e12d21aaf3bc10788f55"
+    },
+    "candidate_pg16": {
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 59.182,
+      "names": [
+        "test_cancel_mode_requires_explicit_single_private_target",
+        "test_client_image_is_nonroot_readonly_and_supports_forced_timeout",
+        "test_connection_override_environment_cannot_bypass_fixed_target",
+        "test_exact_blocked_me_query_cancelled_once_and_lock_released",
+        "test_invalid_limits_are_rejected",
+        "test_invalid_target_or_confirmation_never_starts_pulse",
+        "test_lock_conflict_fails_without_leaving_transaction",
+        "test_multiple_blocked_app_queries_are_not_cancelled",
+        "test_real_query_waits_then_rollback_preserves_data",
+        "test_stop_cancel_controller_releases_lock_without_cancelling_query",
+        "test_stop_during_start_delay_never_opens_database_session",
+        "test_stop_task_signal_releases_actual_db_lock",
+        "test_trusted_certificate_with_wrong_hostname_fails_closed",
+        "test_untrusted_server_certificate_fails_closed",
+        "test_wrong_ip_application_name_or_role_is_not_cancelled",
+        "test_wrong_query_shape_is_not_cancelled",
+        "test_zero_matching_queries_refuses_without_leaving_lock"
+      ],
+      "log_sha256": "14665672668115761a03e7519e81a3429850db5bc9f1df74f2ec16f47042c69d"
+    },
+    "infrastructure_boundaries": {
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.207,
+      "names": [
+        "test_fixed_image_entrypoint_and_no_listener",
+        "test_no_test_ingress_and_only_db_or_https_egress",
+        "test_optional_definition_never_starts_a_service",
+        "test_secret_only_injected_by_execution_role",
+        "test_account_is_pinned_in_both_roots",
+        "test_cloudwatch_export_keeps_personal_runtime_boundaries",
+        "test_cloudwatch_permission_is_opt_in_and_namespace_limited",
+        "test_disposable_data",
+        "test_no_hourly_compute_in_foundation",
+        "test_no_unrestricted_ingress_or_nat",
+        "test_task_role_and_secret_isolation",
+        "test_workloads_require_explicit_gate",
+        "test_baseline_default_denies_unfinished_routes",
+        "test_grafana_secret_is_not_a_literal_environment_value",
+        "test_metrics_port_is_internal_and_prometheus_not_exposed",
+        "test_aws_normalized_defaults_are_explicit",
+        "test_baseline_api_and_preflight_preserve_query_after_stage_removal",
+        "test_cors_and_forwarded_headers_do_not_weaken_authentication",
+        "test_deployment_tracks_config_and_caches_are_off",
+        "test_gateway_backend_paths_reach_allowed_alb_routes",
+        "test_grafana_login_assets_and_queries_keep_stage_prefix",
+        "test_internal_alb_only_accepts_dedicated_vpc_link_security_group",
+        "test_no_domain_certificate_and_simple_stage_segment",
+        "test_no_top_level_catchall_gateway_route",
+        "test_nonbaseline_paths_and_writes_fail_closed",
+        "test_request_correlation_uses_gateway_context_only_on_baseline_get",
+        "test_source_ip_policy_has_allowlist_and_explicit_deny",
+        "test_timing_does_not_enable_sensitive_or_account_wide_logging",
+        "test_invalid_name_cannot_modify_configuration",
+        "test_name_changes_dns_and_configuration_digest",
+        "test_real_terraform_rejects_missing_or_mismatched_contract",
+        "test_root_shell_or_different_retention_is_rejected",
+        "test_stale_image_or_forged_config_label_is_rejected",
+        "test_terraform_uses_shared_inputs_and_checks_published_image",
+        "test_verified_metadata_matches_actual_file"
+      ],
+      "log_sha256": "dccbf461e2ece9528115e98c73b072b77cde270dac96d61ff04d6aa0a762c181"
+    },
+    "workflow_syntax": "actionlint PASS",
+    "fixed_sql_scripts_and_rds_ca_unchanged": true,
+    "network": "disposable Docker internal network, no exposed host ports, synthetic data and certificates only",
+    "client_major": 18,
+    "app_query_fixture_client_major": 16
+  },
+  "cleanup": {
+    "owned_test_containers_remaining": 0,
+    "owned_test_networks_remaining": 0,
+    "test_database_volumes_and_generated_keys_cleaned": true,
+    "existing_developer_resources_modified": false
+  },
+  "boundaries": {
+    "aws_calls": false,
+    "terraform_apply": false,
+    "aws_servers_created": false,
+    "aws_fault_or_load_test": false,
+    "ecr_push_or_scan": false,
+    "deployment_selection_promoted": false,
+    "existing_database_upgrade": false,
+    "lambdaops_repo_modified": false,
+    "cognito_modified": false,
+    "notion_modified": false,
+    "other_thread_scope": "capstone-구현-설계2: LambdaOps UI, authenticated seeded Incident demo; no shared files modified"
+  },
+  "remaining": [
+    "ECR publication and registry scanning of exact candidate",
+    "Explicit deployment plan and approval before AWS execution",
+    "Actual ECS/RDS TLS and secret injection, HTTP outcome, CloudWatch and Alarm/M3 verification",
+    "Separate API Boot4 real Cognito validation and historical AWS2.05s latency investigation"
+  ],
+  "source_review": {
+    "reviewed_at_utc": "2026-10-29T01:41:31.042784+00:00",
+    "review_scope": "Read-only primary-source package and remediation research; no containers or AWS operations",
+    "debian_trixie": {
+      "CVE-2026-85091": {
+        "package": "zlib",
+        "version": "1:1.3.dfsg+really1.3.1-1",
+        "status": "vulnerable",
+        "stable_fixed_version_verified": false,
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-85091"
+      },
+      "CVE-2026-5435": {
+        "package": "glibc",
+        "version": "2.41-12+deb13u4",
+        "status": "vulnerable",
+        "stable_fixed_version_verified": false,
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-5435"
+      },
+      "CVE-2026-19499": {
+        "package": "glibc",
+        "version": "2.41-12+deb13u4",
+        "status": "vulnerable",
+        "stable_fixed_version_verified": false,
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-19499"
+      },
+      "CVE-2026-107161": {
+        "package": "cyrus-sasl2",
+        "version": "2.1.28+dfsg1-9",
+        "status": "vulnerable; point-release fix planned",
+        "stable_fixed_version_verified": false,
+        "source": "https://security-tracker.debian.org/tracker/CVE-2026-107161"
+      }
+    },
+    "alpine_candidate": {
+      "branch": "3.24-stable/main/x86_64",
+      "versions": {
+        "postgresql18-client": "18.6-r0",
+        "libpq": "18.6-r0",
+        "coreutils": "9.11-r0",
+        "zlib": "1.3.2-r1",
+        "musl": "1.2.6-r3",
+        "ca-certificates": "20261020-r0"
+      },
+      "postgresql16_client_in_main_index": false,
+      "libpq_dependencies": [
+        "so:libc.musl-x86_64.so.1",
+        "so:libcrypto.so.3",
+        "so:libssl.so.3"
+      ],
+      "libpq_build": "Separate interface build uses --without-ldap; server package build uses --with-ldap. Client-only packages do not require server package.",
+      "zlib_patch": "APKBUILD includes CVE-2026-85091.patch and secfix 1.3.2-r1; official secdb lists that fixed version.",
+      "support_main_until": "2028-06-01",
+      "sources": [
+        "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/APKINDEX.tar.gz",
+        "https://secdb.alpinelinux.org/v3.24/main.json",
+        "https://raw.githubusercontent.com/alpinelinux/aports/3.24-stable/main/postgresql18/APKBUILD",
+        "https://raw.githubusercontent.com/alpinelinux/aports/3.24-stable/main/zlib/APKBUILD",
+        "https://alpinelinux.org/releases/"
+      ]
+    },
+    "compatibility": {
+      "psql": "Official Notes recommend same or older major servers and newest psql for multiple server versions; existing fixed SQL/TLS and cancellation behavior require actual PG16 and PG18 tests.",
+      "timeout": "GNU coreutils must remain; --signal and --kill-after process-group/cleanup behavior must be tested, not substituted with BusyBox.",
+      "sources": [
+        "https://www.postgresql.org/docs/18/app-psql.html#APP-PSQL-NOTES",
+        "https://www.gnu.org/software/coreutils/manual/html_node/timeout-invocation.html"
+      ]
+    },
+    "required_claim_boundaries": [
+      "glibc and SASL remediation means dependency removal from the new image, not patching those Debian packages.",
+      "zlib remediation means official Alpine backport applied.",
+      "Image scan zero findings is scoped to exact image, scan tool, database snapshot and detected inventory.",
+      "ECR historical counts and Trivy counts use different severity sources and package granularity; they must not be conflated.",
+      "AWS deployment and real RDS fault scenario remain unverified."
+    ]
+  },
+  "independent_review": {
+    "reviewed_at_utc": "2026-10-29T01:51:25.206286+00:00",
+    "verdict": "PASS_WITH_SCOPE_LIMITATIONS",
+    "review_method": "Read-only independent comparison of exact image archives, build/scan metadata, installed package database, runtime inventory and existing source. No Docker or AWS operations by reviewer.",
+    "image_identity": {
+      "baseline": {
+        "manifest_digest": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+        "config_digest": "sha256:18fc9f3a0de0e0f136e1f010b6791ebbd2f73ebf002e20472bf60b0aba8f051c",
+        "blob_hashes_verified": 14,
+        "layer_diff_ids_verified": 8,
+        "scan_config_id_matches": true,
+        "architecture": "amd64",
+        "os": "linux",
+        "user": "postgres",
+        "copied_source_inputs": {
+          "observability/personal/db-test/entrypoint.sh": {
+            "sha256": "a7c9bd9754e377f5c8f018049a2a5cfd032996bbd60355d6fcfae7f4c8cf3c9f",
+            "matches_current_source": true
+          },
+          "observability/personal/db-test/pulses.sh": {
+            "sha256": "e24cb98f031064f05682afd96eb54b596b3bc3044f8b8a186d45f275536d77a9",
+            "matches_current_source": true
+          },
+          "observability/personal/db-test/rds-ap-northeast-2-bundle.crt": {
+            "sha256": "913fb5b814f17af79d4c1622584a8d0ceddf5b0d76fe353d0c7d1186cdd6b229",
+            "matches_current_source": true
+          },
+          "observability/personal/sql/db-query-delay.sql": {
+            "sha256": "6537633f6c606f80f0b991948b435415aced5e69b3ca04359baf8d1410ee87f1",
+            "matches_current_source": true
+          },
+          "observability/personal/sql/db-query-cancel-one.sql": {
+            "sha256": "6eaad63bffd1a5c4149fc26f556209c7c1e3da0d036012c74d92990a2db0d24b",
+            "matches_current_source": true
+          }
+        }
+      },
+      "candidate": {
+        "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+        "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+        "blob_hashes_verified": 9,
+        "layer_diff_ids_verified": 7,
+        "scan_config_id_matches": true,
+        "architecture": "amd64",
+        "os": "linux",
+        "user": "999:999",
+        "copied_source_inputs": {
+          "observability/personal/db-test/entrypoint.sh": {
+            "sha256": "a7c9bd9754e377f5c8f018049a2a5cfd032996bbd60355d6fcfae7f4c8cf3c9f",
+            "matches_current_source": true
+          },
+          "observability/personal/db-test/pulses.sh": {
+            "sha256": "e24cb98f031064f05682afd96eb54b596b3bc3044f8b8a186d45f275536d77a9",
+            "matches_current_source": true
+          },
+          "observability/personal/db-test/rds-ap-northeast-2-bundle.crt": {
+            "sha256": "913fb5b814f17af79d4c1622584a8d0ceddf5b0d76fe353d0c7d1186cdd6b229",
+            "matches_current_source": true
+          },
+          "observability/personal/sql/db-query-delay.sql": {
+            "sha256": "6537633f6c606f80f0b991948b435415aced5e69b3ca04359baf8d1410ee87f1",
+            "matches_current_source": true
+          },
+          "observability/personal/sql/db-query-cancel-one.sql": {
+            "sha256": "6eaad63bffd1a5c4149fc26f556209c7c1e3da0d036012c74d92990a2db0d24b",
+            "matches_current_source": true
+          }
+        }
+      }
+    },
+    "candidate_build_inspect_archive_match": true,
+    "source_contracts_unchanged": true,
+    "scanner": {
+      "version": "0.76.1",
+      "same_version_verified": true,
+      "database_metadata": {
+        "Version": 2,
+        "NextUpdate": "2026-10-29T19:18:03.419608078Z",
+        "UpdatedAt": "2026-10-28T19:18:03.419608319Z",
+        "DownloadedAt": "2026-10-28T23:46:17.411572217Z"
+      },
+      "database_metadata_matches_saved_snapshot": true,
+      "execution_flags_limit": "Reports do not independently prove all offline/no-ignore invocation flags; no re-scan performed by reviewer."
+    },
+    "same_tool_comparison": {
+      "baseline": {
+        "os": {
+          "Family": "debian",
+          "Name": "13.7"
+        },
+        "detected_packages": 101,
+        "package_findings": 205,
+        "unique_cves": 83,
+        "severity": {
+          "CRITICAL": 0,
+          "HIGH": 46,
+          "MEDIUM": 71,
+          "LOW": 84,
+          "UNKNOWN": 4
+        }
+      },
+      "candidate": {
+        "os": {
+          "Family": "alpine",
+          "Name": "3.24.3"
+        },
+        "detected_packages": 33,
+        "package_findings": 0,
+        "unique_cves": 0,
+        "severity": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    "candidate_inventory": {
+      "archive_installed_packages": 33,
+      "scanner_packages": 33,
+      "exact_name_version_match": true,
+      "runtime_inventory_matches": true,
+      "versions": {
+        "acl-libs": "2.3.2-r1",
+        "alpine-baselayout": "3.7.2-r1",
+        "alpine-baselayout-data": "3.7.2-r1",
+        "alpine-keys": "2.6-r0",
+        "alpine-release": "3.24.3-r0",
+        "apk-tools": "3.0.8-r0",
+        "busybox": "1.37.0-r31",
+        "busybox-binsh": "1.37.0-r31",
+        "ca-certificates": "20261020-r0",
+        "ca-certificates-bundle": "20261020-r0",
+        "coreutils": "9.11-r0",
+        "coreutils-env": "9.11-r0",
+        "coreutils-fmt": "9.11-r0",
+        "coreutils-sha512sum": "9.11-r0",
+        "libapk": "3.0.8-r0",
+        "libattr": "2.5.2-r2",
+        "libcrypto3": "3.5.9-r0",
+        "libncursesw": "6.6_p20260516-r0",
+        "libpq": "18.6-r0",
+        "libssl3": "3.5.9-r0",
+        "lz4-libs": "1.10.0-r1",
+        "musl": "1.2.6-r3",
+        "musl-utils": "1.2.6-r3",
+        "ncurses-terminfo-base": "6.6_p20260516-r0",
+        "postgresql-common": "1.3-r0",
+        "postgresql18-client": "18.6-r0",
+        "readline": "8.3.3-r1",
+        "scanelf": "1.3.9-r1",
+        "skalibs-libs": "2.15.0.0-r0",
+        "ssl_client": "1.37.0-r31",
+        "utmps-libs": "0.1.3.3-r0",
+        "zlib": "1.3.2-r1",
+        "zstd-libs": "1.5.7-r2"
+      },
+      "glibc_ldap_sasl_packages_and_shared_library_files_absent": true,
+      "database_server_and_initdb_files_absent": true,
+      "gnu_timeout_preserved": true
+    },
+    "historical_four": [
+      {
+        "cve": "CVE-2026-85091",
+        "historical_ecr_severity": "HIGH",
+        "current_baseline_trivy_packages": [
+          {
+            "package": "zlib1g",
+            "version": "1:1.3.dfsg+really1.3.1-1+b1",
+            "severity": "MEDIUM"
+          }
+        ],
+        "candidate_detected": false,
+        "remediation_reason": "zlib updated to Alpine 1.3.2-r1; official package and security database identify the CVE backport."
+      },
+      {
+        "cve": "CVE-2026-5435",
+        "historical_ecr_severity": "HIGH",
+        "current_baseline_trivy_packages": [
+          {
+            "package": "libc-bin",
+            "version": "2.41-12+deb13u4",
+            "severity": "MEDIUM"
+          },
+          {
+            "package": "libc6",
+            "version": "2.41-12+deb13u4",
+            "severity": "MEDIUM"
+          }
+        ],
+        "candidate_detected": false,
+        "remediation_reason": "glibc removed by supported musl-based image; not a claim that Debian glibc was patched."
+      },
+      {
+        "cve": "CVE-2026-19499",
+        "historical_ecr_severity": "HIGH",
+        "current_baseline_trivy_packages": [
+          {
+            "package": "libc-bin",
+            "version": "2.41-12+deb13u4",
+            "severity": "MEDIUM"
+          },
+          {
+            "package": "libc6",
+            "version": "2.41-12+deb13u4",
+            "severity": "MEDIUM"
+          }
+        ],
+        "candidate_detected": false,
+        "remediation_reason": "glibc removed by supported musl-based image; not a claim that Debian glibc was patched."
+      },
+      {
+        "cve": "CVE-2026-107161",
+        "historical_ecr_severity": "HIGH",
+        "current_baseline_trivy_packages": [
+          {
+            "package": "libsasl2-2",
+            "version": "2.1.28+dfsg1-9",
+            "severity": "MEDIUM"
+          },
+          {
+            "package": "libsasl2-modules-db",
+            "version": "2.1.28+dfsg1-9",
+            "severity": "MEDIUM"
+          }
+        ],
+        "candidate_detected": false,
+        "remediation_reason": "LDAP/SASL dependencies removed by client-only libpq built without LDAP; not a patched Debian SASL package."
+      }
+    ],
+    "historical_ecr_comparison_limit": "Historical ECR Basic H4/M9/L3 is a different scanner/time and source-package grouping. Current Trivy reports the same four CVEs as Medium across seven binary packages; do not present ECR H4 as the numeric baseline of this Trivy comparison.",
+    "new_candidate_critical_high": 0,
+    "tests": {
+      "status": "PASS",
+      "suite_logs": {
+        "baseline-tests.log": {
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 54.177,
+          "status": "PASS",
+          "test_names_independently_counted": 15,
+          "log_sha256": "f1bd4bdf01ff94d036252c89ef2bbee7382067dd9b6b7f693b58ef085a31603d"
+        },
+        "candidate-pg16-tests.log": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 59.182,
+          "status": "PASS",
+          "test_names_independently_counted": 17,
+          "log_sha256": "14665672668115761a03e7519e81a3429850db5bc9f1df74f2ec16f47042c69d"
+        },
+        "candidate-pg18-tests.log": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 58.728,
+          "status": "PASS",
+          "test_names_independently_counted": 17,
+          "log_sha256": "39980cc5a006afa1df6dabb85a11d33c3860b3c4e658e12d21aaf3bc10788f55"
+        },
+        "infra-tests.log": {
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 0.207,
+          "status": "PASS",
+          "test_names_independently_counted": 35,
+          "log_sha256": "dccbf461e2ece9528115e98c73b072b77cde270dac96d61ff04d6aa0a762c181"
+        }
+      },
+      "server_target_scope": "PG16 and PG18 targets were selected and executed by parent; reviewer independently counted the named final logs and verified PASS, not a separate rerun.",
+      "test_changes_reviewed": "Original 15 cases preserved; two signal/cleanup cases added; argument/TLS/client-only/readonly assertions strengthened; PG16/18 CI matrix configured.",
+      "actionlint": "Parent reports pass; not independently rerun by reviewer."
+    },
+    "limits": [
+      "Zero findings applies to this exact image, Trivy version and database snapshot; it is not a general guarantee that all vulnerabilities are absent.",
+      "Debian and Alpine vulnerability databases have different coverage and classifications, even within the same Trivy release. Package removal and zlib patch evidence accompany the numerical comparison.",
+      "Actual RDS, ECS, ECR Basic scanning, AWS deployment, and CloudWatch/Alarm fault scenarios are not verified by this review.",
+      "Platform changed from Debian/glibc to Alpine/musl and client from PostgreSQL16 to18; real AWS compatibility remains pending."
+    ],
+    "evidence_sha256": {
+      "scan-output/baseline.json": "13bfd952917721435a5d2832b063bd51effaacf99b1bb26c4633311fd0faab6a",
+      "scan-output/candidate.json": "d4bf6031c331a0e58802eaf4549ab6522716136bf32ed1edd0ca25baa8833684",
+      "build-metadata.json": "e2c63a289daded041f6a632604a2b3ddce3e82652c7d3c180d9c48e7970d2a17",
+      "image-inspect.json": "341b231bd10e318662bcee00a972eeb029a8a160d35cfd5da1de31e942954c43",
+      "runtime-inventory.log": "01c92e54086fddce23ce308e097488f313e9dd55b9e8499513199c7faffc9155",
+      "scan-db-metadata.json": "8dfd0cd7c66ef011746e47bc3a246cf06c12c0743adee8924b1badf5fbe69f68",
+      "official-source-review.json": "df907aae993579a5759dfdb2a41122dd696d66ebe6cdc6b3bc79c7b0722cf47c",
+      "image-source-hashes.json": "11640f46a355132c324c570c0a3bb04eec7541e0f12019cc11286c9c3d8cb594",
+      "baseline-tests.log": "f1bd4bdf01ff94d036252c89ef2bbee7382067dd9b6b7f693b58ef085a31603d",
+      "candidate-pg16-tests.log": "14665672668115761a03e7519e81a3429850db5bc9f1df74f2ec16f47042c69d",
+      "candidate-pg18-tests.log": "39980cc5a006afa1df6dabb85a11d33c3860b3c4e658e12d21aaf3bc10788f55",
+      "infra-tests.log": "dccbf461e2ece9528115e98c73b072b77cde270dac96d61ff04d6aa0a762c181"
+    },
+    "blocking_findings": [],
+    "source_identity": {
+      "image_input_files": 7,
+      "all_saved_hashes_match_current_files": true,
+      "input_sha256": {
+        "observability/personal/db-test/Dockerfile": "5212163f654f90f5b638f45a1f42c87cc3ca0b125aa890a2fa2e7acc4b87fff2",
+        "observability/personal/db-test/Dockerfile.dockerignore": "3455bbb631d8f27ab7a4a6a50e658db8627c0d3455e392715b0ab8366fbb8e77",
+        "observability/personal/db-test/entrypoint.sh": "a7c9bd9754e377f5c8f018049a2a5cfd032996bbd60355d6fcfae7f4c8cf3c9f",
+        "observability/personal/db-test/pulses.sh": "e24cb98f031064f05682afd96eb54b596b3bc3044f8b8a186d45f275536d77a9",
+        "observability/personal/db-test/rds-ap-northeast-2-bundle.crt": "913fb5b814f17af79d4c1622584a8d0ceddf5b0d76fe353d0c7d1186cdd6b229",
+        "observability/personal/sql/db-query-delay.sql": "6537633f6c606f80f0b991948b435415aced5e69b3ca04359baf8d1410ee87f1",
+        "observability/personal/sql/db-query-cancel-one.sql": "6eaad63bffd1a5c4149fc26f556209c7c1e3da0d036012c74d92990a2db0d24b"
+      },
+      "scripts_sql_public_ca_match_both_baseline_and_candidate_archives": true,
+      "final_build_history_server_absence_checks": "Explicit test -z checks verified in final archive config history and Dockerfile.",
+      "platform": "linux/amd64"
+    },
+    "cleanup_scope": "Parent verifies final owned-container/network cleanup; reviewer performs no Docker mutations."
+  },
+  "evidence_sha256": {
+    "scan-output/baseline.json": "13bfd952917721435a5d2832b063bd51effaacf99b1bb26c4633311fd0faab6a",
+    "scan-output/candidate.json": "d4bf6031c331a0e58802eaf4549ab6522716136bf32ed1edd0ca25baa8833684",
+    "build-metadata.json": "e2c63a289daded041f6a632604a2b3ddce3e82652c7d3c180d9c48e7970d2a17",
+    "runtime-inventory.log": "01c92e54086fddce23ce308e097488f313e9dd55b9e8499513199c7faffc9155",
+    "image-source-hashes.json": "11640f46a355132c324c570c0a3bb04eec7541e0f12019cc11286c9c3d8cb594",
+    "independent-review.json": "28fff85825de22dba15e6e2952d5b3d640f35136a26746ee4b284a1bc0b94eb5"
+  }
+}

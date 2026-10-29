@@ -12,6 +12,8 @@ import time
 import unittest
 
 IMAGE = os.environ.get('DB_TEST_IMAGE', 'slash-personal-db-test:preparation')
+SERVER_IMAGE = os.environ.get('DB_TEST_SERVER_IMAGE', 'postgres:18')
+CLIENT_MAJOR = os.environ.get('DB_TEST_CLIENT_MAJOR', '18')
 HOST = 'synthetic.test.ap-northeast-2.rds.amazonaws.com'
 WRONG_HOST = 'wrong.test.ap-northeast-2.rds.amazonaws.com'
 
@@ -43,7 +45,7 @@ class RunnerTests(unittest.TestCase):
         cls.resources.append(('network', cls.network))
         command('docker', 'run', '-d', '--name', cls.name, '--network', cls.network,
                 '--network-alias', HOST, '--network-alias', WRONG_HOST, '--env-file', str(cls.server_env),
-                '-v', str(cls.path)+':/certs:ro', '--entrypoint', '/bin/sh', 'postgres:16', '-c',
+                '-v', str(cls.path)+':/certs:ro', '--entrypoint', '/bin/sh', SERVER_IMAGE, '-c',
                 'cp /certs/server.key /tmp/server.key && cp /certs/server.crt /tmp/server.crt && chown postgres:postgres /tmp/server.key && chmod 0600 /tmp/server.key && exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key')
         cls.resources.append(('container', cls.name))
         deadline = time.monotonic()+45
@@ -222,6 +224,11 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 64, result.stderr)
                 self.assertNotIn('pulse_start', result.stdout)
                 self.assertNotIn(self.password, result.stdout+result.stderr)
+        # Arguments must never turn the fixed runner into an arbitrary SQL client.
+        result = command(*self.run_command(), '--command=SELECT pg_sleep(600)', check=False)
+        self.assertEqual(result.returncode, 64, result.stderr)
+        self.assertNotIn('pulse_start', result.stdout)
+        self.assertNotIn(self.password, result.stdout+result.stderr)
 
     def test_invalid_limits_are_rejected(self):
         for overrides in [{'DB_TEST_PULSES':'0'}, {'DB_TEST_PULSES':'19'},
@@ -270,6 +277,7 @@ class RunnerTests(unittest.TestCase):
             'PGSERVICE': 'missing-service', 'PGSERVICEFILE': '/does-not-exist',
             'PGHOSTADDR': '127.0.0.1', 'PGPASSFILE': '/does-not-exist',
             'PGOPTIONS': '-c statement_timeout=1',
+            'PGSSLROOTCERT': '/does-not-exist', 'PGCONNECT_TIMEOUT': 'invalid',
         }), check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn('pulse_completed', result.stdout)
@@ -280,10 +288,23 @@ class RunnerTests(unittest.TestCase):
                          '--entrypoint', '/bin/sh', IMAGE, '-ec',
                          'test "$(id -u)" = 999; '
                          'test ! -e /usr/lib/postgresql/16/bin/postgres; '
+                         'test -z "$(command -v postgres || true)"; '
+                         'test -z "$(command -v initdb || true)"; '
+                         'test -z "$(find /usr /opt -type f \\( -name postgres -o -name initdb \\) -print)"; '
+                         'if command -v apk >/dev/null 2>&1; then '
+                         '  packages=$(apk info); '
+                         '  if printf "%s\\n" "$packages" | grep -Eq "^postgresql[0-9]+$"; then exit 1; fi; '
+                         'else '
+                         '  packages=$(dpkg-query -W -f=\'${binary:Package} ${db:Status-Status}\\n\'); '
+                         '  if printf "%s\\n" "$packages" | grep -Eq "^postgresql-[0-9]+ installed$"; then exit 1; fi; '
+                         'fi; '
+                         'for file in /opt/db-test/*.sql /opt/db-test/*.crt; do '
+                         '  test -r "$file"; test ! -w "$file"; '
+                         'done; '
                          'psql --version; timeout --version; '
                          '! touch /opt/db-test/should-not-be-writable', check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn('psql (PostgreSQL) 16.', result.stdout)
+        self.assertIn('psql (PostgreSQL) ' + CLIENT_MAJOR + '.', result.stdout)
         self.assertIn('GNU coreutils', result.stdout)
         started = time.monotonic()
         result = command('docker', 'run', '--rm', '--read-only', '--network', 'none',
@@ -329,6 +350,55 @@ class RunnerTests(unittest.TestCase):
         finally:
             command('docker','rm','-f',name,check=False)
             if proc.poll() is None: proc.kill();proc.wait()
+
+    def test_stop_during_start_delay_never_opens_database_session(self):
+        name = self.name + '-waiting-signal'
+        proc = subprocess.Popen(self.run_command({'DB_TEST_START_DELAY_SECONDS': '60'}, name=name),
+                                text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                logs = command('docker', 'logs', name, check=False)
+                if '"event":"waiting"' in logs.stdout:
+                    break
+                if proc.poll() is not None:
+                    stdout, stderr = proc.communicate()
+                    self.fail('Runner ended before start delay: ' + stdout + stderr)
+                time.sleep(.03)
+            else:
+                self.fail('Runner did not enter start delay')
+            command('docker', 'stop', '--time', '8', name)
+            stdout, stderr = proc.communicate(timeout=10)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn('stopped', stdout)
+            self.assertNotIn('pulse_start', stdout)
+            self.assertNotIn(self.password, stdout + stderr)
+            self.assertEqual(self.sql("SELECT count(*) FROM pg_stat_activity WHERE application_name='slash-m2-db-delay'").stdout.strip(), '0')
+            self.assertEqual(self.sql('SELECT name FROM public.users').stdout.strip(), 'synthetic')
+        finally:
+            command('docker', 'rm', '-f', name, check=False)
+            if proc.poll() is None: proc.kill(); proc.wait()
+
+    def test_stop_cancel_controller_releases_lock_without_cancelling_query(self):
+        name = self.name + '-cancel-signal'
+        proc = subprocess.Popen(self.run_command({'DB_TEST_MODE': 'cancel-one',
+            'DB_TEST_EXPECTED_APP_IP': self.app_ip}, name=name),
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            self.wait_for_lock(proc)
+            command('docker', 'stop', '--time', '8', name)
+            stdout, stderr = proc.communicate(timeout=10)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn('stopped', stdout)
+            self.assertNotIn('cancel_signalled', stdout)
+            self.assertNotIn(self.password, stdout + stderr)
+            started = time.monotonic()
+            self.assertEqual(self.sql('SELECT name FROM public.users').stdout.strip(), 'synthetic')
+            self.assertLess(time.monotonic() - started, 6)
+            self.assert_no_controller()
+        finally:
+            command('docker', 'rm', '-f', name, check=False)
+            if proc.poll() is None: proc.kill(); proc.wait()
 
 
 if __name__ == '__main__':

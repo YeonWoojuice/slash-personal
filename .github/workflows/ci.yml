@@ -81,9 +81,15 @@ jobs:
         run: python -m unittest discover -s observability/personal/auth -p 'test_*.py' -v
 
   database:
-    name: Disposable TLS PostgreSQL fault tests
+    name: Disposable TLS PostgreSQL ${{ matrix.postgres }} fault tests
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ['16', '18']
+    env:
+      DB_TEST_SERVER_IMAGE: postgres:${{ matrix.postgres }}
     steps:
       - uses: actions/checkout@v7
         with:

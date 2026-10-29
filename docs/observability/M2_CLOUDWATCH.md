@@ -121,6 +121,8 @@ Java 검출은 이전 ECR Basic의 운영체제 검사와 범위가 다르다. �
 
 최신 로컬 후보 `m2-20261029-boot412`는 같은 Trivy·취약점 DB 검사에서 **OS 73개·Java 151개 패키지의 검출 0건**이다. 기존 Critical 2·Medium 2도 더 이상 검출되지 않으며 검사 예외는 없다. [Boot 4 전환 근거](results/2026-10-29-boot4-security-remediation.json)와 [현재 후보의 범위](../../infra/personal/README.md#boot-41-전환--로컬-후보-검증)를 참고한다. 실제 Cognito·AWS 검증, ECR 추가 게시·배포 선택 승격·서버 생성·장애 시험은 수행하지 않았다. 별도 DB 장애 도구 High 4건과 M2·M3 환경 검증은 완료로 바꾸지 않는다.
 
+그다음 DB 장애 도구의 로컬 후보 `m2-20261029-highfix2`를 보완했다. Alpine의 클라이언트 전용 구성으로 glibc·LDAP·SASL 의존성을 제거하고, 수정된 zlib를 적용했다. 기존 SQL·RDS CA·시간 제한·정확한 쿼리 한 건만 취소하는 계약은 유지한다. 새 이미지의 Trivy 검사에서는 OS 패키지 33개에서 검출 0건을 확인했으며, PostgreSQL 16·18의 테스트 결과와 과거 ECR High 4건의 항목별 처리 근거는 [DB 도구 보완 기록](results/2026-10-29-db-tool-security-remediation.json)에 연결한다. 과거 ECR 이미지는 교체·재검사하지 않았고 배포 선택도 유지한다. AWS 서버 생성·실제 HTTP 500·Alarm 전이·M3 종단 검증은 이번 보완에 포함하지 않는다.
+
 ## AWS 시험 준비 — 2026-10-28
 
 이 절은 당시 개인 ECS 시험 환경의 설정과 실행 방법을 정의한 기록이다. 이후 AWS 배포·정상 지표 수신은 위 2026-10-29 실행에서 확인했으며 Alarm 전이는 아직 별도 환경 검증이다. 기존 `local,m1` 장애 API와 `personal`의 인증·프로필 제한은 유지한다.

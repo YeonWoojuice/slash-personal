@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 High 4건, 장애 시험·세 Alarm 전이·M3 종단 검증은 미해결·미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 기존 ECR High 4건은 새 로컬 후보에서 보완했으며, ECR 교체·검사는 아직 진행하지 않았다. 장애 시험·세 Alarm 전이·M3 종단 검증은 미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -318,6 +318,22 @@ jOOQ 3.21 OSS의 공식 PostgreSQL 최소 버전은 18이다. 따라서 16의 �
 정확히 이 이미지를 실행한 검사 28개가 통과했다. 로컬 합성 JWT·401/404·보안 헤더·관리 포트 격리·WebSocket 연결과 접속표 재사용 거부·시간 로그 4건의 일대일 연결을 확인했다. 임시 컨테이너·네트워크·DB와 합성 키·토큰은 정리했다. [전환·테스트·이미지 검사 근거](../../docs/observability/results/2026-10-29-boot4-security-remediation.json)에 결과와 한계를 기록한다.
 
 현재 상태는 **로컬 전환 후보 검증 완료**다. 새 이미지의 실제 Cognito·AWS 검증, ECR 게시, 배포 선택 승격, Terraform 실행과 장애 시험은 남아 있다. DB 장애 도구의 기존 High 4건과 과거 2.05초의 원인도 별도 미해결 항목이다. 기존 Alarm·Incident 계약과 M2·M3의 환경 검증 상태는 바꾸지 않는다. 다음 단계는 실제 로그인 검증 일정 분리 → ECR 후보 게시·검사 → 배포 계획 검토이며, 실제 서버 생성은 별도 승인 범위다.
+
+### DB 장애 도구 High 보완 — 로컬 후보 검증
+
+위 Boot 전환 이후 DB 시험 도구를 별도 `codex/slash-db-highfix` 작업 폴더에서 보완했다. Debian 13 안정판의 수정 패키지가 확인되지 않아, 지원 중인 Alpine 3.24의 클라이언트 전용 구성으로 변경했다. `psql`은 18.6이며 PostgreSQL 서버·RDS 엔진·기존 데이터는 변경하지 않았다. 고정 SQL·실행 스크립트·서울 RDS CA는 기존과 동일하다.
+
+| 이전 ECR High | 새 로컬 후보의 처리 |
+| --- | --- |
+| glibc 2건 | musl 기반으로 변경해 glibc 의존성을 포함하지 않음 |
+| Cyrus SASL 1건 | LDAP·SASL 의존성이 없는 공식 libpq 사용 |
+| zlib 1건 | `CVE-2026-85091` 수정 패치가 포함된 `1.3.2-r1` 적용 |
+
+변경 전 기존 테스트 15개가 통과했다. 시작 대기·쿼리 취소 대기 중 종료 검사를 더한 17개도 최종 이미지로 PostgreSQL 16·18에서 각각 통과했으며 실패·오류·건너뜀은 0개다. UID/GID 999·읽기 전용 실행·GNU timeout·TLS 호스트 검증·정확한 쿼리 한 건만 취소하는 계약을 유지한다. GitHub의 DB 검사도 두 서버 버전을 사용한다. 최종 실행 결과와 이미지 식별자는 [보완 근거](../../docs/observability/results/2026-10-29-db-tool-security-remediation.json)를 따른다.
+
+같은 Trivy 0.76.1·취약점 DB로 비교하면 이전 이미지의 패키지별 검출은 High 46·Medium 71·Low 84·Unknown 4건이고, 새 후보는 **33개 OS 패키지에서 검출 0건**이다. 이전 ECR High 4건은 이 Trivy에서 Medium 7개 패키지 검출로 표시되므로 두 도구의 수치를 같은 기준으로 합치지 않는다. glibc·SASL은 제거한 의존성, zlib는 적용한 수정 패키지로 구분한다. 검사 예외나 숨김 규칙은 추가하지 않았다.
+
+새 태그는 `slash-personal-db-test:m2-20261029-highfix2`다. 현재 결과는 로컬 후보에 한정하며 기존 ECR 이미지·`current_image_selection`·`enable_db_test_task=false` 설정은 유지한다. ECR 게시·재검사, ECS/RDS 실행·실제 HTTP 500·Alarm 전이는 미검증이다. Terraform apply·AWS 서버 생성·실제 장애 시험은 실행하지 않았다. LambdaOps의 화면·Cognito·DEMO 데이터·Notion은 이번 변경에 포함하지 않는다.
 
 ## 검증의 범위
 

@@ -865,5 +865,24 @@
     "runtime_image_java_findings": 0,
     "aws_or_ecr_changed": false,
     "deployment_selection_promoted": false
+  },
+  "db_tool_security_followup_20261029": {
+    "status": "Local candidate remediated and verified; historical ECR selection retained",
+    "evidence": "2026-10-29-db-tool-security-remediation.json",
+    "candidate_manifest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+    "candidate_tag": "slash-personal-db-test:m2-20261029-highfix2",
+    "local_scan_counts": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "UNKNOWN": 0
+    },
+    "postgres16_tests": 17,
+    "postgres18_tests": 17,
+    "ecr_published": false,
+    "ecr_rescanned": false,
+    "aws_servers_created": false,
+    "selection_promoted": false
   }
 }
