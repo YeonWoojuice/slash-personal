@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 기존 ECR High 4건은 새 로컬 후보에서 보완했으며, ECR 교체·검사는 아직 진행하지 않았다. 장애 시험·세 Alarm 전이·M3 종단 검증은 미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 새 이미지는 ECR 게시·Basic 검사에서 검출 0건을 확인했다. 전체 배포 계획은 새 Boot 4 API의 실제 인증 검증·ECR 게시가 남아 차단 상태다. 장애 시험·세 Alarm 전이·M3 종단 검증은 미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -334,6 +334,36 @@ jOOQ 3.21 OSS의 공식 PostgreSQL 최소 버전은 18이다. 따라서 16의 �
 같은 Trivy 0.76.1·취약점 DB로 비교하면 이전 이미지의 패키지별 검출은 High 46·Medium 71·Low 84·Unknown 4건이고, 새 후보는 **33개 OS 패키지에서 검출 0건**이다. 이전 ECR High 4건은 이 Trivy에서 Medium 7개 패키지 검출로 표시되므로 두 도구의 수치를 같은 기준으로 합치지 않는다. glibc·SASL은 제거한 의존성, zlib는 적용한 수정 패키지로 구분한다. 검사 예외나 숨김 규칙은 추가하지 않았다.
 
 새 태그는 `slash-personal-db-test:m2-20261029-highfix2`다. 현재 결과는 로컬 후보에 한정하며 기존 ECR 이미지·`current_image_selection`·`enable_db_test_task=false` 설정은 유지한다. ECR 게시·재검사, ECS/RDS 실행·실제 HTTP 500·Alarm 전이는 미검증이다. Terraform apply·AWS 서버 생성·실제 장애 시험은 실행하지 않았다. LambdaOps의 화면·Cognito·DEMO 데이터·Notion은 이번 변경에 포함하지 않는다.
+
+### DB 도구 ECR 게시와 배포 계획 — 2026-10-29
+
+위 로컬 보완 이후 승인된 ECR 게시·검사를 완료했다. 계정 `642935793048`·서울 `slash-lab/db-test`의 새 불변 태그 `m2-20261029-highfix2`가 로컬 검증 이미지와 일치한다. manifest는 `sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84`이며, 게시 직후 자동 Basic 검사가 11:02:25 KST에 완료되어 검출 0건을 확인했다. 태그 덮어쓰기·기존 이미지 삭제·API 이미지 게시 없이 DB 도구의 선택 기록만 갱신했다. 임시 ECR 인증 파일도 삭제했다.
+
+배포에 앞서 원본 상태를 복사한 별도 폴더에서 Terraform 계획을 실행했다. `init`·`validate`는 통과했고, DB 도구 자체의 계약 검사도 통과했다. 전체 `plan`은 **`cloud_contract_verified=false`인 인증·지표 검증 조건**으로 종료 코드 1에서 중단됐다. 새 Boot 4 API는 실제 Cognito 검증과 ECR 게시 전이므로 이 값을 임의로 통과시키지 않았다. 계산용 API 참조는 실제 게시된 이전 이미지 `f7390b8c…`이며, Java 보안 승인을 받은 배포 후보가 아니다. 미게시 Boot 4 digest를 ECR에 존재하는 것처럼 입력하지 않았다.
+
+부분 계획은 생성 101개(AWS 98·로컬 3), 변경·삭제 0개다. 전체 계약 검사·API/관측/DB 작업 정의 3개·API/관측 서비스 2개가 아직 평가되지 않았다. 이를 포함한 전체 107개(AWS 103·로컬 4)는 코드에서 예상한 설정 수이며, 통과한 최종 계획이나 서버 수가 아니다. [계획·독립 검토 근거](../../docs/observability/results/2026-10-29-db-tool-deployment-review.json)에 계산 범위를 구분했다.
+
+| DB 도구에 추가되는 설정 | 개수 | 역할 |
+| --- | ---: | --- |
+| ECS 작업 정의 | 1 | 0.25 vCPU·512 MiB·X86_64로 실행할 일회성 도구 명세. 정의 생성만으로 실행되지 않음 |
+| IAM 역할·정책 | 3 | 실행 역할·빈 task 역할, 해당 이미지·로그·시험 DB 비밀값 읽기 범위 |
+| 보안 그룹·접근 규칙 | 4 | 도구 인바운드 없음, 시험 RDS 5432와 HTTPS 접근 |
+| 로컬 Terraform 계약 검사 | 1 | 명시적 활성화·digest·최대 실행 시간 확인 |
+
+DB 도구의 9개 설정 중 작업 정의를 제외한 8개가 부분 계획에 계산됐다. 앞으로 전체 시험 환경에는 API Fargate 1개(1 vCPU·3 GiB), 관측 Fargate 1개(1 vCPU·2 GiB), RDS PostgreSQL `db.t4g.small`·20GB gp3, Valkey `cache.t4g.micro`, 내부 ALB·REST API·VPC Link와 네트워크 설정이 필요하다. 읽기 전용 조회에서 현재 서울 RDS의 PostgreSQL 기본 버전은 사용 가능한 18.3으로 확인했다. 엔진 버전은 코드에 고정되어 있지 않으므로 최종 계획에서 다시 확인한다. DB 도구는 기본 지연 1회·시작 대기 15초이며 별도 실행 요청 전에는 시작되지 않는다. LambdaOps·Cognito·Alarm·NAT·VPC endpoint 신규 생성은 이 계획에 없다.
+
+| 비용 구분 | 서울 기준 예상액(USD·세전) |
+| --- | ---: |
+| 이번 DB 이미지 보관 | 10,322,807 bytes를 모두 신규 공간으로 한 달 보관한다고 가정하면 약 $0.0011/월 |
+| 이번 ECR Basic 검사 | 추가 검사 요금 없음 |
+| 향후 DB 도구 실행 1분 / 10분 | 약 $0.000320 / $0.003199, 컴퓨팅·공인 IPv4 기준 |
+| 향후 전체 Slash 기반 | 주요 시간 요금 약 $0.22137/시간, 저장·지표·로그·요청·LCU 등 별도 |
+
+공식 Price List API의 19개 단가를 재조회했으며 이전 비용 검토와 같았다. DB 작업 요금은 이미지 다운로드부터 종료까지의 시간에 적용되며 최소 60초다. 10분 예시는 지출 상한이 아니고 로그·비밀값 조회·재시도는 별도다. 이미지 공유 계층과 실제 보관 기간에 따라 추가 저장비는 줄어든다. 위 금액은 계정 전체 비용을 뜻하지 않는다. [ECR 요금](https://aws.amazon.com/ecr/pricing/), [Basic 검사 안내](https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/), [Fargate 요금](https://aws.amazon.com/fargate/pricing/), [IPv4 요금](https://aws.amazon.com/vpc/pricing/).
+
+이번 읽기 전용 조회에서 Slash 시험용 VPC·RDS·활성 ECS 클러스터·캐시·ALB는 0개였고 원본 experiment state도 변경 없이 관리 항목 0개다. ECR 게시 외에 서버 생성·Terraform apply·ECS 작업 실행·부하·장애 시험은 하지 않았다. 시험자 주소는 현재 단일 `/32`를 비공개로 반영했으며 종료 태그는 검토용이다. 실제 일정이나 자동 삭제 기능으로 취급하지 않는다. `capstone-구현-설계2`의 LambdaOps 화면·로그인·DEMO 데이터·영상과 Notion은 수정하지 않았다.
+
+다음 순서는 새 Boot 4 API의 실제 Cognito·지표 격리 검증 → 해당 API 이미지 ECR 게시·검사 → 이미지·시험자 주소·실행/정리 시간·RDS 버전을 반영한 전체 계획 재검토다. 실제 서버 생성과 장애 시험은 그 이후의 별도 실행 단계다.
 
 ## 검증의 범위
 

@@ -82,7 +82,11 @@ docker build --platform linux/amd64 \
 
 이전 `m2-20261028-highfix1`의 ECR Basic 결과는 **High 4·Medium 9·Low 3건**으로 보존한다. 당시 Debian 패키지의 적용 조건·함수 참조·SASL 플러그인 조사와 미해결 판단은 [기존 이미지 기록의 `remaining_high_followup_review`](../../../docs/observability/results/2026-10-28-image-publication.json)에 남아 있다. 새 로컬 후보의 결과로 과거 ECR 이미지를 수정 완료로 바꾸지 않는다.
 
-이번 후보는 아직 ECR에 게시·재검사하거나 Terraform의 선택 이미지로 승격하지 않았다. 실제 게시 단계에서는 검증한 이미지를 개인 ECR에 올리고 **ECR에서 확인한 digest**를 `images["db-test"]`에 입력한다. 로컬 이미지 ID는 ECR 게시나 AWS 실행 완료의 증거가 아니다.
+후속 승인으로 같은 이미지를 서울 `slash-lab/db-test` ECR에 `m2-20261029-highfix2` 태그로 게시했다. 원격 manifest·config·7개 계층이 검증한 로컬 이미지와 일치하며, 2026-10-29 11:02:25 KST에 **ECR Basic 검사 COMPLETE·검출 0건**을 확인했다. 자동 게시 검사를 사용했고 중복 수동 검사는 요청하지 않았다. 게시 크기는 10,322,807 bytes다. 임시 레지스트리 인증 파일은 삭제했다.
+
+선택 기록의 DB 도구 참조만 `642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84`로 갱신했다. 기존 Debian 이미지의 High 4건은 이력으로 보존한다. [게시·검사·배포 검토 근거](../../../docs/observability/results/2026-10-29-db-tool-deployment-review.json)에 정확한 이미지와 검사 시각을 기록했다.
+
+전체 배포 계획은 새 Boot 4 API의 실제 Cognito·지표 격리 검증과 ECR 게시가 남아 있어 차단 상태다. Terraform 구성 검사는 통과했지만 `cloud_contract_verified=false`인 기존 조건으로 plan이 중단됐다. DB 도구 정의가 추가되는 구성과 비용은 [기존 배포 안내](../../../infra/personal/README.md#db-도구-ecr-게시와-배포-계획--2026-10-29)를 따른다. Terraform 기본 활성화 값은 바꾸지 않았으며 `apply`·서버 생성·작업 실행·AWS 장애 시험은 수행하지 않았다.
 
 서버 인바운드 포트는 필요 없다. 기존 환경에 NAT나 VPC endpoint가 없으므로 task는 public subnet/public IP를 통해 이미지·로그에 접근한다. DB 통신은 VPC의 private RDS로만 연결한다. task 실행은 Terraform apply와 분리된 명시적 일회성 실행으로 한다. 자동 재시작 service나 반복 일정을 만들지 않는다.
 

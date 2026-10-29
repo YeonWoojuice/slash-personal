@@ -1,0 +1,829 @@
+{
+  "recorded_at_utc": "2026-10-29T02:13:20.773546+00:00",
+  "scope": "Authorized DB-tool ECR publication/rescan and non-applicable Terraform deployment preview; no runtime creation",
+  "source_commit": "e778f4886655708e5d07818058efe8a813d75e1e",
+  "publication": {
+    "at_utc": "2026-10-29T02:02:19.550978+00:00",
+    "source_commit": "e778f4886655708e5d07818058efe8a813d75e1e",
+    "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test",
+    "tag": "m2-20261029-highfix2",
+    "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+    "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+    "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+    "platform": "linux/amd64",
+    "size_bytes": 10322807,
+    "local_manifest_matches_remote": true,
+    "local_config_matches_remote": true,
+    "scan_type": "BASIC",
+    "scan_on_push": true,
+    "scan_status": "COMPLETE",
+    "temporary_registry_credential_removed": true,
+    "runtime_resources_created": false,
+    "terraform_apply": false,
+    "task_run": false,
+    "scan_counts": {},
+    "scan_pages": 1,
+    "scan_finding_count": 0,
+    "image_scan_completed_at": "2026-10-29T11:02:25+09:00",
+    "vulnerability_source_updated_at": "2026-10-29T11:02:25+09:00",
+    "scan_result_read_at_utc": "2026-10-29T02:03:36.235575+00:00"
+  },
+  "ecr_scan": {
+    "status": {
+      "status": "COMPLETE",
+      "description": "The scan was completed successfully."
+    },
+    "raw_finding_severity_counts": {},
+    "normalized_counts": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFORMATIONAL": 0,
+      "UNDEFINED": 0
+    },
+    "findings": [],
+    "pages": 1,
+    "image_scan_completed_at": "2026-10-29T11:02:25+09:00",
+    "vulnerability_source_updated_at": "2026-10-29T11:02:25+09:00",
+    "trigger": "Repository scan-on-push; no duplicate manual scan request",
+    "coverage": "ECR Basic OS package findings, not all application or runtime security; Alpine and Debian vendor advisory coverage differs",
+    "prior_local_evidence": "2026-10-29-db-tool-security-remediation.json"
+  },
+  "deployment_review": {
+    "status": "BLOCKED_PREVIEW_NOT_APPLICABLE",
+    "execution": {
+      "steps": [
+        {
+          "step": "init",
+          "exit_code": 0
+        },
+        {
+          "step": "validate",
+          "exit_code": 0
+        },
+        {
+          "step": "plan",
+          "exit_code": 1
+        },
+        {
+          "step": "show",
+          "exit_code": 0
+        }
+      ],
+      "plan_exit_code": 1,
+      "diagnostics": [
+        {
+          "severity": "error",
+          "summary": "Resource precondition failed",
+          "detail": "Verify the authentication/metrics contract before baseline, plus job/Bedrock safety before full mode."
+        }
+      ],
+      "change_summary": [
+        {
+          "add": 101,
+          "change": 0,
+          "import": 0,
+          "remove": 0,
+          "operation": "plan"
+        }
+      ]
+    },
+    "terraform_version": "1.5.7",
+    "validation": {
+      "format_version": "1.0",
+      "valid": true,
+      "error_count": 0,
+      "warning_count": 0,
+      "diagnostics": []
+    },
+    "partial_changes": {
+      "add": 101,
+      "change": 0,
+      "remove": 0,
+      "aws": 98,
+      "local": 3,
+      "counts_by_type": {
+        "aws_api_gateway_deployment": 1,
+        "aws_api_gateway_gateway_response": 2,
+        "aws_api_gateway_integration": 4,
+        "aws_api_gateway_method": 4,
+        "aws_api_gateway_method_settings": 1,
+        "aws_api_gateway_resource": 5,
+        "aws_api_gateway_rest_api": 1,
+        "aws_api_gateway_rest_api_policy": 1,
+        "aws_api_gateway_stage": 1,
+        "aws_apigatewayv2_vpc_link": 1,
+        "aws_cloudwatch_log_group": 1,
+        "aws_db_instance": 1,
+        "aws_db_subnet_group": 1,
+        "aws_ecs_cluster": 1,
+        "aws_elasticache_replication_group": 1,
+        "aws_elasticache_subnet_group": 1,
+        "aws_iam_role": 8,
+        "aws_iam_role_policy": 4,
+        "aws_iam_role_policy_attachment": 3,
+        "aws_internet_gateway": 1,
+        "aws_lb": 1,
+        "aws_lb_listener": 1,
+        "aws_lb_listener_rule": 5,
+        "aws_lb_target_group": 2,
+        "aws_route": 1,
+        "aws_route_table": 1,
+        "aws_route_table_association": 2,
+        "aws_secretsmanager_secret": 2,
+        "aws_secretsmanager_secret_version": 2,
+        "aws_security_group": 8,
+        "aws_service_discovery_private_dns_namespace": 1,
+        "aws_service_discovery_service": 2,
+        "aws_subnet": 4,
+        "aws_vpc": 1,
+        "aws_vpc_security_group_egress_rule": 13,
+        "aws_vpc_security_group_ingress_rule": 9,
+        "random_password": 2,
+        "terraform_data": 1
+      }
+    },
+    "expected_complete_configuration": {
+      "total": 107,
+      "aws": 103,
+      "local": 4,
+      "meaning": "Static expected configuration, not a successful complete plan and not server count",
+      "unevaluated_addresses": [
+        "terraform_data.contract",
+        "aws_ecs_task_definition.core[0]",
+        "aws_ecs_task_definition.monitoring[0]",
+        "aws_ecs_task_definition.db_test[0]",
+        "aws_ecs_service.core[0]",
+        "aws_ecs_service.monitoring[0]"
+      ]
+    },
+    "db_additional_configuration": {
+      "total": 9,
+      "aws": 8,
+      "local": 1,
+      "security_group": 1,
+      "ingress_rule": 1,
+      "egress_rules": 2,
+      "iam_roles": 2,
+      "iam_inline_policy": 1,
+      "task_definition": 1,
+      "terraform_contract": 1,
+      "planned_now": 8,
+      "task_definition_blocked_by_global_contract": true,
+      "vcpu": 0.25,
+      "memory_mib": 512,
+      "default_mode": "delay",
+      "pulses": 1,
+      "start_delay_seconds": 15,
+      "interval_seconds": 10,
+      "creating_definition_does_not_run_task": true
+    },
+    "inputs": {
+      "cloud_contract_verified": false,
+      "enable_workloads": true,
+      "enable_cloudwatch_metrics": true,
+      "enable_db_test_task": true,
+      "experiment_mode": "api-baseline",
+      "fresh_tester_ipv4_prefix": 32,
+      "tester_ip_redacted": true,
+      "expiry_is_review_tag_not_execution_schedule": true,
+      "old_published_api_reference_only_for_blocked_structure_preview": true,
+      "old_api_not_security_approved": true,
+      "boot4_image_not_published_or_fabricated": true,
+      "original_state_unchanged": true,
+      "copied_state_managed_instances": 0
+    },
+    "source_hashes": {
+      "infra/personal/experiment/.terraform.lock.hcl": "d5bc55ad65632e434bd7c79fa55a393b9f0b8ae7453fe121e767a43df0291407",
+      "infra/personal/experiment/db-test.tf.json": "46900e13d3cb8b337263ef7a79ca55d4af9afbd44c9dadf461edf5159f786cc9",
+      "infra/personal/experiment/ingress.tf.json": "df8f840a2524e7f4685d4de9a3f2c4c348bf07fd867d6140c39abceb3f62de79",
+      "infra/personal/experiment/main.tf.json": "a95000dc06ee4b73ba414095b9e509138dace10d3bbe9ec393d4976d509db3e2",
+      "infra/personal/experiment/terraform.tfvars.example": "67454248623b577f74b808211cfc407bba2ab8fff0eae1e9b5a282038bb6be3b",
+      "infra/personal/experiment/variables.tf.json": "2c1868968ab3ecaa751553457059fa3f19015f1eb47f24712a55d1b314251861",
+      "infra/personal/experiment/versions.tf.json": "4ffd719630ec72df452505766d6c3a2286208e3e27c7192e8799bd516a6b4fa3",
+      "observability/personal/prometheus/Dockerfile": "999e69ae6da3a3fecbb098bc399a2e661a4dfd260f3c0b69780e0387408f7039",
+      "observability/personal/prometheus/README.md": "838d6c403fea16eb22f68a89abc27e81cd6f8942b4db10685b85800f1f51896f",
+      "observability/personal/prometheus/arguments.json": "f97f70fd54d1cafbcc423a3b076bfccf10613ca6d2532b51836062f8150de1ce",
+      "observability/personal/prometheus/config.json.tftpl": "d492522b0e672fc1523147363db882de3b97be606c68bbd7fcf9418abfb54b75",
+      "observability/personal/prometheus/image.py": "f9f394a36dc679fd1fb6c69447cdbc0e72a0393359c5fc7d06607cfcce636e53",
+      "observability/personal/prometheus/verify.py": "489c65df86a352c0248f4ac3f8045f34f014ca7e9a8d1724c525c0e59674e33f"
+    },
+    "environment": {
+      "at_utc": "2026-10-29T02:06:18.979099+00:00",
+      "account_id": "642935793048",
+      "region": "ap-northeast-2",
+      "images": {
+        "api": {
+          "reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+          "digest": "sha256:f7390b8c49d1a13398978da95530c98ef4402ecbd4fde383219d7bd674bbe479",
+          "exists": true,
+          "size_bytes": 131123066
+        },
+        "prometheus": {
+          "reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+          "digest": "sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
+          "exists": true,
+          "size_bytes": 113790104
+        },
+        "grafana": {
+          "reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+          "digest": "sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
+          "exists": true,
+          "size_bytes": 218025640
+        },
+        "db-test": {
+          "reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+          "digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+          "exists": true,
+          "size_bytes": 10322807
+        }
+      },
+      "experiment_inventory": {
+        "matching_vpcs": 0,
+        "rds_instances": [],
+        "active_ecs_clusters": [],
+        "cache_clusters": [],
+        "load_balancers": []
+      },
+      "scope": "Slash experiment only; no assertion about LambdaOps or total AWS account resources"
+    },
+    "missing_before_final_plan": [
+      "Actual Cognito login and metrics isolation verification for the Boot4 API candidate",
+      "Publish and scan that verified API image, then use its real ECR digest",
+      "Reconfirm tester IP, execution/cleanup window, provider-selected RDS version and all image/config contracts",
+      "Rerun complete plan with truthful verification evidence; inspect before any apply"
+    ],
+    "actual_servers_created": false,
+    "apply_executed": false,
+    "ecs_run_task_executed": false,
+    "fault_or_load_test_executed": false,
+    "rds_default_version_read_only": {
+      "engine": "postgres",
+      "region": "ap-northeast-2",
+      "observed_default_version": "18.3",
+      "status": "available",
+      "terraform_engine_version_pinned": false,
+      "note": "Observed current service default only; verify again in final deployment review. No RDS created or changed."
+    }
+  },
+  "cost": {
+    "currency": "USD",
+    "region": "ap-northeast-2",
+    "price_refresh": {
+      "checked_at_utc": "2026-10-29T02:05:20.763179+00:00",
+      "method": "Read-only AWS Price List GetProducts exact SKU queries",
+      "rates": {
+        "rds_db_t4g_small_hour": {
+          "usd": 0.051,
+          "unit": "Hrs",
+          "begin_range": "0",
+          "description": "$ 0.051 per RDS db.t4g.small Single-AZ instance hour (or partial hour) running PostgreSQL",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "UMH398UHTY46K8BK",
+          "service": "AmazonRDS",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "rds_gp3_gb_month": {
+          "usd": 0.131,
+          "unit": "GB-Mo",
+          "begin_range": "0",
+          "description": "$0.131 per GB-month of provisioned GP3 storage running PostgreSQL",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "8TFTRRBWJSP95DQP",
+          "service": "AmazonRDS",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "rds_surplus_vcpu_hour": {
+          "usd": 0.075,
+          "unit": "vCPU-Hours",
+          "begin_range": "0",
+          "description": "USD 0.075 per vCPU-Hour of T4g CPU Credits",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "GYPHBB4HSCMUCDNK",
+          "service": "AmazonRDS",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "valkey_cache_t4g_micro_hour": {
+          "usd": 0.0192,
+          "unit": "Hrs",
+          "begin_range": "0",
+          "description": "$0.0192 per T4G Micro Cache node-hour (or partial hour) running Valkey",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "JWGV22RACS6825AS",
+          "service": "AmazonElastiCache",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "alb_hour": {
+          "usd": 0.0225,
+          "unit": "Hrs",
+          "begin_range": "0",
+          "description": "$0.0225 per Application LoadBalancer-hour (or partial hour)",
+          "effective_date": "2026-08-01T00:00:00Z",
+          "sku": "VUV9M7PZ543S2SC9",
+          "service": "AWSELB",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "alb_lcu_hour": {
+          "usd": 0.008,
+          "unit": "LCU-Hrs",
+          "begin_range": "0",
+          "description": "$0.008 per used Application load balancer capacity unit-hour (or partial hour)",
+          "effective_date": "2026-08-01T00:00:00Z",
+          "sku": "CX4ZBV2SE6F5HJV3",
+          "service": "AWSELB",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "public_ipv4_hour": {
+          "usd": 0.005,
+          "unit": "Hrs",
+          "begin_range": "0",
+          "description": "$0.005 per In-use public IPv4 address per hour",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "ZKBHEVDXYBRCKFQ8",
+          "service": "AmazonVPC",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "rest_request": {
+          "usd": 3.5e-06,
+          "unit": "Requests",
+          "begin_range": "0",
+          "description": "$3.50/million requests - first 333 million requests/month",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "3U6J7Z7NQKKPWAZ9",
+          "service": "AmazonApiGateway",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "cw_metric_month": {
+          "usd": 0.3,
+          "unit": "Metrics",
+          "begin_range": "0",
+          "description": "$0.30 per metric-month for the first 10,000 metrics - Asia Pacific (Seoul)",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "92QAN7T7PQUAG6NQ",
+          "service": "AmazonCloudWatch",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "cw_logs_ingest_gb": {
+          "usd": 0.76,
+          "unit": "GB",
+          "begin_range": "0",
+          "description": "$0.76 per GB custom log data ingested in Standard log class - Asia Pacific (Seoul)",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "5P9Q77R2ADUJCNJ2",
+          "service": "AmazonCloudWatch",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "cw_logs_store_gb_month": {
+          "usd": 0.0314,
+          "unit": "GB-Mo",
+          "begin_range": "0",
+          "description": "$0.0314 per GB-mo of log storage - Asia Pacific (Seoul)",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "E7V5NF3GN7MQKCB6",
+          "service": "AmazonCloudWatch",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "cw_api_request": {
+          "usd": 1e-05,
+          "unit": "Requests",
+          "begin_range": "0",
+          "description": "$0.01 per 1,000 requests",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "CY5JMB5JBHJAY5XB",
+          "service": "AmazonCloudWatch",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "secret_month": {
+          "usd": 0.4,
+          "unit": "Secrets",
+          "begin_range": "0",
+          "description": "$0.40 per Secret",
+          "effective_date": "2025-07-01T00:00:00Z",
+          "sku": "8TY6BPQ52JVYCRQD",
+          "service": "AWSSecretsManager",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "secrets_api_request": {
+          "usd": 5e-06,
+          "unit": "API Requests",
+          "begin_range": "0",
+          "description": "$0.05 per 10000 API Requests",
+          "effective_date": "2025-07-01T00:00:00Z",
+          "sku": "9779GVGYGTKZ2UJA",
+          "service": "AWSSecretsManager",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "cloudmap_resource_month": {
+          "usd": 0.1,
+          "unit": "CloudMapResource",
+          "begin_range": "0",
+          "description": "$0.10 per resource-month",
+          "effective_date": "2025-08-01T00:00:00Z",
+          "sku": "JAF56EEF95B2NSXP",
+          "service": "AWSCloudMap",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "internet_egress_gb": {
+          "usd": 0.126,
+          "unit": "GB",
+          "begin_range": "0",
+          "description": "$0.126 per GB - first 10 TB / month data transfer out beyond the global free tier",
+          "effective_date": "2026-06-01T00:00:00Z",
+          "sku": "9AS8NERTGECRPGT7",
+          "service": "AWSDataTransfer",
+          "location": null,
+          "matches_previous": true
+        },
+        "existing_ecr_gb_month": {
+          "usd": 0.1,
+          "unit": "GB-Mo",
+          "begin_range": "0",
+          "description": "$0.10 per GB-month of data storage",
+          "effective_date": "2025-11-01T00:00:00Z",
+          "sku": "FP58BXCX2RHZR3B2",
+          "service": "AmazonECR",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "fargate_x86_vcpu_hour": {
+          "usd": 0.04656,
+          "unit": "hours",
+          "begin_range": "0",
+          "description": "AWS Fargate - vCPU  - Asia Pacific (Seoul)",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "DS579H2QDYXPJDKE",
+          "service": "AmazonECS",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        },
+        "fargate_x86_gib_hour": {
+          "usd": 0.00511,
+          "unit": "hours",
+          "begin_range": "0",
+          "description": "AWS Fargate - Memory  - Asia Pacific (Seoul)",
+          "effective_date": "2026-10-01T00:00:00Z",
+          "sku": "KJE68NNYFF2BQG98",
+          "service": "AmazonECS",
+          "location": "Asia Pacific (Seoul)",
+          "matches_previous": true
+        }
+      }
+    },
+    "image": {
+      "size_bytes": 10322807,
+      "storage_rate_gb_month": 0.1,
+      "all_layers_new_full_month_decimal_gb_estimate": 0.0010322807,
+      "all_layers_new_full_month_binary_gib_comparison": 0.0009613863192498685,
+      "rounded_up_estimate_usd_month": 0.0011,
+      "basic_scan_additional_fee": 0,
+      "assumptions": "Full-month retention with every reported compressed byte treated as new storage. Shared layers/partial-month retention reduce marginal charge. Not total account cost."
+    },
+    "future_db_task": {
+      "vcpu": 0.25,
+      "memory_gib": 0.5,
+      "public_ipv4_count": 1,
+      "compute_only_hour": 0.014195,
+      "compute_plus_ip_hour": 0.019195,
+      "one_minute_compute_plus_ip": 0.00031991666666666665,
+      "ten_minutes_compute_plus_ip": 0.0031991666666666666,
+      "definition_only_compute_cost": 0,
+      "minimum_billing_seconds": 60,
+      "duration_scope": "Image download through task termination; not SQL sleep duration",
+      "extras": "Logs, secret reads, API requests, network transfers and repeated tasks extra; not spending limit"
+    },
+    "future_base_environment": {
+      "main_hourly_usd": 0.22136999999999998,
+      "scope": "2 Fargate tasks (2vCPU/5GiB total), RDS db.t4g.small, Valkey cache.t4g.micro, ALB,2publicIPv4; storage/metrics/secrets/requests/logs/LCU/credits/tax extra",
+      "prior_two_hour_estimate_usd": [
+        0.720586,
+        1.420663
+      ],
+      "prior_estimate_reference": "2026-10-29-baseline-cost-estimate.json: latency_candidate_followup",
+      "all_19_rates_unchanged": true
+    },
+    "sources": [
+      "https://aws.amazon.com/ecr/pricing/",
+      "https://aws.amazon.com/fargate/pricing/",
+      "https://aws.amazon.com/vpc/pricing/",
+      "https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/"
+    ]
+  },
+  "coordination": {
+    "other_chat": "capstone-구현-설계2",
+    "other_scope": "LambdaOps seeded Incident UI demo and video",
+    "lambdaops_repository_modified": false,
+    "cognito_configuration_modified": false,
+    "notion_modified": false,
+    "db_image_only_published": true,
+    "api_image_promoted": false
+  },
+  "independent_publication_review": {
+    "reviewed_at_utc": "2026-10-29T02:08:25.426533+00:00",
+    "verdict": "PASS_WITH_SCOPE_LIMITATIONS",
+    "blocking_findings": [],
+    "review_method": "Read-only comparison of saved ECR responses, verified local image archive, publication and scan scripts, test evidence and current image inputs. Reviewer made no Docker or AWS calls.",
+    "identity": {
+      "registry": "642935793048",
+      "region": "ap-northeast-2",
+      "repository": "slash-lab/db-test",
+      "tag": "m2-20261029-highfix2",
+      "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+      "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+      "platform": "linux/amd64",
+      "local_manifest_hash_verified": true,
+      "remote_manifest_object_equals_local_archive": true,
+      "remote_config_reference_matches_tested_archive": true,
+      "layer_digests_sizes_and_local_blob_hashes_verified": 7,
+      "local_inspect_and_ecr_scan_digest_match": true,
+      "source_image_inputs_unchanged": true,
+      "tag_immutable": true,
+      "size_bytes": 10322807,
+      "size_equals_layer_bytes_plus_config": true
+    },
+    "scan": {
+      "type": "BASIC",
+      "repository_scan_on_push": true,
+      "registry_filter_rules": [],
+      "trigger_evidence": "Repository scanOnPush=true; completed approximately 7 seconds after new image push; reviewed publication/scan scripts contain no manual start-image-scan call. Empty registry rules are not reported as a matching filter.",
+      "status": "COMPLETE",
+      "findings": 0,
+      "raw_severity_counts": {},
+      "normalized_counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "INFORMATIONAL": 0,
+        "UNDEFINED": 0
+      },
+      "pages": 1,
+      "next_token_absent": true,
+      "image_pushed_at": "2026-10-29T11:02:18.042000+09:00",
+      "scan_completed_at": "2026-10-29T11:02:25+09:00",
+      "vulnerability_source_updated_at": "2026-10-29T11:02:25+09:00",
+      "result_read_at_utc": "2026-10-29T02:03:36.235575+00:00",
+      "timestamps_ordered": true,
+      "scope": "OS package findings reported by ECR Basic for this exact image; no package inventory count is returned in this empty finding response."
+    },
+    "credentials": {
+      "temporary_docker_config_file_absent": true,
+      "temporary_docker_config_directory_empty": true,
+      "scope": "Checked task-specific temporary Docker credential location; no global credential files read."
+    },
+    "prior_verification": {
+      "postgres16_tests": 17,
+      "postgres18_tests": 17,
+      "local_trivy_detected_packages": 33,
+      "local_trivy_findings": 0,
+      "historical_ecr_image_preserved": "sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+      "historical_ecr_counts": {
+        "HIGH": 4,
+        "MEDIUM": 9,
+        "LOW": 3
+      }
+    },
+    "promotion_assessment": "The db-test image reference alone can be updated to this verified ECR digest. This does not approve Terraform apply, task launch, API-image promotion, or the overall deployment plan.",
+    "scope_limits": [
+      "Historical ECR High4 belongs to the older Debian image and remains historical; it must not be overwritten as a passed scan.",
+      "Alpine vendor advisory status in the official support table is Fixed; Debian is Fixed/Open. Zero findings are not a general security certification. Existing zlib patch and glibc/SASL removal evidence remains necessary.",
+      "ECR scan is separate from local Trivy; counts and package coverage must not be merged.",
+      "No ECS/RDS runtime, secret injection, HTTP outcome, CloudWatch, Alarm or M3 end-to-end verification is established here.",
+      "Absence of all runtime AWS changes requires the main executor scope checks; the reviewer inspected only saved publication/scan artifacts and scripts."
+    ],
+    "sources": [
+      "https://docs.aws.amazon.com/inspector/latest/user/supported.html",
+      "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-basic.html",
+      "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html",
+      "https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/",
+      "https://aws.amazon.com/ecr/pricing/"
+    ],
+    "evidence_sha256": {
+      "publication.json": "223c10d27d63d7a5a0e621f96b0ac9381ca8c528d7edd9e52e233eb405568829",
+      "remote-manifest.json": "1788af1ce57c21423e8c559ae1523b69e0a153bf465a661402f94b4d34de6483",
+      "remote-image-detail.json": "0b351fd02dd87232eef9413ef724a483bbdb7b39eda7e104f76971a903e05e85",
+      "ecr-scan.json": "5333f99ade4235614151926ff390ee777d324bbc664557ce52c26324f5363d40",
+      "repository.json": "478443d1caaa70dfbd1e8f9e83e6a79c6cba3b796a4574ab5a567accca045f67",
+      "registry-scanning.json": "75ef3535559dc216734311aa54f13add2303aa4f63d2cd5b272eddfe43d8bbe1",
+      "local-image-inspect.json": "601e92bfe24b0d3fab01a13da97b090cf6a17a03891c5b82fa70f4d65b8a3ff2"
+    }
+  },
+  "independent_plan_review": {
+    "reviewed_at_utc": "2026-10-29T02:11:19.345893+00:00",
+    "verdict": "PASS_FOR_BLOCKED_PREVIEW_NOT_DEPLOYMENT_APPROVAL",
+    "method": "Independent read-only comparison of saved Terraform JSON, source commit hashes, ECR publication result, inventory snapshot and refreshed pricing; no AWS calls by reviewer",
+    "source_commit": "e778f4886655708e5d07818058efe8a813d75e1e",
+    "source_file_hashes_verified_count": 13,
+    "ecr": {
+      "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+      "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+      "local_and_remote_identity_match": true,
+      "scan_type": "BASIC",
+      "scan_status": "COMPLETE",
+      "findings": 0,
+      "size_bytes": 10322807,
+      "scan_completed_at": "2026-10-29T11:02:25+09:00",
+      "scope": "Recorded OS package scan for this exact image; no claim of AWS runtime verification"
+    },
+    "terraform": {
+      "version": "1.5.7",
+      "validate_passed": true,
+      "plan_exit_code": 1,
+      "only_error": "Authentication/metrics contract precondition failed",
+      "auth_gate": false,
+      "db_test_contract": "pass",
+      "plan_status": "BLOCKED; not a successful apply-ready plan",
+      "partial_create": 101,
+      "partial_aws_create": 98,
+      "partial_non_aws_create": 3,
+      "updates": 0,
+      "deletes": 0,
+      "replacements": 0,
+      "counts_by_type": {
+        "aws_api_gateway_deployment": 1,
+        "aws_api_gateway_gateway_response": 2,
+        "aws_api_gateway_integration": 4,
+        "aws_api_gateway_method": 4,
+        "aws_api_gateway_method_settings": 1,
+        "aws_api_gateway_resource": 5,
+        "aws_api_gateway_rest_api": 1,
+        "aws_api_gateway_rest_api_policy": 1,
+        "aws_api_gateway_stage": 1,
+        "aws_apigatewayv2_vpc_link": 1,
+        "aws_cloudwatch_log_group": 1,
+        "aws_db_instance": 1,
+        "aws_db_subnet_group": 1,
+        "aws_ecs_cluster": 1,
+        "aws_elasticache_replication_group": 1,
+        "aws_elasticache_subnet_group": 1,
+        "aws_iam_role": 8,
+        "aws_iam_role_policy": 4,
+        "aws_iam_role_policy_attachment": 3,
+        "aws_internet_gateway": 1,
+        "aws_lb": 1,
+        "aws_lb_listener": 1,
+        "aws_lb_listener_rule": 5,
+        "aws_lb_target_group": 2,
+        "aws_route": 1,
+        "aws_route_table": 1,
+        "aws_route_table_association": 2,
+        "aws_secretsmanager_secret": 2,
+        "aws_secretsmanager_secret_version": 2,
+        "aws_security_group": 8,
+        "aws_service_discovery_private_dns_namespace": 1,
+        "aws_service_discovery_service": 2,
+        "aws_subnet": 4,
+        "aws_vpc": 1,
+        "aws_vpc_security_group_egress_rule": 13,
+        "aws_vpc_security_group_ingress_rule": 9,
+        "random_password": 2,
+        "terraform_data": 1
+      },
+      "not_evaluated_due_to_failed_dependency": [
+        "terraform_data.contract",
+        "aws_ecs_task_definition.core[0]",
+        "aws_ecs_task_definition.monitoring[0]",
+        "aws_ecs_task_definition.db_test[0]",
+        "aws_ecs_service.core[0]",
+        "aws_ecs_service.monitoring[0]"
+      ],
+      "full_configuration_expected_not_successful_plan": {
+        "total": 107,
+        "aws": 103,
+        "non_aws": 4
+      },
+      "api_reference": "Existing published f7390b8c49d1... retained for blocked structural review only; not security-approved. Boot4 candidate is not falsely represented as published."
+    },
+    "db_addition": {
+      "declarations": 9,
+      "aws_declarations": 8,
+      "local_contract": 1,
+      "already_in_partial_plan": 8,
+      "task_definition_missing_until_global_contract_passes": 1,
+      "vcpu": 0.25,
+      "memory_gib": 0.5,
+      "x86_64": true,
+      "mode": "delay",
+      "pulses": 1,
+      "start_delay_seconds": 15,
+      "interval_seconds": 10,
+      "auto_service_or_schedule_or_run_task": false,
+      "container_inbound_ports": false,
+      "allowed_outbound": "Dedicated RDS SG port5432 and HTTPS443",
+      "password_delivery": "Specific RDS-managed secret via execution role; no plaintext plan input",
+      "default_enable_db_test_task_unchanged_false": true
+    },
+    "future_running_base_from_configuration": {
+      "api_fargate": {
+        "tasks": 1,
+        "vcpu": 1,
+        "memory_gib": 3
+      },
+      "monitor_fargate": {
+        "tasks": 1,
+        "vcpu": 1,
+        "memory_gib": 2
+      },
+      "rds": "Single-AZ private encrypted PostgreSQL db.t4g.small,20GB gp3; engine version is not pinned in code",
+      "valkey": "cache.t4g.micro, TLS and storage encryption",
+      "ingress": "Regional REST API, VPC Link V2, internal ALB",
+      "db_tool": "one-off task only after separate explicit execution"
+    },
+    "preserved_boundaries": {
+      "account_and_region_correct": true,
+      "all_four_image_refs_exist_in_recorded_ecr_inventory": true,
+      "local_only_api_digest_not_fabricated_as_published": true,
+      "fresh_single_private_32_allowlist": true,
+      "cleanup_tag_review_only_not_schedule_or_auto_delete": true,
+      "prometheus_name_and_image_contract_match": true,
+      "rds_private_encrypted": true,
+      "cache_encrypted_tls": true,
+      "alb_internal": true,
+      "no_new_lambdaops_cognito_alarm_resources": true,
+      "no_nat_or_interface_endpoints": true,
+      "no_nlu_inference_or_bedrock_workload": true,
+      "original_state_managed_resources_recorded": 0,
+      "all_13_copied_source_files_match_reviewed_commit": true
+    },
+    "existing_environment_snapshot": {
+      "matching_slash_vpcs": 0,
+      "slash_rds": 0,
+      "slash_active_ecs_clusters": 0,
+      "slash_cache_clusters": 0,
+      "slash_load_balancers": 0,
+      "scope": "Slash experiment only, not the total account or LambdaOps"
+    },
+    "cost_check": {
+      "refreshed_rate_count": 19,
+      "all_match_prior": true,
+      "source_method": "Read-only AWS Price List GetProducts exact SKU queries",
+      "checked_at_utc": "2026-10-29T02:05:20.763179+00:00",
+      "db_task_and_one_public_ipv4_hourly_usd": 0.019195,
+      "examples_usd_excluding_logs_secrets_and_network": {
+        "60_seconds": 0.000319917,
+        "600_seconds": 0.003199167
+      },
+      "base_main_hourly_usd": 0.22137,
+      "image_full_new_storage_assumption_monthly_usd_decimal_gb": 0.0010322807,
+      "storage_caveat": "Assumes all reported compressed bytes add new storage for one month; shared layers and shorter retention reduce incremental storage, taxes/allowances excluded. Not a bill or hard cap.",
+      "basic_scan_additional_fee_usd": 0,
+      "task_definition_is_not_running_compute": true,
+      "sources": [
+        "https://aws.amazon.com/fargate/pricing/",
+        "https://aws.amazon.com/vpc/pricing/",
+        "https://aws.amazon.com/ecr/pricing/",
+        "https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/"
+      ],
+      "base_main_hourly_recalculated_from_refreshed_rates": 0.22137
+    },
+    "required_before_actual_execution": [
+      "Publish and inspect the tested Boot4 API image in its own authorized step",
+      "Verify exact API image with actual Cognito and metrics isolation before setting cloud_contract_verified=true",
+      "Refresh tester IP, lifetime tag, state/inventory, immutable images and Prometheus configuration; obtain a successful full plan",
+      "No apply or run-task in current authorized scope; actual server creation and bounded fault scenario need separate authorization",
+      "After deployment, verify actual RDS engine/schema, ECS secret injection/TLS, baseline HTTP/metrics and exact live query target before fault execution"
+    ],
+    "limits": [
+      "ECR and inventory were independently checked from parent-saved AWS results; reviewer did not repeat AWS calls.",
+      "No runtime endpoints, new servers, Cognito changes, LambdaOps changes, task execution or actual HTTP500/Alarm/M3 completion are proven by this review.",
+      "101 is partial planned resource creation, not created resources and not server count.",
+      "Snapshot empty state/inventory does not prove account-wide zero cost.",
+      "Final absence of mutations and original state preservation are parent executor checks."
+    ],
+    "evidence_sha256": {
+      "plan/execution-summary.json": "0e5aa69f50bba73aee63ba68c6e76755bfd9b5949bc8b89f6096b38c3dc5f59c",
+      "plan/show.stdout": "90a3c3faedfc805d8c37ba0af250df9ac31ab2ea86e55ba200a5f097d6742bd5",
+      "plan/validate.stdout": "4cd9eddc4d07c5aff74dadb6b3544f98186f6705ac60e0d94d545fc42b45b9b6",
+      "plan/review-input-summary.json": "e8713253f72bd9bbca116a953869b5c4315d819f364ccebb41aeb733cdaaddfc",
+      "plan/environment-review.json": "8621ee02f46940b89ad79b20148453dfdc8212ba5a89cad7360add91bf58aa77",
+      "publication.json": "223c10d27d63d7a5a0e621f96b0ac9381ca8c528d7edd9e52e233eb405568829",
+      "pricing.json": "1c20845c0e3270809339223fc45541fa50496d41b4b58835b228174b3fe66833"
+    }
+  },
+  "evidence_sha256": {
+    "publication.json": "223c10d27d63d7a5a0e621f96b0ac9381ca8c528d7edd9e52e233eb405568829",
+    "remote-manifest.json": "1788af1ce57c21423e8c559ae1523b69e0a153bf465a661402f94b4d34de6483",
+    "ecr-scan.json": "5333f99ade4235614151926ff390ee777d324bbc664557ce52c26324f5363d40",
+    "plan/execution-summary.json": "0e5aa69f50bba73aee63ba68c6e76755bfd9b5949bc8b89f6096b38c3dc5f59c",
+    "plan/show.stdout": "90a3c3faedfc805d8c37ba0af250df9ac31ab2ea86e55ba200a5f097d6742bd5",
+    "pricing.json": "1c20845c0e3270809339223fc45541fa50496d41b4b58835b228174b3fe66833",
+    "independent-publication-review.json": "bc03ce3331f9c58f206c4c17fecb355378b5765245d56d6f20f90ccc05169900",
+    "independent-plan-review.json": "db6ad957fc3e288cac6b6ed84ad3237b1deb4e8a8d2bdeb04513d7838fa13915",
+    "plan/rds-default-version.json": "f12fcdc0395bf176299041585a98ef5ef78b17ddd9de76cf684d7232fe262c74"
+  }
+}

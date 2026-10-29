@@ -754,7 +754,7 @@
   "current_image_selection": {
     "grafana": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
     "prometheus": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
-    "db-test": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+    "db-test": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
     "api": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735"
   },
   "latency_image_followup": {
@@ -884,5 +884,42 @@
     "ecr_rescanned": false,
     "aws_servers_created": false,
     "selection_promoted": false
+  },
+  "db_tool_ecr_publication_20261029": {
+    "evidence": "2026-10-29-db-tool-deployment-review.json",
+    "previous_db_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:e8acbc3f6fa11a6f3d5c1754247737c57ecf554cadd5bb4bf1f619cf4372d321",
+    "publication": {
+      "at_utc": "2026-10-29T02:02:19.550978+00:00",
+      "source_commit": "e778f4886655708e5d07818058efe8a813d75e1e",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test",
+      "tag": "m2-20261029-highfix2",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+      "manifest_digest": "sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
+      "config_digest": "sha256:c809b275dcac095d8fcf416bf9d9a2ec7004a7840b66cd88f3a3013daa3b0c4e",
+      "platform": "linux/amd64",
+      "size_bytes": 10322807,
+      "local_manifest_matches_remote": true,
+      "local_config_matches_remote": true,
+      "scan_type": "BASIC",
+      "scan_on_push": true,
+      "scan_status": "COMPLETE",
+      "temporary_registry_credential_removed": true,
+      "runtime_resources_created": false,
+      "terraform_apply": false,
+      "task_run": false,
+      "scan_counts": {},
+      "scan_pages": 1,
+      "scan_finding_count": 0,
+      "image_scan_completed_at": "2026-10-29T11:02:25+09:00",
+      "vulnerability_source_updated_at": "2026-10-29T11:02:25+09:00",
+      "scan_result_read_at_utc": "2026-10-29T02:03:36.235575+00:00"
+    },
+    "status": "DB image published and ECR Basic scan passed; complete deployment remains blocked by API prerequisites",
+    "historical_old_image_findings_retained": true,
+    "only_db_selection_updated": true,
+    "terraform_defaults_changed": false,
+    "api_selection_changed": false,
+    "apply": false,
+    "run_task": false
   }
 }

@@ -608,5 +608,17 @@
       "https://aws.amazon.com/about-aws/whats-new/2024/08/new-version-amazon-ecr-basic-scanning/",
       "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
     ]
+  },
+  "db_tool_publication_followup": {
+    "evidence": "2026-10-29-db-tool-deployment-review.json",
+    "checked_at_utc": "2026-10-29T02:05:20.763179+00:00",
+    "rates_rechecked": 19,
+    "rates_changed": 0,
+    "image_storage_full_new_month_estimate_usd": 0.0010322807,
+    "basic_scan_additional_usd": 0,
+    "db_task_compute_plus_ipv4_hour_usd": 0.019195,
+    "db_task_10_minutes_usd": 0.0031991666666666666,
+    "actual_runtime_created": false,
+    "note": "Storage estimate assumes all layers newly stored for a month. Task cost excludes logs/secret calls/base environment and is not a spending cap."
   }
 }
