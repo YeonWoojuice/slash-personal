@@ -37,6 +37,24 @@ Cognito resource server `lambdaops`와 `incidents.read` scope를 추가한다. �
 
 ## 실제 Slash 로그인 — 로컬 검증 결과
 
+### 2026-10-30 Boot 4 후보 실제 로그인·지표 분리 — 40/40 통과
+
+정확한 Boot 4.1.2 이미지 `99575923…`와 임시 PostgreSQL 18·캐시로 실제 Cognito web client의 code+PKCE 로그인을 검증했다. 첫·반복 `/api/v1/me`는 200이며 같은 사용자를 반환했고, 임시 DB 사용자 수는 1건으로 유지됐다. 실제 access token에 이메일이 없는 상태에서 HTTPS UserInfo를 거쳐 생성된 프로필의 일치도 확인했다. 프로필 원문과 토큰은 결과에 저장하지 않았다.
+
+무토큰·가짜 토큰·변조 서명·ID token 대용은 401이었다. 일반 API 포트의 Prometheus는 무인증 401·인증 후 404이며 전달 헤더로 관리 포트를 위장해도 노출되지 않았다. 내부 Prometheus는 200, 관리 포트의 업무 API와 불필요한 관리 경로는 403이었다. `service=slash-api`, `environment=personal`인 내부 요청 집계는 4→11, DB 쿼리 집계는 0→20으로 증가했다. 이 로컬 태그 확인은 AWS CloudWatch의 `Service/Environment` 계약이나 실제 발행 검증을 대신하지 않는다.
+
+실행 검사 40개와 정리가 모두 통과했다. 비루트·읽기 전용 API, 호스트 포트 미공개·개발 DB 분리를 유지했고 생성한 컨테이너·네트워크·임시 사용자 데이터·로그인 URL 파일을 제거했다. 메인의 후속 조회에서도 시험 컨테이너·네트워크 0개와 callback 포트 종료를 확인했다. 앱 코드·이미지·Cognito 설정은 변경하지 않았다. ECR 게시·AWS 서버 생성·CloudWatch 발행·장애 시험은 하지 않았다. 과거 2.05초 지연 원인과 실제 만료 토큰·다른 실제 client 토큰 검증은 범위 밖이다. [기존 Boot 4 근거의 후속 결과](../../../docs/observability/results/2026-10-29-boot4-security-remediation.json)를 따른다.
+
+### 2026-10-29 Boot 4 후보 재검증 — 로그인 대기로 미완료
+
+새 Boot 4.1.2 이미지 `99575923…`를 임시 PostgreSQL 18·캐시와 실행했다. 기존 인증 도구의 자동 검사 13개와 로그인 전 실행 검사 24개가 통과했다. 실제 이미지 일치·비루트·읽기 전용 실행·개발 DB 분리, 무토큰 및 가짜 토큰 401, 일반 API 포트의 지표 401, 전달 헤더 위장 차단, 내부 지표 200과 불필요한 관리 경로 403을 확인했다.
+
+실제 Cognito callback을 300초 동안 받지 못해 전체 실행은 통과하지 못했다. 실제 access token의 첫·반복 `/me`, 서명 변조·ID token 거부, 인증 후 지표 미노출·지표 증가 검사는 **아직 실행하지 않았다**. 이전 버전의 로그인 성공을 새 이미지의 결과로 대체하지 않는다.
+
+시험 컨테이너·네트워크·임시 사용자 데이터는 정리됐고, 실행 전후 기존 컨테이너 16개·네트워크 5개·볼륨 7개의 식별자 집합이 일치했다. 다른 채팅의 8765 화면과 LambdaOps 저장소는 수정하지 않았다. ECR 게시·AWS 서버 생성·CloudWatch 발행은 하지 않았다. [기존 Boot 4 기록의 후속 실행 결과](../../../docs/observability/results/2026-10-29-boot4-security-remediation.json)를 따른다. 다음 실제 로그인 시 새 PKCE 대기 세션으로 재실행한다.
+
+### 2026-10-28 이전 API의 실제 로그인 검증
+
 2026-10-28 기존 웹 client의 code+PKCE 로그인과 **실제 Cognito → 로컬 personal API → 임시 PostgreSQL 16** 경로를 확인했다. API의 서명·발급자·만료·client·토큰 종류 검증은 그대로 사용했다. 비밀번호는 Cognito 화면에서 입력했으며 토큰은 프로세스 메모리로만 다루고 파일·명령 인자·공개 결과에 남기지 않았다.
 
 | 확인 항목 | 결과 |
