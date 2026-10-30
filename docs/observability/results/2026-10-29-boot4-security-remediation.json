@@ -2650,9 +2650,9 @@
     "deployment_image_selection_promoted": false,
     "existing_developer_database_modified": false
   },
-  "release_status": "Local Boot4 candidate functional and runtime-image scan checks passed; actual Cognito/AWS validation and deployment selection still pending",
+  "release_status": "Boot4 candidate passed 40/40 actual Cognito/local metrics separation checks on 2026-10-30; API ECR publication, AWS validation and deployment selection remain pending. Original scan and synthetic runtime records retain their original scope.",
   "remaining_separate_items": [
-    "DB fault-tool historical High4 not rescanned or resolved",
+    "API ECR publication and AWS runtime validation pending; DB fault-tool High4 remediation and ECR scan are recorded separately in 2026-10-29-db-tool-deployment-review.json",
     "Past AWS2.05s request root cause still unverified",
     "Original PostgreSQL16 data migration not performed",
     "Build-plugin/codegen classpath not included in image vulnerability scan"
@@ -3044,5 +3044,433 @@
       "gradle_dependency_inventory": "b7d8658231faa0fd0a798bbaa5950fb51621fb780fc5f887a30007fd11504a38",
       "candidate_source_hash_inventory": "d88851987bd870135c851eaa02a1dd72c077e0097a0c7071520caef69faa5439"
     }
-  }
+  },
+  "actual_cognito_local_attempts": [
+    {
+      "classification": "INCOMPLETE_LOGIN_NOT_RECEIVED_WITHIN_WAIT_WINDOW",
+      "actual_cognito_verified": false,
+      "preflight": {
+        "recorded_at_utc": "2026-10-29T03:06:26.101589+00:00",
+        "source_commit": "06dfc1a5c06e181c2e69db68a9eab65599404cf2",
+        "harness_sha256": "c8958415ca54a0821584c46d91c47d8410c36e4a54a4b2c309ffacd67eba3e1a",
+        "operator_helper_unit_tests": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0
+        },
+        "cognito_read_only_preflight": {
+          "discovery_200": true,
+          "issuer_matches": true,
+          "registered_callback_5173": true,
+          "code_flow": true,
+          "required_web_scopes": true,
+          "public_client": true,
+          "configuration_changed": false
+        },
+        "coordination": {
+          "other_chat": "capstone-구현-설계2",
+          "other_chat_status_at_start": "idle",
+          "existing_frontend_port_8765_untouched": true,
+          "pen_frontend_lambdaops_not_modified": true
+        },
+        "pre_execution_review": "main and independent runtime reviewer approved local verification boundaries; no AWS deployment authorized"
+      },
+      "execution": {
+        "at": "2026-10-29T03:04:29.445094+00:00",
+        "scope": "Actual Cognito login with local personal API and disposable DB/cache",
+        "image_id": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+        "tested_image_tag": "slash-personal-api:m2-20261029-boot412",
+        "postgresql_major": 18,
+        "profile": "personal",
+        "aws_servers_created": false,
+        "cloudwatch_enabled": false,
+        "aws_credentials_in_container": false,
+        "host_api_or_db_ports_published": false,
+        "checks": [
+          {
+            "case": "expected_api_image_matches",
+            "passed": true
+          },
+          {
+            "case": "personal_api_health",
+            "passed": true
+          },
+          {
+            "case": "no_api_host_ports",
+            "passed": true
+          },
+          {
+            "case": "empty_disposable_users_table",
+            "passed": true
+          },
+          {
+            "case": "exact_runtime_image",
+            "passed": true
+          },
+          {
+            "case": "api_non_root",
+            "passed": true
+          },
+          {
+            "case": "api_read_only_and_restricted",
+            "passed": true
+          },
+          {
+            "case": "api_tmpfs_only_no_host_mounts",
+            "passed": true
+          },
+          {
+            "case": "real_auth_only_cloudwatch_and_faults_disabled",
+            "passed": true
+          },
+          {
+            "case": "no_aws_credentials_in_api",
+            "passed": true
+          },
+          {
+            "case": "network_private_boundary",
+            "passed": true
+          },
+          {
+            "case": "network_outbound_boundary",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_pg",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_cache",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_observer",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_api",
+            "passed": true
+          },
+          {
+            "case": "postgres18_runtime",
+            "passed": true
+          },
+          {
+            "case": "missing_token",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "local_fake_token",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "metrics_not_public_on_app_port",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "forwarded_headers_do_not_expose_metrics",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "internal_management_metrics",
+            "passed": true,
+            "actual_status": 200
+          },
+          {
+            "case": "other_management_endpoints_denied",
+            "passed": true,
+            "actual_status": 403
+          },
+          {
+            "case": "metrics_baseline_available",
+            "passed": true
+          }
+        ],
+        "status": "FAIL",
+        "failure_stage": "interactive Cognito login",
+        "error_type": "RuntimeError",
+        "cleanup_checks": {
+          "owned_container_and_network_absence": true,
+          "owned_volumes_absent": true,
+          "login_url_removed": true
+        },
+        "cleanup": "completed",
+        "token_saved_to_disk": false,
+        "temporary_user_data_destroyed": true,
+        "limits": [
+          "Local HTTP on an isolated Docker network, not AWS ingress/RDS TLS validation.",
+          "No ECS/RDS/ALB servers created, no fault trial or CloudWatch metric publication.",
+          "No check of a genuinely expired token or another signed client token in this run.",
+          "Cognito email verification attribute is not changed or assumed verified."
+        ]
+      },
+      "independent_cleanup_review": {
+        "checked_at_utc": "2026-10-29T03:10:47.213769+00:00",
+        "checks": {
+          "containers": {
+            "before": 16,
+            "after": 16,
+            "existing_preserved": true,
+            "same_set": true
+          },
+          "networks": {
+            "before": 5,
+            "after": 5,
+            "existing_preserved": true,
+            "same_set": true
+          },
+          "volumes": {
+            "before": 7,
+            "after": 7,
+            "existing_preserved": true,
+            "same_set": true
+          },
+          "p002_residual_containers": 0,
+          "p002_residual_networks": 0
+        }
+      },
+      "evidence_sha256": {
+        "check.py": "c8958415ca54a0821584c46d91c47d8410c36e4a54a4b2c309ffacd67eba3e1a",
+        "preflight.json": "5248d0d60b80742d7b035487dc1b71839cf5eca2d597054dd4228485e7c56518",
+        "result.json": "6315760534dcc7193737328a37f1f67d3807014f87bde32f76c49c241725e330",
+        "cleanup-review.json": "721eefe64cbce8de6e6aa3559ec0f4413a4f1f4fa7d665052b952fea52aa0792"
+      },
+      "interpretation": "All 24 pre-login checks passed. No real token was available before the 300-second login wait ended. Authenticated API and post-login metrics checks were not executed; this is not a passing real-Cognito verification.",
+      "repository_changes": "Evidence/docs only; application, Terraform and operator auth.py unchanged. No ECR publication or AWS resource mutation."
+    },
+    {
+      "classification": "PASS_REAL_COGNITO_BOOT4_20261030",
+      "actual_cognito_verified": true,
+      "execution": {
+        "at": "2026-10-30T04:01:39.567386+00:00",
+        "scope": "Actual Cognito login with local personal API and disposable DB/cache",
+        "image_id": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+        "tested_image_tag": "slash-personal-api:m2-20261029-boot412",
+        "postgresql_major": 18,
+        "profile": "personal",
+        "aws_servers_created": false,
+        "cloudwatch_enabled": false,
+        "aws_credentials_in_container": false,
+        "host_api_or_db_ports_published": false,
+        "checks": [
+          {
+            "case": "expected_api_image_matches",
+            "passed": true
+          },
+          {
+            "case": "personal_api_health",
+            "passed": true
+          },
+          {
+            "case": "no_api_host_ports",
+            "passed": true
+          },
+          {
+            "case": "empty_disposable_users_table",
+            "passed": true
+          },
+          {
+            "case": "exact_runtime_image",
+            "passed": true
+          },
+          {
+            "case": "api_non_root",
+            "passed": true
+          },
+          {
+            "case": "api_read_only_and_restricted",
+            "passed": true
+          },
+          {
+            "case": "api_tmpfs_only_no_host_mounts",
+            "passed": true
+          },
+          {
+            "case": "real_auth_only_cloudwatch_and_faults_disabled",
+            "passed": true
+          },
+          {
+            "case": "no_aws_credentials_in_api",
+            "passed": true
+          },
+          {
+            "case": "network_private_boundary",
+            "passed": true
+          },
+          {
+            "case": "network_outbound_boundary",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_pg",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_cache",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_observer",
+            "passed": true
+          },
+          {
+            "case": "no_host_ports_api",
+            "passed": true
+          },
+          {
+            "case": "postgres18_runtime",
+            "passed": true
+          },
+          {
+            "case": "missing_token",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "local_fake_token",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "metrics_not_public_on_app_port",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "forwarded_headers_do_not_expose_metrics",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "internal_management_metrics",
+            "passed": true,
+            "actual_status": 200
+          },
+          {
+            "case": "other_management_endpoints_denied",
+            "passed": true,
+            "actual_status": 403
+          },
+          {
+            "case": "metrics_baseline_available",
+            "passed": true
+          },
+          {
+            "case": "real_web_client_access_token_received",
+            "passed": true
+          },
+          {
+            "case": "access_token_requires_userinfo_for_email",
+            "passed": true
+          },
+          {
+            "case": "real_cognito_me_first",
+            "passed": true,
+            "actual_status": 200
+          },
+          {
+            "case": "profile_shape_and_userinfo_email",
+            "passed": true
+          },
+          {
+            "case": "first_request_creates_one_local_user",
+            "passed": true
+          },
+          {
+            "case": "real_cognito_me_repeat",
+            "passed": true,
+            "actual_status": 200
+          },
+          {
+            "case": "tampered_signature",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "id_token_used_as_access",
+            "passed": true,
+            "actual_status": 401
+          },
+          {
+            "case": "authenticated_app_port_has_no_metrics_endpoint",
+            "passed": true,
+            "actual_status": 404
+          },
+          {
+            "case": "management_port_does_not_serve_me",
+            "passed": true,
+            "actual_status": 403
+          },
+          {
+            "case": "authenticated_forwarded_headers_do_not_expose_metrics",
+            "passed": true,
+            "actual_status": 404
+          },
+          {
+            "case": "management_business_route_unauthenticated_denied",
+            "passed": true,
+            "actual_status": 403
+          },
+          {
+            "case": "valid_token_still_works_after_negative_checks",
+            "passed": true,
+            "actual_status": 200
+          },
+          {
+            "case": "internal_metrics_available_after_requests",
+            "passed": true
+          },
+          {
+            "case": "http_server_requests_seconds_count_increased_with_expected_tags",
+            "passed": true,
+            "before": 4.0,
+            "after": 11.0
+          },
+          {
+            "case": "slash_db_query_seconds_count_increased_with_expected_tags",
+            "passed": true,
+            "before": 0.0,
+            "after": 20.0
+          }
+        ],
+        "status": "PASS",
+        "real_cognito_userinfo_path": "First request on empty DB using access token without email returned profile matching real Cognito ID token; unmodified API uses HTTPS userInfo.",
+        "cleanup_checks": {
+          "owned_container_and_network_absence": true,
+          "owned_volumes_absent": true,
+          "login_url_removed": true
+        },
+        "cleanup": "completed",
+        "token_saved_to_disk": false,
+        "temporary_user_data_destroyed": true,
+        "limits": [
+          "Local HTTP on an isolated Docker network, not AWS ingress/RDS TLS validation.",
+          "No ECS/RDS/ALB servers created, no fault trial or CloudWatch metric publication.",
+          "No check of a genuinely expired token or another signed client token in this run.",
+          "Cognito email verification attribute is not changed or assumed verified."
+        ]
+      },
+      "independent_cleanup_review": {
+        "checked_at_utc": "2026-10-30T04:03:16.162958+00:00",
+        "checks": {
+          "containers_remaining": 0,
+          "networks_remaining": 0,
+          "callback_stopped": true,
+          "login_url_removed": true,
+          "all_40_checks_pass": true
+        }
+      },
+      "evidence_sha256": {
+        "check.py": "bba41036dafb78eb3260b6c44cd11f1d2c0826f7fb905f332495ac55c6b0bf47",
+        "result.json": "cc830b5b3f47cbe4700c6025df9163d99f3b5d787b1b03b70f931456be3613b6",
+        "cleanup-review.json": "8fe7c82a0f3adcda2ec7ee2ffd9aad8f8c54166841043b422285702a4352dddb"
+      },
+      "interpretation": "40/40 actual Cognito and local isolation/metrics checks passed. No application code/image changed. ECR publication, AWS ingress/RDS TLS, CloudWatch publication and Alarm/M3 end-to-end remain unverified for this candidate."
+    }
+  ],
+  "original_boundaries_scope": "boundaries and runtime_smoke describe the original conversion run; actual_cognito_local_attempts records the later real-login attempts."
 }
