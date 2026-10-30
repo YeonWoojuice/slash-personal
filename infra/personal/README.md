@@ -1,6 +1,6 @@
 # 일회성 AWS 테스트 환경
 
-2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 새 이미지는 ECR 게시·Basic 검사에서 검출 0건을 확인했다. 새 Boot 4 API는 2026-10-30 로컬 실제 Cognito 로그인·지표 분리 40/40 검사를 통과했다. API ECR 게시와 최종 전체 배포 계획은 남아 있다. 장애 시험·세 Alarm 전이·M3 종단 검증은 미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
+2026-10-29 기준. 첫 AWS 시험에서 실제 Cognito·HTTPS API 검증 17개, 정상 요청 91회 모두 200, CloudWatch 지표 6종 수신을 확인했다. 후속 단계별 요청 시험은 **0.5·1·2 rps 단계를 완료했으나, 5 rps 단계에서 응답 1건이 2초 기준을 넘어 안전 중단**됐다. 정상 요청 관찰 709회는 모두 HTTP 200이지만 전체 시험은 FAIL이며 마지막 단계와 사후 조회가 미완료다. 02:30 KST 최종 조회 59/59를 통과해 재시험용 자원 정리를 확인했다. Terraform 관리 자원은 0개다. Cognito·ECR foundation과 기존 LambdaOps는 유지한다. DB 장애 도구의 새 이미지는 ECR 게시·Basic 검사에서 검출 0건을 확인했다. 새 Boot 4 API는 2026-10-30 로컬 실제 Cognito 로그인·지표 분리 40/40 검사를 통과했다. API 이미지는 2026-10-30 ECR 게시와 재검사까지 완료했으며, 최종 전체 배포 계획은 남아 있다. 장애 시험·세 Alarm 전이·M3 종단 검증은 미검증 상태다. 기존 팀 환경과 `infra/reference`의 state는 사용하지 않는다.
 
 ## 구성과 수명
 
@@ -374,3 +374,9 @@ foundation 생성과 실제 Cognito code+PKCE 로그인을 확인했다. 활성�
 Slash의 REST API→VPC Link V2→내부 ALB→ECS·RDS 경로에서 정상 로그인·요청과 지표 수신을 검증했다. 비허용 IP의 실제 차단, 세 Alarm의 ALARM/OK 전이, 장애 시험, M3 이벤트 처리와 실제 Incident 상세 200은 미검증이다. 로컬 21개·첫 AWS 17개·후속 단계별 시험 15/17 결과는 서로 다른 실행 근거이며 혼합해 집계하지 않는다. M2·M3는 아직 In Progress다.
 
 공식 근거: [REST/HTTP 기능 비교](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html), [VPC Link V2와 ALB](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html), [stage 전달](https://docs.aws.amazon.com/apigateway/latest/developerguide/private-integration.html), [ALB URL rewrite](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-transforms.html), [IP 정책](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html), [Cognito 기본 domain](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html), [API Gateway 요금](https://aws.amazon.com/api-gateway/pricing/).
+
+## Boot 4 API ECR 게시·재검사 — 2026-10-30
+
+실제 Cognito·로컬 지표 분리 40/40 검사를 통과한 API 이미지를 재빌드 없이 `m2-20261030-boot412-cognito1` 태그로 게시했다. manifest `sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b`와 config는 로컬 검증 이미지와 일치한다. 최신 데이터로 다시 수행한 Trivy 0.76.1 검사는 OS 73·Java 151개 패키지에서 검출 0건이다. ECR Basic도 15:08:19 KST COMPLETE·검출 0건이며 이는 OS 패키지 검사 범위다. 임시 ECR 인증 파일은 제거했다.
+
+[기존 Boot 4 검증 기록](../../docs/observability/results/2026-10-29-boot4-security-remediation.json)에 게시·검사 근거를 추가했다. 기존 이미지 선택 기록에서 API 참조만 새 digest로 갱신했으며 Terraform 입력은 바꾸지 않았다. 최종 전체 배포 계획·실제 AWS 실행·과거 2.05초 원인 확인은 남아 있다. 서버 생성·apply·ECS 작업 실행·장애 시험은 수행하지 않았다.

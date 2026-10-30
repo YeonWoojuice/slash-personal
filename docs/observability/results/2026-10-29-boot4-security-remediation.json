@@ -2650,7 +2650,7 @@
     "deployment_image_selection_promoted": false,
     "existing_developer_database_modified": false
   },
-  "release_status": "Boot4 candidate passed 40/40 actual Cognito/local metrics separation checks on 2026-10-30; API ECR publication, AWS validation and deployment selection remain pending. Original scan and synthetic runtime records retain their original scope.",
+  "release_status": "Boot4 actual Cognito/local metrics verification 40/40 passed, exact image published to ECR, fresh Trivy OS73/Java151 and ECR Basic scans completed with zero findings. AWS runtime, final Terraform plan and deployment approval remain pending.",
   "remaining_separate_items": [
     "API ECR publication and AWS runtime validation pending; DB fault-tool High4 remediation and ECR scan are recorded separately in 2026-10-29-db-tool-deployment-review.json",
     "Past AWS2.05s request root cause still unverified",
@@ -3472,5 +3472,93 @@
       "interpretation": "40/40 actual Cognito and local isolation/metrics checks passed. No application code/image changed. ECR publication, AWS ingress/RDS TLS, CloudWatch publication and Alarm/M3 end-to-end remain unverified for this candidate."
     }
   ],
-  "original_boundaries_scope": "boundaries and runtime_smoke describe the original conversion run; actual_cognito_local_attempts records the later real-login attempts."
+  "original_boundaries_scope": "boundaries and runtime_smoke describe the original conversion run; actual_cognito_local_attempts records the later real-login attempts.",
+  "ecr_publication_followup_20261030": {
+    "publication": {
+      "at_utc": "2026-10-30T06:08:10.797180+00:00",
+      "source_commit": "3c11a99db2502573e6446a946bb17cdcbaad26d9",
+      "repository_uri": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api",
+      "tag": "m2-20261030-boot412-cognito1",
+      "image_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+      "manifest_digest": "sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+      "config_digest": "sha256:cc99492a1aa513fb5363da4c4b60cd058986e53b942ade323f34596c3a70cc41",
+      "platform": "linux/amd64",
+      "size_bytes": 132762194,
+      "local_manifest_matches_remote": true,
+      "local_config_matches_remote": true,
+      "scan_type": "BASIC",
+      "scan_on_push": true,
+      "scan_status": "COMPLETE",
+      "temporary_registry_credential_removed": true,
+      "runtime_resources_created": false,
+      "terraform_apply": false,
+      "task_run": false,
+      "scan_counts": {},
+      "scan_pages": 1,
+      "scan_finding_count": 0,
+      "image_scan_completed_at": "2026-10-30T15:08:19+09:00",
+      "vulnerability_source_updated_at": "2026-10-30T15:08:19+09:00",
+      "scan_result_read_at_utc": "2026-10-30T06:08:38.068964+00:00"
+    },
+    "ecr_basic_scan": {
+      "status": {
+        "status": "COMPLETE",
+        "description": "The scan was completed successfully."
+      },
+      "counts": {},
+      "scope": "ECR Basic OS packages, not Java library coverage"
+    },
+    "local_rescan": {
+      "scanner": {
+        "Version": "0.76.1"
+      },
+      "created_at": "2026-10-30T06:06:49.374823388Z",
+      "image_config": "sha256:cc99492a1aa513fb5363da4c4b60cd058986e53b942ade323f34596c3a70cc41",
+      "inventory": [
+        {
+          "type": "alpine",
+          "packages": 73,
+          "findings": 0
+        },
+        {
+          "type": "jar",
+          "packages": 151,
+          "findings": 0
+        }
+      ],
+      "scope": "Runtime image OS and Java packages; freshly downloaded vulnerability and Java databases",
+      "report_sha256": "6ec90d927581139984c2a8ee409b39ab48e2907024dc25a69a3732809c6c5c18",
+      "database_metadata": {
+        "vulnerability": {
+          "Version": 2,
+          "NextUpdate": "2026-10-31T01:01:11.134359572Z",
+          "UpdatedAt": "2026-10-30T01:01:11.134360213Z",
+          "DownloadedAt": "2026-10-30T06:04:56.981513086Z"
+        },
+        "java": {
+          "Version": 1,
+          "NextUpdate": "2026-11-02T00:58:38.959786014Z",
+          "UpdatedAt": "2026-10-30T00:58:38.959786515Z",
+          "DownloadedAt": "2026-10-30T06:06:48.629867221Z"
+        }
+      }
+    },
+    "final_review": {
+      "verified_at_utc": "2026-10-30T06:09:41.752658+00:00",
+      "tested_and_published_manifest_match": true,
+      "scanned_and_published_config_match": true,
+      "ecr_scan_complete_zero": true,
+      "local_os_java_zero": true,
+      "temporary_registry_credential_removed": true,
+      "raw_report_sha256": "6ec90d927581139984c2a8ee409b39ab48e2907024dc25a69a3732809c6c5c18"
+    },
+    "boundaries": {
+      "aws_runtime_servers_created": false,
+      "terraform_apply": false,
+      "ecs_task_execution": false,
+      "cognito_changed": false,
+      "deployment_inputs_changed": false,
+      "image_rebuilt": false
+    }
+  }
 }

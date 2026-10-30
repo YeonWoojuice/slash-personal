@@ -755,7 +755,7 @@
     "grafana": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/grafana@sha256:8b4387da54c607dc01a1210a12f593a65ce7ee675bbe5387d3852a1f0bb811de",
     "prometheus": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/prometheus@sha256:fca63956ad481fde72a8505361de1dc5e1907ca49bcbd3e326336fb918001617",
     "db-test": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/db-test@sha256:82b02a988204e1b463dace5e32b1c5c4155db19ea07e2164e025fc2efc01ba84",
-    "api": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735"
+    "api": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b"
   },
   "latency_image_followup": {
     "at": "2026-10-28T23:52:45.115813+00:00",
@@ -791,7 +791,7 @@
     "existing_selection_preserved": true,
     "old_api_not_a_verified_java_security_fallback": true
   },
-  "current_image_selection_status": "Historical AWS image selection only. New Boot4 image passed local runtime and image scan checks but has not been published to ECR or verified against actual Cognito/AWS.",
+  "current_image_selection_status": "Verified published candidates for future deployment-plan review. API Boot4 actual Cognito/local metrics 40/40, fresh Trivy OS/Java zero and ECR Basic zero on 2026-10-30. No Terraform deployment inputs or AWS runtime were changed.",
   "java_security_remediation_followup": {
     "recorded_at_utc": "2026-10-29T00:37:08.869660+00:00",
     "local_candidate": {
@@ -921,5 +921,13 @@
     "api_selection_changed": false,
     "apply": false,
     "run_task": false
+  },
+  "boot4_ecr_followup_20261030": {
+    "tag": "m2-20261030-boot412-cognito1",
+    "reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b",
+    "previous_api_reference": "642935793048.dkr.ecr.ap-northeast-2.amazonaws.com/slash-lab/api@sha256:c834b04c5a5cf51ed13ec073f234428ff526dff9ff86314c2c4ee09f1cf96735",
+    "evidence": "2026-10-29-boot4-security-remediation.json#ecr_publication_followup_20261030",
+    "other_image_selections_unchanged": true,
+    "terraform_inputs_changed": false
   }
 }
