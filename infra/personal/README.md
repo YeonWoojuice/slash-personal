@@ -377,6 +377,16 @@ Slash의 REST API→VPC Link V2→내부 ALB→ECS·RDS 경로에서 정상 로�
 
 ## Boot 4 API ECR 게시·재검사 — 2026-10-30
 
+최신 PostgreSQL 버전 고정과 실행 준비 승인은 아래 `승인된 PostgreSQL 18.6 기준선 설정` 절을 따른다. 앞선 기본 18.3·버전 미고정 설명은 당시 기록이다.
+
 실제 Cognito·로컬 지표 분리 40/40 검사를 통과한 API 이미지를 재빌드 없이 `m2-20261030-boot412-cognito1` 태그로 게시했다. manifest `sha256:99575923af1d78a6d7cc54f461072a0a1347b9c2ae441538f93f3e6ecd39256b`와 config는 로컬 검증 이미지와 일치한다. 최신 데이터로 다시 수행한 Trivy 0.76.1 검사는 OS 73·Java 151개 패키지에서 검출 0건이다. ECR Basic도 15:08:19 KST COMPLETE·검출 0건이며 이는 OS 패키지 검사 범위다. 임시 ECR 인증 파일은 제거했다.
 
 [기존 Boot 4 검증 기록](../../docs/observability/results/2026-10-29-boot4-security-remediation.json)에 게시·검사 근거를 추가했다. 기존 이미지 선택 기록에서 API 참조만 새 digest로 갱신했으며 Terraform 입력은 바꾸지 않았다. 최종 전체 배포 계획·실제 AWS 실행·과거 2.05초 원인 확인은 남아 있다. 서버 생성·apply·ECS 작업 실행·장애 시험은 수행하지 않았다.
+
+## 승인된 PostgreSQL 18.6 기준선 설정 — 2026-10-30
+
+사용자가 정상 기준선의 PostgreSQL `18.6` 명시 고정, `auto_minor_version_upgrade=false`, `allow_major_version_upgrade=false` 설정안을 승인했다. 기존 로컬 Boot 4·jOOQ·Flyway 이미지 검증과 같은 버전을 선택하며, 서울 RDS에서 `db.t4g.small`·20GB gp3의 18.6 제공 여부를 읽기 확인했다. API·관측 이미지 digest, DB 사양과 접근 경계는 유지한다. API JDBC의 `sslmode=require`는 암호화를 요구하며 CA·호스트명 `verify-full` 검증까지 입증한 것은 아니다. 이 설정은 짧은 합성 데이터 시험의 재현성을 위한 것으로 장기 운영의 보안 패치 정책이 아니며 AWS의 필수 업그레이드까지 영구 차단하지 않는다.
+
+준비 일정과 예산은 2026-10-31 13:00~18:00 KST, 생성부터 삭제 완료까지 5시간 이내·추가 $5로 승인됐다. 늦게 시작해도 18:00 종료 시각을 연장하지 않는다. 이는 **설정 PR과 최종 계획 준비 승인**이며 AWS 배포·이미지 게시·부하/장애 시험이나 삭제 실행 승인이 아니다. 종료 태그는 자동 삭제 기능이 아니다. 실제 실행 전에 담당자·로그인·현재 시험 IP `/32`·계정·소스·상태와 종료 절차를 다시 확인하고 별도 배포 승인을 받는다.
+
+최종 saved plan은 비공개 입력과 원래 personal experiment의 canonical local state를 명시해 생성한다. 실행 전 source commit·계획 hash·상태 불변 여부를 대조하며 적용 결과는 같은 canonical state에 보존한다. 다른 worktree의 빈 기본 state나 기존 검토용 사본 계획으로 배포하지 않는다. 별도 승인 후 적용할 때도 local backend의 `-state` 경로를 명시하고 작업 폴더 기본 state에 쓰지 않았는지 확인한다. 배포 후 정리는 실제 state의 새 destroy 계획과 별도 승인으로 진행하며 Cognito·ECR foundation과 LambdaOps는 보존한다.
